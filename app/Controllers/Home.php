@@ -2,25 +2,24 @@
 
 namespace App\Controllers;
 
+use App\Models\SekolahModel;
+
 class Home extends BaseController
 {
-    // Halaman Utama (URL: /)
-    public function index(): string
+    protected $sekolahModel;
+
+    public function __construct()
     {
-        // Anda bisa mengarahkan ke landing page atau peta
-        return view('maps');
+        $this->sekolahModel = new SekolahModel();
     }
 
-    // Halaman Peta (URL: /maps)
-    public function maps(): string
+    public function index()
     {
-        $data['sekolah'] = []; // Tempatkan data sekolah Anda di sini nanti
-        return view('maps', $data);
-    }
-
-    // Halaman Full Maps (URL: /fullmaps)
-    public function fullmaps(): string
-    {
-        return view('fullmaps');
+        $data = [
+            'title' => 'Peta Sebaran Sekolah | WebGIS Publik',
+            // Mengambil semua baris data spasial dari database
+            'sekolah_list' => $this->sekolahModel->findAll()
+        ];
+        return view('maps', $data); // Berkas maps Anda di halaman depanpublik
     }
 }

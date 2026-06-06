@@ -1,0 +1,60 @@
+/* Styling khusus agar Card Sekolah terlihat premium */
+.school-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 12px;
+}
+
+.school-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.badge-jenjang {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.school-img {
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Kustomisasi Landing Page & Tata Letak */
+.hero-section {
+    padding: 40px 0 60px 0;
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 60%);
+}
+
+.stat-card {
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+#preview-map {
+    height: 400px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #e5e7eb;
+}
+
+.scroll-margin {
+    scroll-margin-top: 100px;
+}

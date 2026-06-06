@@ -112,13 +112,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="#peta-section">
-                            <i class="fa-solid fa-earth-asia me-1"></i> Peta Interaktif
+                        <a class="nav-link nav-link-custom" href="#statistik-section">
+                            <i class="fa-solid fa-chart-simple me-1"></i> Statistik
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="#statistik-section">
-                            <i class="fa-solid fa-chart-simple me-1"></i> Statistik
+                        <a class="nav-link nav-link-custom" href="#peta-section">
+                            <i class="fa-solid fa-earth-asia me-1"></i> Peta Interaktif
                         </a>
                     </li>
                 </ul>

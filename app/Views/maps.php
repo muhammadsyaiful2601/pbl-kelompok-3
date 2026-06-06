@@ -1,68 +1,8 @@
 <?= $this->extend('layout/template_publik') ?>
 
 <?= $this->section('styles') ?>
-<style>
-    /* Styling khusus agar Card Sekolah terlihat premium */
-    .school-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border: none;
-        border-radius: 12px;
-    }
-
-    .school-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .badge-jenjang {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        font-size: 0.8rem;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-weight: 600;
-        z-index: 10;
-    }
-
-    .school-img {
-        height: 180px;
-        object-fit: cover;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-    }
-
-    /* Kustomisasi Landing Page & Tata Letak */
-    .hero-section {
-        padding: 40px 0 60px 0;
-        background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 60%);
-    }
-
-    .stat-card {
-        border: none;
-        border-radius: 16px;
-        background: #ffffff;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
-    }
-
-    #preview-map {
-        height: 400px;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        background-color: #e5e7eb;
-    }
-
-    .scroll-margin {
-        scroll-margin-top: 100px;
-    }
-</style>
+<link rel="stylesheet" href="<?= base_url('assets/css/style-publik.css') ?>">
+<link class="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -88,8 +28,26 @@
                 </a>
             </div>
         </div>
-        <div class="col-lg-6 text-center">
-            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1000&auto=format&fit=crop" class="img-fluid rounded-4 shadow-lg" alt="Peta Pendidikan" style="max-height: 380px; width: 100%; object-fit: cover;">
+
+        <div class="col-lg-6">
+            <div class="search-list-container">
+                <div class="search-box-wrapper">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="searchSchoolInput" class="form-select border-start-0 ps-0" placeholder="Cari nama atau alamat sekolah..." style="box-shadow: none; border-color: #dee2e6;">
+                    </div>
+                    <div class="btn-group w-100 shadow-sm p-1 bg-white rounded-3 border" role="group">
+                        <button type="button" class="btn btn-sm btn-light active rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('semua', this)">Semua</button>
+                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SD', this)">SD</button>
+                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
+                    </div>
+                </div>
+                <div class="school-list-group" id="schoolSearchList">
+                    <div class="text-center text-muted py-4 small">Memuat data sekolah...</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -173,138 +131,46 @@
         </div>
     </section>
 
-    <hr class="my-5 opacity-25">
-
-    <section class="mb-5">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-            <div>
-                <h3 class="fw-bold mb-1">Daftar Lembaga Sekolah</h3>
-                <p class="text-muted mb-0 small">Menampilkan cuplikan data sekolah aktif jenjang pendidikan dasar</p>
-            </div>
-
-            <div class="btn-group shadow-sm p-1 bg-white rounded-3 border" role="group">
-                <button type="button" class="btn btn-sm btn-light active rounded-2 px-3 py-2 fw-semibold" onclick="filterSekolah('semua')">Semua</button>
-                <button type="button" class="btn btn-sm btn-light rounded-2 px-3 py-2 fw-semibold" onclick="filterSekolah('SD')">SD</button>
-                <button type="button" class="btn btn-sm btn-light rounded-2 px-3 py-2 fw-semibold" onclick="filterSekolah('SMP')">SMP</button>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4 item-sekolah" data-jenjang="SD">
-                <div class="card school-card shadow-sm h-100 position-relative bg-white">
-                    <span class="badge bg-success badge-jenjang">SD NEGERI</span>
-                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=500" class="card-img-top school-img" alt="SDN 01">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-2 text-dark">SDN 01 Kota Utama</h5>
-                        <p class="card-text text-muted small flex-grow-1"><i class="fa-solid fa-map-marker-alt me-2 text-danger"></i>Jl. Pendidikan No. 45, Kecamatan Pusat</p>
-                        <div class="border-top pt-3 mt-2 d-flex justify-content-between text-muted small fw-medium">
-                            <span><i class="fa-solid fa-users me-1 text-primary"></i> 320 Siswa</span>
-                            <span>Akreditasi <strong class="text-success">A</strong></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-4 item-sekolah" data-jenjang="SMP">
-                <div class="card school-card shadow-sm h-100 position-relative bg-white">
-                    <span class="badge bg-primary badge-jenjang">SMP NEGERI</span>
-                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=500" class="card-img-top school-img" alt="SMPN 03">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-2 text-dark">SMP Negeri 3 Unggulan</h5>
-                        <p class="card-text text-muted small flex-grow-1"><i class="fa-solid fa-map-marker-alt me-2 text-danger"></i>Jl. Merdeka Barat No. 12, Wilayah Utara</p>
-                        <div class="border-top pt-3 mt-2 d-flex justify-content-between text-muted small fw-medium">
-                            <span><i class="fa-solid fa-users me-1 text-primary"></i> 512 Siswa</span>
-                            <span>Akreditasi <strong class="text-success">A</strong></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-4 item-sekolah" data-jenjang="SD">
-                <div class="card school-card shadow-sm h-100 position-relative bg-white">
-                    <span class="badge bg-success badge-jenjang">SD NEGERI</span>
-                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500" class="card-img-top school-img" alt="SDN 05">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold mb-2 text-dark">SDN 05 Merdeka Sejahtera</h5>
-                        <p class="card-text text-muted small flex-grow-1"><i class="fa-solid fa-map-marker-alt me-2 text-danger"></i>Jl. Jenderal Sudirman Km. 3, Sektor Timur</p>
-                        <div class="border-top pt-3 mt-2 d-flex justify-content-between text-muted small fw-medium">
-                            <span><i class="fa-solid fa-users me-1 text-primary"></i> 180 Siswa</span>
-                            <span>Akreditasi <strong class="text-warning">B</strong></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
 </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-    // Fungsi untuk memfilter Card
-    function filterSekolah(jenjang) {
-        const items = document.querySelectorAll('.item-sekolah');
-        const buttons = document.querySelectorAll('.btn-group .btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-
-        if (event && event.target) {
-            event.target.classList.add('active');
-        }
-
-        items.forEach(item => {
-            if (jenjang === 'semua') {
-                item.style.display = 'block';
-            } else {
-                if (item.getAttribute('data-jenjang').toLowerCase() === jenjang.toLowerCase()) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // Atur koordinat default (Ganti dengan koordinat wilayah pusat Dinas Pendidikan Anda)
-        var map = L.map('preview-map').setView([-0.941, 100.370], 12);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Menerima data dinamis dari Controller PHP
-        var dataSekolah = <?= json_encode($sekolah ?? []) ?>;
-
-        // Looping data marker otomatis dari database
-        dataSekolah.forEach(function(school) {
-            // Sesuaikan properti ini jika penamaan field di database Anda berbeda
-            var latitude = school.latitude || school.lat;
-            var longitude = school.longitude || school.lng;
-            var namaSekolah = school.nama_sekolah || school.name;
-            var alamatSekolah = school.alamat || school.addr;
-            var jenjangSekolah = school.jenjang || school.type || 'SD';
-
-            if (latitude && longitude) {
-                var marker = L.marker([latitude, longitude]).addTo(map);
-
-                var badgeColor = jenjangSekolah.toLowerCase() === 'sd' ? 'bg-success' : 'bg-primary';
-
-                marker.bindPopup(`
-                    <div style="min-width: 160px;">
-                        <span class="badge ${badgeColor} mb-1">${jenjangSekolah.toUpperCase()}</span>
-                        <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">${namaSekolah}</h6>
-                        <p class="text-muted small mb-0" style="font-size: 0.8rem;">
-                            <i class="fa-solid fa-map-marker-alt text-danger me-1"></i> ${alamatSekolah}
-                        </p>
-                    </div>
-                `);
-            }
-        });
-
-        setTimeout(function() {
-            map.invalidateSize();
-        }, 300);
-    });
+    /* Menyediakan data database ke global runtime javascript */
+    window.sekolahData = <?= json_encode($sekolah ?? []) ?>;
 </script>
+
+<script>
+    // Inisialisasi Peta Utama Publik
+    var map = L.map('map_publik').setView([-0.4795, 100.6274], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // MENCETAK DATA DARI DATABASE SECARA DINAMIS
+    <?php if (!empty($sekolah_list)): ?>
+        <?php foreach ($sekolah_list as $sk): ?>
+
+            <?php if ($sk['tipe_objek'] == 'marker' && !empty($sk['latitude'])): ?>
+                // Render Objek Titik (Marker)
+                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>])
+                    .addTo(map)
+                    .bindPopup("<b><?= $sk['nama_sekolah'] ?> (<?= $sk['jenjang'] ?>)</b><br><?= $sk['alamat'] ?>");
+
+            <?php elseif ($sk['tipe_objek'] == 'polygon' && !empty($sk['koordinat_polygon'])): ?>
+                // Render Objek Area (Polygon)
+                var polygonCoords = <?= $sk['koordinat_polygon'] ?>;
+                L.polygon(polygonCoords, {
+                    color: '<?= $sk['jenjang'] == "SD" ? "#10b981" : "#f59e0b" ?>',
+                    fillColor: '<?= $sk['jenjang'] == "SD" ? "#10b981" : "#f59e0b" ?>',
+                    fillOpacity: 0.4
+                }).addTo(map).bindPopup("<b>Area Wilayah: <?= $sk['nama_sekolah'] ?></b><br><= $sk['alamat'] ?>");
+            <?php endif; ?>
+
+        <?php endforeach; ?>
+    <?php endif; ?>
+</script>
+<script src="<?= base_url('assets/js/script-publik.js') ?>"></script>
+<script src="<?= base_url('assets/js/search-hero.js') ?>"></script>
 <?= $this->endSection() ?>

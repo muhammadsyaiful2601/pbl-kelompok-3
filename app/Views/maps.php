@@ -2,7 +2,7 @@
 
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="<?= base_url('assets/css/style-publik.css') ?>">
-<link class="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -44,8 +44,25 @@
                         <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
                     </div>
                 </div>
-                <div class="school-list-group" id="schoolSearchList">
-                    <div class="text-center text-muted py-4 small">Memuat data sekolah...</div>
+
+                <div class="school-table-container">
+                    <div class="table-responsive m-0">
+                        <table class="table table-custom-3d align-middle mb-0" id="schoolSearchTable" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="ps-4">Nama Sekolah</th>
+                                    <th scope="col">Jenjang</th>
+                                    <th scope="col">Alamat</th>
+                                    <th scope="col" class="text-center pe-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schoolSearchListTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="schoolListStatus" class="text-center text-muted py-5 small">
+                        <i class="fa-solid fa-circle-notch fa-spin me-2"></i>Memuat data sekolah...
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,13 +159,13 @@
 
 <script>
     // Inisialisasi Peta Utama Publik
-    var map = L.map('preview-map').setView([-0.4795, 100.6274], 13); // ID div adalah preview-map di baris 107
+    var map = L.map('preview-map').setView([-0.4795, 100.6274], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Definisi Icon Kustom
+    // Definisi Icon Kustom Leaflet
     var redIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -167,14 +184,12 @@
         shadowSize: [41, 41]
     });
 
-    // MENCETAK DATA DARI DATABASE SECARA DINAMIS
+    // Merender marker secara dinamis berdasarkan data PHP
     <?php if (!empty($sekolah_list)): ?>
         <?php foreach ($sekolah_list as $sk): ?>
             <?php if (!empty($sk['latitude'])): ?>
-                // Tentukan Icon berdasarkan Jenjang
                 var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
-                
-                // Siapkan template popup premium
+
                 var popupContent = `
                     <div class="custom-popup" style="width: 220px;">
                         <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/220x120?text=No+Image' ?>" 
@@ -193,9 +208,14 @@
                     </div>
                 `;
 
-                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], { icon: iconSekolah })
+                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
+                        icon: iconSekolah
+                    })
                     .addTo(map)
-                    .bindPopup(popupContent, { maxWidth: 250, className: 'modern-leaflet-popup' });
+                    .bindPopup(popupContent, {
+                        maxWidth: 250,
+                        className: 'modern-leaflet-popup'
+                    });
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>

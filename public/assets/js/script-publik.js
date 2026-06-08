@@ -1,62 +1,101 @@
-// Fungsi untuk memfilter Card
-function filterSekolah(jenjang) {
-    const items = document.querySelectorAll('.item-sekolah');
-    const buttons = document.querySelectorAll('.btn-group .btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
+let currentJenjangFilter = 'semua';
 
-    if (window.event && window.event.target) {
-        window.event.target.classList.add('active');
+/* Fungsi untuk merender daftar sekolah ke elemen HTML (Format Tabel Hover 3D) */
+function renderSchoolSearchList() {
+    const tableBody = document.getElementById('schoolSearchListTableBody');
+    const tableElement = document.getElementById('schoolSearchTable');
+    const statusElement = document.getElementById('schoolListStatus');
+    const searchKeyword = document.getElementById('searchSchoolInput').value.toLowerCase();
+
+    if (!tableBody || !tableElement || !statusElement) return;
+    
+    // Bersihkan data baris lama sebelum rendering ulang
+    tableBody.innerHTML = '';
+
+    // Lakukan pemfilteran data array global
+    const filteredSchools = window.sekolahData.filter(school => {
+        const nama = (school.nama_sekolah || school.name || '').toLowerCase();
+        const alamat = (school.alamat || school.addr || '').toLowerCase();
+        const jenjang = (school.jenjang || school.type || 'SD').toLowerCase();
+
+        const matchesSearch = nama.includes(searchKeyword) || alamat.includes(searchKeyword);
+        const matchesJenjang = currentJenjangFilter === 'semua' || jenjang === currentJenjangFilter.toLowerCase();
+
+        return matchesSearch && matchesJenjang;
+    });
+
+    // Validasi kondisi apabila data tidak ditemukan
+    if (filteredSchools.length === 0) {
+        tableElement.style.display = 'none';
+        statusElement.style.display = 'block';
+        statusElement.innerHTML = 'Sekolah tidak ditemukan.';
+        return;
     }
 
-    items.forEach(item => {
-        if (jenjang === 'semua') {
-            item.style.display = 'block';
-        } else {
-            if (item.getAttribute('data-jenjang').toLowerCase() === jenjang.toLowerCase()) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        }
+    // Ubah visibilitas elemen: Tampilkan tabel, sembunyikan status box
+    statusElement.style.display = 'none';
+    tableElement.style.display = 'table';
+
+    // Sisipkan struktur baris baru secara dinamis
+    filteredSchools.forEach(school => {
+        const nama = school.nama_sekolah || school.name;
+        const alamat = school.alamat || school.addr || 'Alamat belum diatur';
+        const jenjang = (school.jenjang || school.type || 'SD').toUpperCase();
+        
+        // Klasifikasi warna badge Bootstrap berdasarkan jenjang sekolah
+        const badgeColor = jenjang === 'SD' ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary';
+
+        const rowHtml = `
+            <tr onclick="focusToMapMatrix(${school.latitude || school.lat}, ${school.longitude || school.lng}, '${nama}')">
+                <td class="ps-4 fw-bold text-slate-800">${nama}</td>
+                <td>
+                    <span class="badge ${badgeColor} px-2.5 py-1.5 rounded font-semibold" style="font-size: 0.75rem;">
+                        ${jenjang}
+                    </span>
+                </td>
+                <td class="text-muted text-truncate" style="max-width: 180px;">
+                    <i class="fa-solid fa-map-marker-alt text-danger me-1" style="font-size: 0.8rem;"></i> ${alamat}
+                </td>
+                <td class="text-center pe-4">
+                    <button class="btn btn-sm btn-outline-primary py-1 px-2.5" style="font-size: 0.78rem; border-radius: 6px;">
+                        <i class="fa-solid fa-eye me-1"></i> Lihat
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.insertAdjacentHTML('beforeend', rowHtml);
     });
 }
 
+/* Fungsi untuk mengubah status filter jenjang aktif dan memperbarui daftar */
+function filterSearchList(jenjang, buttonElement) {
+    currentJenjangFilter = jenjang;
+
+    const buttons = document.querySelectorAll('.filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (buttonElement) {
+        buttonElement.classList.add('active');
+    }
+
+    renderSchoolSearchList();
+}
+
+/* Fungsi untuk memindahkan fokus tampilan peta koordinat dan menggulir halaman */
+function focusToMapMatrix(lat, lng, name) {
+    if (typeof map !== 'undefined' && lat && lng) {
+        map.setView([lat, lng], 16);
+        document.getElementById('peta-section').scrollIntoView({
+            behavior: 'smooth'
+        });
+    } else {
+        document.getElementById('peta-section').scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+}
+
+/* Inisialisasi event listener pencarian saat seluruh dokumen HTML selesai dimuat */
 document.addEventListener("DOMContentLoaded", function() {
-    // Atur koordinat default
-    var map = L.map('preview-map').setView([-0.941, 100.370], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // Membaca data dinamis yang di-inject dari file View utama
-    var dataSekolah = window.sekolahData || [];
-
-    // Looping data marker otomatis dari database
-    dataSekolah.forEach(function(school) {
-        var latitude = school.latitude || school.lat;
-        var longitude = school.longitude || school.lng;
-        var namaSekolah = school.nama_sekolah || school.name;
-        var alamatSekolah = school.alamat || school.addr;
-        var jenjangSekolah = school.jenjang || school.type || 'SD';
-
-        if (latitude && longitude) {
-            var marker = L.marker([latitude, longitude]).addTo(map);
-            var badgeColor = jenjangSekolah.toLowerCase() === 'sd' ? 'bg-success' : 'bg-primary';
-
-            marker.bindPopup(`
-                <div style="min-width: 160px;">
-                    <span class="badge ${badgeColor} mb-1">${jenjangSekolah.toUpperCase()}</span>
-                    <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">${namaSekolah}</h6>
-                    <p class="text-muted small mb-0" style="font-size: 0.8rem;">
-                        <i class="fa-solid fa-map-marker-alt text-danger me-1"></i> ${alamatSekolah}
-                    </p>
-                </div>
-            `);
-        }
-    });
-
-    setTimeout(function() {
-        map.invalidateSize();
-    }, 300);
+    renderSchoolSearchList();
+    document.getElementById('searchSchoolInput').addEventListener('input', renderSchoolSearchList);
 });

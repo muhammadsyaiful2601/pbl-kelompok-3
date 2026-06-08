@@ -15,11 +15,24 @@ class Home extends BaseController
 
     public function index()
     {
+        $sekolahList = $this->sekolahModel->findAll();
+        
+        $totalSekolah = count($sekolahList);
+        $totalSD = 0;
+        $totalSMP = 0;
+        
+        foreach ($sekolahList as $s) {
+            if ($s['jenjang'] == 'SD') $totalSD++;
+            if ($s['jenjang'] == 'SMP') $totalSMP++;
+        }
+
         $data = [
-            'title' => 'Peta Sebaran Sekolah | WebGIS Publik',
-            // Mengambil semua baris data spasial dari database
-            'sekolah_list' => $this->sekolahModel->findAll()
+            'title'        => 'Peta Sebaran Sekolah | WebGIS Publik',
+            'sekolah_list' => $sekolahList,
+            'total_sekolah' => $totalSekolah,
+            'total_sd'      => $totalSD,
+            'total_smp'     => $totalSMP,
         ];
-        return view('maps', $data); // Berkas maps Anda di halaman depanpublik
+        return view('maps', $data);
     }
 }

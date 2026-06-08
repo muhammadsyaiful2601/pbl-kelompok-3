@@ -18,18 +18,9 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="<?= base_url('admin/input-data') ?>" class="nav-link <?= (url_is('admin/input-data') ? 'active' : '') ?>">
-                        <i class="nav-icon fa-solid fa-map-location-dot"></i>
-                        <p>Input Data</p>
-                    </a>
-                </li>
-
-                <li class="nav-header" style="color: #6c757d; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">MANAJEMEN DATA</li>
-
-                <li class="nav-item">
-                    <a href="<?= base_url('admin/marker-polygon') ?>" class="nav-link <?= (url_is('admin/marker-polygon') ? 'active' : '') ?>">
-                        <i class="nav-icon fa-solid fa-draw-polygon"></i>
-                        <p style="font-size: 0.95rem;">Tambah Data Marker & Polygon</p>
+                    <a href="<?= base_url('admin/sekolah') ?>" class="nav-link <?= (url_is('admin/sekolah*') ? 'active' : '') ?>">
+                        <i class="nav-icon fa-solid fa-school"></i>
+                        <p>Data Sekolah</p>
                     </a>
                 </li>
 

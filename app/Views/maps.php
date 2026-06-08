@@ -65,25 +65,25 @@
                     <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
                         <i class="fa-solid fa-school fs-4"></i>
                     </div>
-                    <h3 class="fw-bold mb-1">142</h3>
+                    <h3 class="fw-bold mb-1"><?= number_format($total_sekolah, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Total Sekolah</p>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="stat-card p-4">
-                    <div class="p-3 bg-success-subtle text-success rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+                    <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
                         <i class="fa-solid fa-children fs-4"></i>
                     </div>
-                    <h3 class="fw-bold mb-1">98</h3>
+                    <h3 class="fw-bold mb-1"><?= number_format($total_sd, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Sekolah Dasar (SD)</p>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
                 <div class="stat-card p-4">
-                    <div class="p-3 bg-warning-subtle text-warning rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
                         <i class="fa-solid fa-graduation-cap fs-4"></i>
                     </div>
-                    <h3 class="fw-bold mb-1">44</h3>
+                    <h3 class="fw-bold mb-1"><?= number_format($total_smp, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Sekolah Menengah (SMP)</p>
                 </div>
             </div>
@@ -92,8 +92,8 @@
                     <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
                         <i class="fa-solid fa-user-chalkboard fs-4"></i>
                     </div>
-                    <h3 class="fw-bold mb-1">1.820</h3>
-                    <p class="text-muted small mb-0 fw-medium">Total Guru & Staff</p>
+                    <h3 class="fw-bold mb-1">...</h3>
+                    <p class="text-muted small mb-0 fw-medium">Data Terverifikasi</p>
                 </div>
             </div>
         </div>
@@ -137,37 +137,66 @@
 <?= $this->section('scripts') ?>
 <script>
     /* Menyediakan data database ke global runtime javascript */
-    window.sekolahData = <?= json_encode($sekolah ?? []) ?>;
+    window.sekolahData = <?= json_encode($sekolah_list ?? []) ?>;
 </script>
 
 <script>
     // Inisialisasi Peta Utama Publik
-    var map = L.map('map_publik').setView([-0.4795, 100.6274], 12);
+    var map = L.map('preview-map').setView([-0.4795, 100.6274], 13); // ID div adalah preview-map di baris 107
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    // Definisi Icon Kustom
+    var redIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var blueIcon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
     // MENCETAK DATA DARI DATABASE SECARA DINAMIS
     <?php if (!empty($sekolah_list)): ?>
         <?php foreach ($sekolah_list as $sk): ?>
+            <?php if (!empty($sk['latitude'])): ?>
+                // Tentukan Icon berdasarkan Jenjang
+                var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
+                
+                // Siapkan template popup premium
+                var popupContent = `
+                    <div class="custom-popup" style="width: 220px;">
+                        <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/220x120?text=No+Image' ?>" 
+                             style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px 8px 0 0;" class="mb-2">
+                        <div class="px-2 pb-2">
+                            <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : 'bg-primary' ?> mb-1" style="font-size: 10px;"><?= $sk['jenjang'] ?></span>
+                            <h6 class="fw-bold mb-1 text-dark"><?= $sk['nama_sekolah'] ?></h6>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>
+                                <a href="#" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-            <?php if ($sk['tipe_objek'] == 'marker' && !empty($sk['latitude'])): ?>
-                // Render Objek Titik (Marker)
-                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>])
+                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], { icon: iconSekolah })
                     .addTo(map)
-                    .bindPopup("<b><?= $sk['nama_sekolah'] ?> (<?= $sk['jenjang'] ?>)</b><br><?= $sk['alamat'] ?>");
-
-            <?php elseif ($sk['tipe_objek'] == 'polygon' && !empty($sk['koordinat_polygon'])): ?>
-                // Render Objek Area (Polygon)
-                var polygonCoords = <?= $sk['koordinat_polygon'] ?>;
-                L.polygon(polygonCoords, {
-                    color: '<?= $sk['jenjang'] == "SD" ? "#10b981" : "#f59e0b" ?>',
-                    fillColor: '<?= $sk['jenjang'] == "SD" ? "#10b981" : "#f59e0b" ?>',
-                    fillOpacity: 0.4
-                }).addTo(map).bindPopup("<b>Area Wilayah: <?= $sk['nama_sekolah'] ?></b><br><= $sk['alamat'] ?>");
+                    .bindPopup(popupContent, { maxWidth: 250, className: 'modern-leaflet-popup' });
             <?php endif; ?>
-
         <?php endforeach; ?>
     <?php endif; ?>
 </script>

@@ -13,5 +13,8 @@ $routes->post('login/process', 'Auth::loginProcess');
 $routes->get('logout', 'Auth::logout');
 // Rute Admin Dashboard dan Fitur Terkait
 $routes->get('admin/dashboard', 'Admin\Dashboard::index');
-$routes->get('admin/input-data', 'Admin\InputData::index');
-$routes->get('admin/marker-polygon', 'Admin\MarkerPolygon::index');
+$routes->get('admin/sekolah', 'Admin\Sekolah::index');
+$routes->get('admin/sekolah/tambah', 'Admin\Sekolah::tambah');
+$routes->get('admin/sekolah/edit/(:num)', 'Admin\Sekolah::edit/$1');
+$routes->post('admin/sekolah/simpan', 'Admin\Sekolah::simpan');
+$routes->get('admin/sekolah/hapus/(:num)', 'Admin\Sekolah::hapus/$1');

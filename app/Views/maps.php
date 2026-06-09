@@ -202,7 +202,7 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
                                 <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>
-                                <a href="#" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
+                                <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
                             </div>
                         </div>
                     </div>

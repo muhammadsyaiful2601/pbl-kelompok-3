@@ -35,4 +35,31 @@ class Home extends BaseController
         ];
         return view('maps', $data);
     }
+
+    public function fullmaps()
+    {
+        $sekolahList = $this->sekolahModel->findAll();
+
+        $data = [
+            'title'        => 'Peta Sebaran Sekolah Mode Penuh',
+            'sekolah_list' => $sekolahList,
+        ];
+        return view('fullmaps', $data);
+    }
+
+    public function detail($id)
+    {
+        $sekolah = $this->sekolahModel->find($id);
+
+        if (!$sekolah) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Sekolah dengan ID $id tidak ditemukan.");
+        }
+
+        $data = [
+            'title'   => 'Detail Sekolah | ' . $sekolah['nama_sekolah'],
+            'sekolah' => $sekolah,
+        ];
+
+        return view('detail', $data);
+    }
 }

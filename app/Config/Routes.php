@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('maps', 'Home::maps');
 $routes->get('fullmaps', 'Home::fullmaps');
+$routes->get('sekolah/(:num)', 'Home::detail/$1');
 
 // Rute Autentikasi Admin
 $routes->get('login', 'Auth::login');

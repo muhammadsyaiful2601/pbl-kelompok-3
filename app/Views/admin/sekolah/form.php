@@ -11,6 +11,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php $validation = session()->getFlashdata('validation') ?? ($validation ?? \Config\Services::validation()); ?>
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
@@ -51,6 +52,12 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label fw-semibold">Website Sekolah</label>
+                                <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
+                                <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
                                 <textarea name="alamat" class="form-control <?= ($validation->hasError('alamat')) ? 'is-invalid' : '' ?>" rows="3" placeholder="Alamat lengkap sekolah..."><?= old('alamat', $sekolah['alamat'] ?? '') ?></textarea>
                                 <div class="invalid-feedback"><?= $validation->getError('alamat') ?></div>
@@ -68,14 +75,14 @@
                                 <div id="map-input" class="mb-2"></div>
                                 <div class="row g-2">
                                     <div class="col-6">
-                                        <input type="text" name="latitude" id="latitude" class="form-control form-control-sm <?= ($validation->hasError('latitude')) ? 'is-invalid' : '' ?>" value="<?= old('latitude', $sekolah['latitude'] ?? '') ?>" placeholder="Latitude" readonly>
+                                        <input type="text" name="latitude" id="latitude" class="form-control form-control-sm <?= ($validation->hasError('latitude')) ? 'is-invalid' : '' ?>" value="<?= old('latitude', $sekolah['latitude'] ?? '') ?>" placeholder="Latitude">
                                     </div>
                                     <div class="col-6">
-                                        <input type="text" name="longitude" id="longitude" class="form-control form-control-sm <?= ($validation->hasError('longitude')) ? 'is-invalid' : '' ?>" value="<?= old('longitude', $sekolah['longitude'] ?? '') ?>" placeholder="Longitude" readonly>
+                                        <input type="text" name="longitude" id="longitude" class="form-control form-control-sm <?= ($validation->hasError('longitude')) ? 'is-invalid' : '' ?>" value="<?= old('longitude', $sekolah['longitude'] ?? '') ?>" placeholder="Longitude">
                                     </div>
                                 </div>
                                 <div class="text-danger small mt-1"><?= $validation->getError('latitude') ?: $validation->getError('longitude') ?></div>
-                                <p class="text-muted small mt-2"><i class="fa-solid fa-circle-info me-1"></i> Klik pada peta untuk menandai lokasi sekolah.</p>
+                                <p class="text-muted small mt-2"><i class="fa-solid fa-circle-info me-1"></i> Klik pada peta atau ketik koordinat (format desimal) untuk menandai lokasi sekolah.</p>
                             </div>
 
                             <div class="mb-3">
@@ -127,11 +134,27 @@
     }).addTo(map);
 
     var marker;
+    var latInput = document.getElementById('latitude');
+    var lngInput = document.getElementById('longitude');
 
     // Jika sedang edit, tampilkan marker di posisi awal
     <?php if (isset($sekolah['latitude'])) : ?>
         marker = L.marker([defaultLat, defaultLng]).addTo(map);
     <?php endif; ?>
+
+    // Jika input sudah berisi koordinat (mis. ketika redirect withInput), tampilkan marker
+    if (latInput && lngInput && latInput.value && lngInput.value) {
+        var latVal = parseFloat(latInput.value);
+        var lngVal = parseFloat(lngInput.value);
+        if (isFinite(latVal) && isFinite(lngVal)) {
+            if (marker) {
+                marker.setLatLng([latVal, lngVal]);
+            } else {
+                marker = L.marker([latVal, lngVal]).addTo(map);
+            }
+            map.setView([latVal, lngVal], zoomLevel);
+        }
+    }
 
     // Event Klik Peta
     map.on('click', function(e) {
@@ -144,9 +167,35 @@
             marker = L.marker(e.latlng).addTo(map);
         }
 
-        document.getElementById('latitude').value = lat;
-        document.getElementById('longitude').value = lng;
+        // Set input dengan 6 desimal untuk konsistensi
+        if (latInput) latInput.value = lat.toFixed(6);
+        if (lngInput) lngInput.value = lng.toFixed(6);
     });
+
+    // Update marker saat user mengetik koordinat secara manual
+    function updateMarkerFromInputs() {
+        if (!latInput || !lngInput) return;
+        var lat = parseFloat(latInput.value);
+        var lng = parseFloat(lngInput.value);
+
+        if (!isFinite(lat) || !isFinite(lng)) return;
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+
+        var latlng = L.latLng(lat, lng);
+        if (marker) {
+            marker.setLatLng(latlng);
+        } else {
+            marker = L.marker(latlng).addTo(map);
+        }
+        map.panTo(latlng);
+    }
+
+    if (latInput && lngInput) {
+        latInput.addEventListener('input', updateMarkerFromInputs);
+        lngInput.addEventListener('input', updateMarkerFromInputs);
+        // Inisialisasi saat load
+        updateMarkerFromInputs();
+    }
 
     // Preview Gambar
     function previewImage() {

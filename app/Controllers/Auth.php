@@ -52,7 +52,6 @@ class Auth extends BaseController
 
     public function logout()
     {
-        // Menghancurkan session login admin
         session()->destroy();
 
         // Mengalihkan langsung ke rute utama publik (Landing Page / Peta Sebaran)

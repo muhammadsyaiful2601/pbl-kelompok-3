@@ -9,5 +9,5 @@ class SekolahModel extends Model
     // Pastikan nama tabelnya menggunakan huruf kecil semua sesuai phpMyAdmin
     protected $table            = 'sekolah';
     protected $primaryKey       = 'id_sekolah'; // sesuaikan dengan primary key tabel Anda
-    protected $allowedFields    = ['nama_sekolah', 'jenjang', 'latitude', 'longitude', 'alamat', 'foto', 'jumlah_siswa', 'deskripsi_sekolah']; // sesuaikan field Anda
+    protected $allowedFields    = ['nama_sekolah', 'jenjang', 'latitude', 'longitude', 'alamat', 'foto', 'jumlah_siswa', 'deskripsi_sekolah', 'website']; // sesuaikan field Anda
 }

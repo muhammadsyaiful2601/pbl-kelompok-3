@@ -136,6 +136,14 @@
                         <i class="fa-solid fa-directions me-2"></i>Petunjuk Arah (Google Maps)
                     </a>
                 </div>
+                <?php if (!empty($sekolah['website'])) : ?>
+                    <?php $link = preg_match('/^https?:\/\//i', $sekolah['website']) ? $sekolah['website'] : 'https://' . $sekolah['website']; ?>
+                    <div class="mt-3">
+                        <a href="<?= $link ?>" target="_blank" class="btn btn-outline-success w-100 rounded-pill fw-semibold">
+                            <i class="fa-solid fa-globe me-2"></i> Kunjungi Website Sekolah
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -176,8 +184,8 @@
     var iconSekolah = <?= $sekolah['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
 
     L.marker([lat, lng], {
-        icon: iconSekolah
-    }).addTo(map)
-    .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b>').openPopup();
+            icon: iconSekolah
+        }).addTo(map)
+        .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b>').openPopup();
 </script>
 <?= $this->endSection() ?>

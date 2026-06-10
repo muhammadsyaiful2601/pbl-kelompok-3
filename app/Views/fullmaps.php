@@ -103,6 +103,49 @@
             flex-direction: column;
             max-height: 70vh;
             overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top left;
+        }
+
+        .school-panel.collapsed {
+            max-height: 0;
+            opacity: 0;
+            transform: scaleY(0.95);
+            margin-top: -15px;
+            pointer-events: none;
+        }
+
+        .toggle-panel-btn {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .toggle-panel-btn:hover {
+            background: white;
+            color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-panel-btn i {
+            transition: transform 0.4s ease;
+        }
+
+        .toggle-panel-btn.active i {
+            transform: rotate(180deg);
+        }
+
+        .top-nav-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .school-panel-header {
@@ -228,9 +271,14 @@
 
     <!-- Top Left: Navigation & School List -->
     <div class="map-overlay overlay-top-left">
-        <a href="<?= base_url('/') ?>" class="glass-panel back-button">
-            <i class="fa-solid fa-arrow-left me-2 text-primary"></i> Beranda
-        </a>
+        <div class="top-nav-container">
+            <a href="<?= base_url('/') ?>" class="glass-panel back-button">
+                <i class="fa-solid fa-arrow-left me-2 text-primary"></i> Beranda
+            </a>
+            <div id="toggleSchoolPanel" class="glass-panel toggle-panel-btn" title="Toggle Daftar Sekolah">
+                <i class="fa-solid fa-chevron-up"></i>
+            </div>
+        </div>
 
         <div class="glass-panel school-panel">
             <div class="school-panel-header">
@@ -378,6 +426,28 @@
                 var match = $(this).text().toLowerCase().indexOf(v) > -1;
                 $(this).toggle(match);
             });
+        });
+
+        // Toggle Panel Functionality
+        $('#toggleSchoolPanel').on('click', function() {
+            $(this).toggleClass('active');
+            var $panel = $('.school-panel');
+            $panel.toggleClass('collapsed');
+            
+            var isCollapsed = $panel.hasClass('collapsed');
+            $(this).find('i').attr('class', isCollapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up');
+            
+            // Save state
+            localStorage.setItem('schoolPanelCollapsed', isCollapsed);
+        });
+
+        // Restore state on load
+        $(document).ready(function() {
+            if (localStorage.getItem('schoolPanelCollapsed') === 'true') {
+                $('#toggleSchoolPanel').addClass('active');
+                $('.school-panel').addClass('collapsed');
+                $('#toggleSchoolPanel').find('i').attr('class', 'fa-solid fa-chevron-down');
+            }
         });
     </script>
 </body>

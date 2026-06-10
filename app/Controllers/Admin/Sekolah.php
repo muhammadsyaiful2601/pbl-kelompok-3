@@ -81,6 +81,7 @@ class Sekolah extends BaseController
             'longitude'    => 'required|decimal',
             'alamat'       => 'required',
             'foto'         => 'max_size[foto,2048]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+            'website'      => 'permit_empty',
         ];
 
         if (!$this->validate($rules)) {
@@ -107,6 +108,7 @@ class Sekolah extends BaseController
             'latitude'          => $this->request->getPost('latitude'),
             'longitude'         => $this->request->getPost('longitude'),
             'alamat'            => $this->request->getPost('alamat'),
+            'website'           => $this->request->getPost('website'),
             'jumlah_siswa'      => $this->request->getPost('jumlah_siswa'),
             'deskripsi_sekolah' => $this->request->getPost('deskripsi_sekolah'),
             'foto'              => $namaFoto,

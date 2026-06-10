@@ -11,7 +11,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<?php $validation = session()->getFlashdata('validation') ?? ($validation ?? \Config\Services::validation()); ?>
+<?php $validation = \Config\Services::validation(); ?>
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">

@@ -12,7 +12,6 @@ class CreateSekolahTable extends Migration
             'id_sekolah' => [
                 'type'           => 'INT',
                 'constraint'     => 11,
-                'unsigned'       => true,
                 'auto_increment' => true,
             ],
             'nama_sekolah' => [
@@ -25,9 +24,32 @@ class CreateSekolahTable extends Migration
                 'constraint' => ['SD', 'SMP'],
                 'null'       => false,
             ],
+            'foto' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+                'null'       => true,
+                'default'    => null,
+            ],
             'alamat' => [
                 'type' => 'TEXT',
                 'null' => false,
+            ],
+            'jumlah_siswa' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'null'       => true,
+                'default'    => null,
+            ],
+            'deskripsi_sekolah' => [
+                'type' => 'TEXT',
+                'null' => true,
+                'default'    => null,
+            ],
+            'website' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+                'null'       => true,
+                'default'    => null,
             ],
             'latitude' => [
                 'type'       => 'VARCHAR',
@@ -41,7 +63,7 @@ class CreateSekolahTable extends Migration
             ],
             'created_at' => [
                 'type'    => 'DATETIME',
-                'null'    => false,
+                'null'    => true,
                 'default' => 'CURRENT_TIMESTAMP',
             ],
             'tipe_objek' => [
@@ -53,6 +75,7 @@ class CreateSekolahTable extends Migration
             'koordinat_polygon' => [
                 'type' => 'TEXT',
                 'null' => true,
+                'default'    => null,
             ],
         ];
 

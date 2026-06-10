@@ -75,17 +75,50 @@ class Sekolah extends BaseController
 
         // Validasi
         $rules = [
-            'nama_sekolah' => 'required',
-            'jenjang'      => 'required',
-            'latitude'     => 'required|decimal',
-            'longitude'    => 'required|decimal',
-            'alamat'       => 'required',
-            'foto'         => 'max_size[foto,2048]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
-            'website'      => 'permit_empty',
+            'nama_sekolah' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Nama Sekolah harus diisi.'
+                ]
+            ],
+            'jenjang' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Jenjang harus dipilih.'
+                ]
+            ],
+            'latitude' => [
+                'rules'  => 'required|decimal',
+                'errors' => [
+                    'required' => 'Koordinat Latitude harus diisi.',
+                    'decimal'  => 'Format Latitude tidak valid.'
+                ]
+            ],
+            'longitude' => [
+                'rules'  => 'required|decimal',
+                'errors' => [
+                    'required' => 'Koordinat Longitude harus diisi.',
+                    'decimal'  => 'Format Longitude tidak valid.'
+                ]
+            ],
+            'alamat' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Alamat harus diisi.'
+                ]
+            ],
+            'foto' => [
+                'rules'  => 'max_size[foto,2048]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    'max_size' => 'Ukuran foto terlalu besar (Maks. 2MB).',
+                    'is_image' => 'File yang dipilih bukan gambar.',
+                    'mime_in'  => 'Format foto harus JPG, JPEG, atau PNG.'
+                ]
+            ]
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('validation', $this->validator);
+            return redirect()->back()->withInput();
         }
 
         $foto = $this->request->getFile('foto');
@@ -108,9 +141,9 @@ class Sekolah extends BaseController
             'latitude'          => $this->request->getPost('latitude'),
             'longitude'         => $this->request->getPost('longitude'),
             'alamat'            => $this->request->getPost('alamat'),
-            'website'           => $this->request->getPost('website'),
-            'jumlah_siswa'      => $this->request->getPost('jumlah_siswa'),
-            'deskripsi_sekolah' => $this->request->getPost('deskripsi_sekolah'),
+            'website'           => $this->request->getPost('website') ?: null,
+            'jumlah_siswa'      => $this->request->getPost('jumlah_siswa') ?: null,
+            'deskripsi_sekolah' => $this->request->getPost('deskripsi_sekolah') ?: null,
             'foto'              => $namaFoto,
         ];
 

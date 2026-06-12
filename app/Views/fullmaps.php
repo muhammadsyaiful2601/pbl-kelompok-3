@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="<?= base_url('adminlte/css/adminlte.min.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="<?= base_url('assets/api/api_maps.js') ?>"></script>
 
     <style>
         body,
@@ -317,8 +318,18 @@
         </div>
     </div>
 
-    <!-- Bottom Right: Legend -->
+    <!-- Bottom Right: Basemap Selector & Legend -->
     <div class="map-overlay overlay-bottom-right">
+        <!-- Basemap Selection Panel -->
+        <div class="glass-panel p-2 mb-2" style="width: 200px;">
+            <label class="small fw-bold mb-1 d-block px-2 text-muted"><i class="fa-solid fa-layer-group me-1"></i> Ganti Tema Peta</label>
+            <select id="basemapSelector" class="form-select form-select-sm border-0 bg-light rounded-3">
+                <option value="Standard Map">Standar (OSM)</option>
+                <option value="Satellite View">Satelit (Google)</option>
+                <!-- MapTiler layers will be injected here via JS -->
+            </select>
+        </div>
+
         <div class="glass-panel legend-card">
             <h6 class="fw-bold mb-2" style="font-size: 0.85rem;">Legenda</h6>
             <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
@@ -347,20 +358,61 @@
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Layers
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+        // Base Layers Initialization
+        var baseMaps = {
+            "Standard Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }),
+            "Satellite View": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Maps'
+            })
 
-        var googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            // "Satellite View": L.tileLayer('https://api.maptiler.com/maps/hybrid-v4/{z}/{x}/{y}.jpg?key=VMd1gieKnl5V7Z3FAPeW', {
+            //        maxZoom: 20,
+            //         attribution: '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // })
+        };
+
+        // Inject MapTiler layers from api_maps.js helper
+        if (typeof window.getMapTilerLayers === 'function') {
+            var maptilerLayers = window.getMapTilerLayers();
+            Object.assign(baseMaps, maptilerLayers);
+            
+            // Populate selector with all available layers
+            var $selector = $('#basemapSelector');
+            // Check if MapTiler layers exist, then add them to dropdown
+            Object.keys(maptilerLayers).forEach(function(name) {
+                $selector.append($('<option>', {
+                    value: name,
+                    text: name
+                }));
+            });
+        }
+
+        // Initialize with saved basemap or default
+        var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
+        if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
+        
+        baseMaps[savedBasemap].addTo(map);
+        $('#basemapSelector').val(savedBasemap);
+
+        // Handle Selector Change
+        $('#basemapSelector').on('change', function() {
+            var selected = $(this).val();
+            
+            // Remove all current base layers
+            Object.values(baseMaps).forEach(function(layer) {
+                if (map.hasLayer(layer)) map.removeLayer(layer);
+            });
+            
+            // Add selected
+            if (baseMaps[selected]) {
+                baseMaps[selected].addTo(map);
+                localStorage.setItem('selectedBasemap', selected);
+            }
         });
-
-        L.control.layers({
-            "Standard Map": osm,
-            "Satellite View": googleHybrid
-        }, null, { position: 'bottomright' }).addTo(map);
 
         // Marker Icons
         var createIcon = function(color) {

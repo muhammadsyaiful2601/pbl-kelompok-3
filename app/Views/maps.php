@@ -156,14 +156,34 @@
     /* Menyediakan data database ke global runtime javascript */
     window.sekolahData = <?= json_encode($sekolah_list ?? []) ?>;
 </script>
+<script src="<?= base_url('assets/api/api_maps.js') ?>"></script>
 
 <script>
     // Inisialisasi Peta Utama Publik
     var map = L.map('preview-map').setView([-0.4795, 100.6274], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    // Initial Base Layers
+    var baseMaps = {
+        "Standard Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }),
+        "Satellite View": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        })
+    };
+
+    // Inject MapTiler layers
+    if (typeof window.getMapTilerLayers === 'function') {
+        Object.assign(baseMaps, window.getMapTilerLayers());
+    }
+
+    // Load saved basemap or default
+    var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
+    if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
+    
+    baseMaps[savedBasemap].addTo(map);
 
     // Definisi Icon Kustom Leaflet
     var redIcon = L.icon({

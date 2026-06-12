@@ -28,6 +28,7 @@ class Dashboard extends BaseController
             'total_sd'     => $this->sekolahModel->where('jenjang', 'SD')->countAllResults(),
             'total_smp'    => $this->sekolahModel->where('jenjang', 'SMP')->countAllResults(),
             'total_sekolah' => $this->sekolahModel->countAllResults(),
+            'sekolah_list'  => $this->sekolahModel->findAll(), // Untuk mini map preview dan tabel daftar sekolah
         ];
 
         return view('admin/dashboard', $data);

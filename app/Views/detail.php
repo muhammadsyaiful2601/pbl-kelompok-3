@@ -151,6 +151,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/api/api_maps.js') ?>"></script>
 <script>
     // Inisialisasi Peta Detail
     var lat = <?= $sekolah['latitude'] ?>;
@@ -159,9 +160,28 @@
 
     var map = L.map('detail-map').setView([lat, lng], zoom);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    // Dynamic Base Layers
+    var baseMaps = {
+        "Standard Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }),
+        "Satellite View": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        })
+    };
+
+    // Inject MapTiler layers
+    if (typeof window.getMapTilerLayers === 'function') {
+        Object.assign(baseMaps, window.getMapTilerLayers());
+    }
+
+    // Load saved basemap or default
+    var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
+    if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
+    
+    baseMaps[savedBasemap].addTo(map);
 
     var redIcon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',

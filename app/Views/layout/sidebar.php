@@ -10,19 +10,44 @@
         <nav class="mt-3">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
 
-                <li class="nav-item">
-                    <a href="<?= base_url('admin/dashboard') ?>" class="nav-link <?= (url_is('admin/dashboard') ? 'active' : '') ?>">
-                        <i class="nav-icon fa-solid fa-gauge-high"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
+                <?php if (session()->get('role') === 'superadmin') : ?>
+                    <li class="nav-item">
+                        <a href="<?= base_url('superadmin/dashboard') ?>" class="nav-link <?= (url_is('superadmin/dashboard') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-gauge-high"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('superadmin/admin') ?>" class="nav-link <?= (url_is('superadmin/admin*') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-users-gear"></i>
+                            <p>Kelola Admin</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('superadmin/geojson') ?>" class="nav-link <?= (url_is('superadmin/geojson*') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-layer-group"></i>
+                            <p>Kelola GeoJSON</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
 
-                <li class="nav-item">
-                    <a href="<?= base_url('admin/sekolah') ?>" class="nav-link <?= (url_is('admin/sekolah*') ? 'active' : '') ?>">
-                        <i class="nav-icon fa-solid fa-school"></i>
-                        <p>Data Sekolah</p>
-                    </a>
-                </li>
+                <?php if (session()->get('role') === 'admin' || session()->get('role') === 'superadmin') : ?>
+                    <?php if (session()->get('role') === 'admin') : ?>
+                    <li class="nav-item">
+                        <a href="<?= base_url('admin/dashboard') ?>" class="nav-link <?= (url_is('admin/dashboard') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-gauge-high"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <?php endif; ?>
+
+                    <li class="nav-item">
+                        <a href="<?= base_url('admin/sekolah') ?>" class="nav-link <?= (url_is('admin/sekolah*') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-school"></i>
+                            <p>Data Sekolah</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
 
                 <li class="nav-header" style="color: #6c757d; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">SISTEM</li>
 

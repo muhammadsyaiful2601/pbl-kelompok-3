@@ -207,5 +207,28 @@
             icon: iconSekolah
         }).addTo(map)
         .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b>').openPopup();
+
+    // Render GeoJSON Layers (Wilayah)
+    <?php if (!empty($active_geojson)) : ?>
+        <?php foreach ($active_geojson as $gj) : ?>
+            fetch('<?= base_url($gj['file_geojson']) ?>')
+                .then(response => response.json())
+                .then(data => {
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            return {
+                                color: "<?= $gj['warna_geojson'] ?>",
+                                weight: 1.5,
+                                opacity: 0.4,
+                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                fillColor: "<?= $gj['warna_geojson'] ?>"
+                            };
+                        }
+                    })
+                    .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>")
+                    .addTo(map);
+                });
+        <?php endforeach; ?>
+    <?php endif; ?>
 </script>
 <?= $this->endSection() ?>

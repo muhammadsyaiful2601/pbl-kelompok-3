@@ -7,10 +7,12 @@ use App\Models\SekolahModel;
 class Home extends BaseController
 {
     protected $sekolahModel;
+    protected $geojsonModel;
 
     public function __construct()
     {
         $this->sekolahModel = new SekolahModel();
+        $this->geojsonModel = new \App\Models\GeojsonModel();
     }
 
     public function index()
@@ -27,11 +29,12 @@ class Home extends BaseController
         }
 
         $data = [
-            'title'        => 'Peta Sebaran Sekolah | WebGIS Publik',
-            'sekolah_list' => $sekolahList,
+            'title'         => 'Peta Sebaran Sekolah | WebGIS Publik',
+            'sekolah_list'  => $sekolahList,
             'total_sekolah' => $totalSekolah,
             'total_sd'      => $totalSD,
             'total_smp'     => $totalSMP,
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
         return view('maps', $data);
     }
@@ -41,8 +44,9 @@ class Home extends BaseController
         $sekolahList = $this->sekolahModel->findAll();
 
         $data = [
-            'title'        => 'Peta Sebaran Sekolah Mode Penuh',
-            'sekolah_list' => $sekolahList,
+            'title'          => 'Peta Sebaran Sekolah Mode Penuh',
+            'sekolah_list'   => $sekolahList,
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
         return view('fullmaps', $data);
     }
@@ -56,8 +60,9 @@ class Home extends BaseController
         }
 
         $data = [
-            'title'   => 'Detail Sekolah | ' . $sekolah['nama_sekolah'],
-            'sekolah' => $sekolah,
+            'title'          => 'Detail Sekolah | ' . $sekolah['nama_sekolah'],
+            'sekolah'        => $sekolah,
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('detail', $data);

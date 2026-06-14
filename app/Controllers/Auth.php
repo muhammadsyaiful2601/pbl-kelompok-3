@@ -17,6 +17,9 @@ class Auth extends BaseController
     {
         // Mengalihkan ke halaman admin jika user sudah berstatus login
         if (session()->get('logged_in')) {
+            if (session()->get('role') === 'superadmin') {
+                return redirect()->to(base_url('superadmin/dashboard'));
+            }
             return redirect()->to(base_url('admin/dashboard'));
         }
         return view('auth/login');
@@ -36,9 +39,14 @@ class Auth extends BaseController
                     'id_user'      => $user['id_user'],
                     'username'     => $user['username'],
                     'nama_lengkap' => $user['nama_lengkap'],
+                    'role'         => $user['role'],
                     'logged_in'    => true
                 ];
                 $session->set($sessionData);
+
+                if ($user['role'] === 'superadmin') {
+                    return redirect()->to(base_url('superadmin/dashboard'));
+                }
                 return redirect()->to(base_url('admin/dashboard'));
             } else {
                 $session->setFlashdata('error', 'Password yang Anda masukkan salah.');

@@ -239,6 +239,34 @@
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    // Render GeoJSON Layers (Wilayah)
+    <?php if (!empty($active_geojson)) : ?>
+        <?php foreach ($active_geojson as $gj) : ?>
+            fetch('<?= base_url($gj['file_geojson']) ?>')
+                .then(response => response.json())
+                .then(data => {
+                    var layer = L.geoJSON(data, {
+                        style: function(feature) {
+                            return {
+                                color: "<?= $gj['warna_geojson'] ?>",
+                                weight: 2,
+                                opacity: 0.6,
+                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                fillColor: "<?= $gj['warna_geojson'] ?>"
+                            };
+                        }
+                    })
+                    .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+
+                    // Check localStorage for visibility preference (Synced with Full Maps)
+                    var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                    if (isVisible === null || isVisible === 'true') {
+                        layer.addTo(map);
+                    }
+                });
+        <?php endforeach; ?>
+    <?php endif; ?>
 </script>
 <script src="<?= base_url('assets/js/script-publik.js') ?>"></script>
 <script src="<?= base_url('assets/js/search-hero.js') ?>"></script>

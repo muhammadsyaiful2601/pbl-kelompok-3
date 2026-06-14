@@ -108,9 +108,9 @@ class Sekolah extends BaseController
                 ]
             ],
             'foto' => [
-                'rules'  => 'max_size[foto,2048]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+                'rules'  => 'max_size[foto,5120]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
                 'errors' => [
-                    'max_size' => 'Ukuran foto terlalu besar (Maks. 2MB).',
+                    'max_size' => 'Ukuran foto terlalu besar (Maks. 5MB).',
                     'is_image' => 'File yang dipilih bukan gambar.',
                     'mime_in'  => 'Format foto harus JPG, JPEG, atau PNG.'
                 ]

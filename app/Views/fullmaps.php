@@ -236,6 +236,18 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
         }
 
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .transition-transform {
+            transition: transform 0.3s ease;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
         /* Responsive Settings */
         @media (max-width: 768px) {
             .overlay-top-left {
@@ -320,9 +332,29 @@
 
     <!-- Bottom Right: Basemap Selector & Legend -->
     <div class="map-overlay overlay-bottom-right">
+        <!-- Layer Management Panel -->
+        <div class="glass-panel mb-2 overflow-hidden" style="width: 200px;">
+            <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom cursor-pointer toggle-layer-content" style="background: rgba(255,255,255,0.5);">
+                <label class="small fw-bold mb-0 text-muted" style="cursor: pointer;"><i class="fa-solid fa-layer-group me-1"></i>Layer</label>
+                <i class="fa-solid fa-chevron-up small text-muted transition-transform" id="layerPanelIcon"></i>
+            </div>
+            <div id="layerPanelContent" class="px-2 py-1 transition-all" style="max-height: 200px; overflow-y: auto;">
+                <?php if (!empty($active_geojson)) : ?>
+                    <?php foreach ($active_geojson as $gj) : ?>
+                        <div class="form-check form-switch mb-1 ms-2">
+                            <input class="form-check-input geojson-toggle" type="checkbox" role="switch" id="toggle_<?= $gj['id_geojson'] ?>" data-id="<?= $gj['id_geojson'] ?>" checked>
+                            <label class="form-check-label small text-dark" for="toggle_<?= $gj['id_geojson'] ?>" style="cursor: pointer;"><?= $gj['nama_geojson'] ?></label>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <small class="text-muted italic d-block text-center py-2">Tidak ada layer aktif.</small>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- Basemap Selection Panel -->
         <div class="glass-panel p-2 mb-2" style="width: 200px;">
-            <label class="small fw-bold mb-1 d-block px-2 text-muted"><i class="fa-solid fa-layer-group me-1"></i> Ganti Tema Peta</label>
+            <label class="small fw-bold mb-1 d-block px-2 text-muted"><i class="fa-solid fa-map me-1"></i> Ganti Tema Peta</label>
             <select id="basemapSelector" class="form-select form-select-sm border-0 bg-light rounded-3">
                 <option value="Standard Map">Standar (OSM)</option>
                 <option value="Satellite View">Satelit (Google)</option>
@@ -499,6 +531,86 @@
                 $('#toggleSchoolPanel').addClass('active');
                 $('.school-panel').addClass('collapsed');
                 $('#toggleSchoolPanel').find('i').attr('class', 'fa-solid fa-chevron-down');
+            }
+        });
+
+        // Global storage for GeoJSON layers
+        var geojsonLayers = {};
+
+        // Render GeoJSON Layers (Wilayah)
+        <?php if (!empty($active_geojson)) : ?>
+            <?php foreach ($active_geojson as $gj) : ?>
+                fetch('<?= base_url($gj['file_geojson']) ?>')
+                    .then(response => response.json())
+                    .then(data => {
+                        var layer = L.geoJSON(data, {
+                            style: function(feature) {
+                                return {
+                                    color: "<?= $gj['warna_geojson'] ?>",
+                                    weight: 2,
+                                    opacity: 0.5,
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                };
+                            }
+                        })
+                        .bindPopup(" <?= $gj['nama_geojson'] ?>")
+                        .on('mouseover', function(e) {
+                            this.setStyle({ fillOpacity: <?= min(1, $gj['opacity_geojson'] + 0.2) ?> });
+                        })
+                        .on('mouseout', function(e) {
+                            this.setStyle({ fillOpacity: <?= $gj['opacity_geojson'] ?> });
+                        });
+
+                        geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+
+                        // Check localStorage for visibility preference
+                        var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                        if (isVisible === null || isVisible === 'true') {
+                            layer.addTo(map);
+                            $('#toggle_<?= $gj['id_geojson'] ?>').prop('checked', true);
+                        } else {
+                            $('#toggle_<?= $gj['id_geojson'] ?>').prop('checked', false);
+                        }
+                    });
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        // Handle GeoJSON Toggle
+        $('.geojson-toggle').on('change', function() {
+            var id = $(this).data('id');
+            var isChecked = $(this).is(':checked');
+            
+            if (geojsonLayers[id]) {
+                if (isChecked) {
+                    geojsonLayers[id].addTo(map);
+                } else {
+                    map.removeLayer(geojsonLayers[id]);
+                }
+                localStorage.setItem('geojson_vis_' + id, isChecked);
+            }
+        });
+
+        // Toggle Layer Panel Visibility
+        $('.toggle-layer-content').on('click', function() {
+            var $content = $('#layerPanelContent');
+            var $icon = $('#layerPanelIcon');
+            
+            $content.slideToggle(300);
+            $(this).toggleClass('active');
+            
+            var isCollapsed = $(this).hasClass('active');
+            $icon.css('transform', isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)');
+            
+            localStorage.setItem('layerPanelCollapsed', isCollapsed);
+        });
+
+        // Restore Layer Panel State
+        $(document).ready(function() {
+            if (localStorage.getItem('layerPanelCollapsed') === 'true') {
+                $('.toggle-layer-content').addClass('active');
+                $('#layerPanelContent').hide();
+                $('#layerPanelIcon').css('transform', 'rotate(180deg)');
             }
         });
     </script>

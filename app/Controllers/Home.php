@@ -18,14 +18,16 @@ class Home extends BaseController
     public function index()
     {
         $sekolahList = $this->sekolahModel->findAll();
-        
+
         $totalSekolah = count($sekolahList);
         $totalSD = 0;
         $totalSMP = 0;
-        
+        $totalTK = 0;
+
         foreach ($sekolahList as $s) {
             if ($s['jenjang'] == 'SD') $totalSD++;
             if ($s['jenjang'] == 'SMP') $totalSMP++;
+            if ($s['jenjang'] == 'TK') $totalTK++;
         }
 
         $data = [
@@ -34,6 +36,7 @@ class Home extends BaseController
             'total_sekolah' => $totalSekolah,
             'total_sd'      => $totalSD,
             'total_smp'     => $totalSMP,
+            'total_tk'      => $totalTK,
             'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
         return view('maps', $data);
@@ -43,9 +46,28 @@ class Home extends BaseController
     {
         $sekolahList = $this->sekolahModel->findAll();
 
+        $totalSekolah = count($sekolahList);
+        $totalSD = 0;
+        $totalSMP = 0;
+        $totalTK = 0;
+
+        foreach ($sekolahList as $s) {
+            if ($s['jenjang'] == 'SD') {
+                $totalSD++;
+            } elseif ($s['jenjang'] == 'SMP') {
+                $totalSMP++;
+            } elseif ($s['jenjang'] == 'TK') {
+                $totalTK++;
+            }
+        }
+
         $data = [
-            'title'          => 'Peta Sebaran Sekolah Mode Penuh',
+            'title'          => 'Peta Sebaran Sekolah | WebGIS Publik',
             'sekolah_list'   => $sekolahList,
+            'total_sekolah'  => $totalSekolah,
+            'total_sd'       => $totalSD,
+            'total_smp'      => $totalSMP,
+            'total_tk'       => $totalTK,
             'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
         return view('fullmaps', $data);

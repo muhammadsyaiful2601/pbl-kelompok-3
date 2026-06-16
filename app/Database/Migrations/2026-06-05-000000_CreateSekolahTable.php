@@ -21,7 +21,7 @@ class CreateSekolahTable extends Migration
             ],
             'jenjang' => [
                 'type'       => 'ENUM',
-                'constraint' => ['SD', 'SMP'],
+                'constraint' => ['SD', 'SMP', 'TK'],
                 'null'       => false,
             ],
             'foto' => [

@@ -44,7 +44,7 @@
             gap: 15px;
         }
 
-        .map-overlay > * {
+        .map-overlay>* {
             pointer-events: auto;
         }
 
@@ -218,6 +218,7 @@
         .school-panel-content::-webkit-scrollbar {
             width: 5px;
         }
+
         .school-panel-content::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 10px;
@@ -227,9 +228,12 @@
         .leaflet-right {
             right: 10px !important;
         }
+
         .leaflet-bottom {
-            bottom: 150px !important; /* Make room for legend if needed */
+            bottom: 150px !important;
+            /* Make room for legend if needed */
         }
+
         .leaflet-control-layers {
             border: none !important;
             border-radius: 12px !important;
@@ -255,12 +259,16 @@
                 top: 10px;
                 left: 10px;
             }
+
             .overlay-top-center {
-                display: none; /* Hide title on mobile to save space */
+                display: none;
+                /* Hide title on mobile to save space */
             }
+
             .school-panel {
                 max-height: 40vh;
             }
+
             .legend-card {
                 padding: 10px 15px;
                 font-size: 0.8rem;
@@ -271,6 +279,7 @@
             .overlay-top-left {
                 width: calc(100vw - 20px);
             }
+
             .school-panel {
                 max-height: 30vh;
             }
@@ -303,7 +312,7 @@
                     <?php foreach ($sekolah_list as $sk): ?>
                         <div class="school-item" onclick="focusOnSchool(<?= $sk['id_sekolah'] ?>, this)">
                             <div class="d-flex align-items-center mb-1">
-                                <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : 'bg-primary' ?> me-2" style="font-size: 0.65rem;"><?= $sk['jenjang'] ?></span>
+                                <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> me-2" style="font-size: 0.65rem;"><?= $sk['jenjang'] ?></span>
                                 <h6 class="fw-bold mb-0 text-dark small"><?= $sk['nama_sekolah'] ?></h6>
                             </div>
                             <p class="text-muted mb-0" style="font-size: 0.72rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
@@ -368,9 +377,13 @@
                 <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; margin-right: 10px;"></div>
                 <span>Sekolah Dasar (SD)</span>
             </div>
-            <div class="d-flex align-items-center" style="font-size: 0.8rem;">
+            <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
                 <div style="width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; margin-right: 10px;"></div>
                 <span>Sekolah Menengah (SMP)</span>
+            </div>
+            <div class="d-flex align-items-center" style="font-size: 0.8rem;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #38bdf8; margin-right: 10px;"></div>
+                <span>Taman Kanak-kanak (TK)</span>
             </div>
         </div>
     </div>
@@ -381,14 +394,16 @@
 
     <script>
         var markers = {};
-        
+
         // Setup Map
         var map = L.map('map', {
             zoomControl: false,
             attributionControl: false
         }).setView([-0.4795, 100.6274], 14);
 
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
 
         // Base Layers Initialization
         var baseMaps = {
@@ -411,7 +426,7 @@
         if (typeof window.getMapTilerLayers === 'function') {
             var maptilerLayers = window.getMapTilerLayers();
             Object.assign(baseMaps, maptilerLayers);
-            
+
             // Populate selector with all available layers
             var $selector = $('#basemapSelector');
             // Check if MapTiler layers exist, then add them to dropdown
@@ -426,19 +441,19 @@
         // Initialize with saved basemap or default
         var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
         if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
-        
+
         baseMaps[savedBasemap].addTo(map);
         $('#basemapSelector').val(savedBasemap);
 
         // Handle Selector Change
         $('#basemapSelector').on('change', function() {
             var selected = $(this).val();
-            
+
             // Remove all current base layers
             Object.values(baseMaps).forEach(function(layer) {
                 if (map.hasLayer(layer)) map.removeLayer(layer);
             });
-            
+
             // Add selected
             if (baseMaps[selected]) {
                 baseMaps[selected].addTo(map);
@@ -446,43 +461,62 @@
             }
         });
 
-        // Marker Icons
-        var createIcon = function(color) {
-            return L.icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-' + color + '.png',
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-        };
+        // Marker Icons using local logo files
+        var redIcon = L.icon({
+            iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [50, 60],
+            iconAnchor: [25, 60],
+            popupAnchor: [0, -50],
+            shadowSize: [41, 41]
+        });
 
-        var redIcon = createIcon('red');
-        var blueIcon = createIcon('blue');
+        var blueIcon = L.icon({
+            iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [50, 60],
+            iconAnchor: [25, 60],
+            popupAnchor: [0, -50],
+            shadowSize: [41, 41]
+        });
+
+        var lightblueIcon = L.icon({
+            iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [50, 60],
+            iconAnchor: [25, 60],
+            popupAnchor: [0, -50],
+            shadowSize: [41, 41]
+        });
 
         // Add Data
         <?php if (!empty($sekolah_list)): ?>
             <?php foreach ($sekolah_list as $sk): ?>
                 <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])): ?>
-                    var icon = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
-                    
-                    var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], { icon: icon })
+                    var icon = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : ($sk['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
+
+                    var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
+                            icon: icon
+                        })
                         .addTo(map)
                         .bindPopup(`
                             <div class="custom-popup">
                                 <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/250x140?text=No+Image' ?>">
                                 <div class="popup-info">
-                                    <div class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : 'bg-primary' ?> mb-2"><?= $sk['jenjang'] ?></div>
+                                    <div class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-2"><?= $sk['jenjang'] ?></div>
                                     <h6 class="fw-bold mb-1"><?= $sk['nama_sekolah'] ?></h6>
                                     <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?></p>
+                                    <p class="text-muted small mb-3"><strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <small class="text-muted"><i class="fa-solid fa-users"></i> <?= number_format($sk['jumlah_siswa'] ?? 0) ?></small>
                                         <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Detail</a>
                                     </div>
                                 </div>
                             </div>
-                        `, { className: 'modern-leaflet-popup', maxWidth: 260 });
+                        `, {
+                            className: 'modern-leaflet-popup',
+                            maxWidth: 260
+                        });
 
                     markers[<?= $sk['id_sekolah'] ?>] = marker;
                 <?php endif; ?>
@@ -493,7 +527,10 @@
         function focusOnSchool(id, element) {
             if (markers[id]) {
                 var m = markers[id];
-                map.setView(m.getLatLng(), 17, { animate: true, duration: 1.5 });
+                map.setView(m.getLatLng(), 17, {
+                    animate: true,
+                    duration: 1.5
+                });
                 m.openPopup();
 
                 $('.school-item').removeClass('active');
@@ -517,10 +554,10 @@
             $(this).toggleClass('active');
             var $panel = $('.school-panel');
             $panel.toggleClass('collapsed');
-            
+
             var isCollapsed = $panel.hasClass('collapsed');
             $(this).find('i').attr('class', isCollapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up');
-            
+
             // Save state
             localStorage.setItem('schoolPanelCollapsed', isCollapsed);
         });
@@ -544,23 +581,27 @@
                     .then(response => response.json())
                     .then(data => {
                         var layer = L.geoJSON(data, {
-                            style: function(feature) {
-                                return {
-                                    color: "<?= $gj['warna_geojson'] ?>",
-                                    weight: 2,
-                                    opacity: 0.5,
-                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                    fillColor: "<?= $gj['warna_geojson'] ?>"
-                                };
-                            }
-                        })
-                        .bindPopup(" <?= $gj['nama_geojson'] ?>")
-                        .on('mouseover', function(e) {
-                            this.setStyle({ fillOpacity: <?= min(1, $gj['opacity_geojson'] + 0.2) ?> });
-                        })
-                        .on('mouseout', function(e) {
-                            this.setStyle({ fillOpacity: <?= $gj['opacity_geojson'] ?> });
-                        });
+                                style: function(feature) {
+                                    return {
+                                        color: "<?= $gj['warna_geojson'] ?>",
+                                        weight: 2,
+                                        opacity: 0.5,
+                                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                        fillColor: "<?= $gj['warna_geojson'] ?>"
+                                    };
+                                }
+                            })
+                            .bindPopup(" <?= $gj['nama_geojson'] ?>")
+                            .on('mouseover', function(e) {
+                                this.setStyle({
+                                    fillOpacity: <?= min(1, $gj['opacity_geojson'] + 0.2) ?>
+                                });
+                            })
+                            .on('mouseout', function(e) {
+                                this.setStyle({
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>
+                                });
+                            });
 
                         geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
 
@@ -580,7 +621,7 @@
         $('.geojson-toggle').on('change', function() {
             var id = $(this).data('id');
             var isChecked = $(this).is(':checked');
-            
+
             if (geojsonLayers[id]) {
                 if (isChecked) {
                     geojsonLayers[id].addTo(map);
@@ -595,13 +636,13 @@
         $('.toggle-layer-content').on('click', function() {
             var $content = $('#layerPanelContent');
             var $icon = $('#layerPanelIcon');
-            
+
             $content.slideToggle(300);
             $(this).toggleClass('active');
-            
+
             var isCollapsed = $(this).hasClass('active');
             $icon.css('transform', isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)');
-            
+
             localStorage.setItem('layerPanelCollapsed', isCollapsed);
         });
 

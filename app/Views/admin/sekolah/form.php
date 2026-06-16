@@ -42,6 +42,7 @@
                                         <option value="">Pilih Jenjang...</option>
                                         <option value="SD" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SD' ? 'selected' : '' ?>>Sekolah Dasar (SD)</option>
                                         <option value="SMP" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SMP' ? 'selected' : '' ?>>Sekolah Menengah Pertama (SMP)</option>
+                                        <option value="TK" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'TK' ? 'selected' : '' ?>>Taman Kanak-kanak (TK)</option>
                                     </select>
                                     <div class="invalid-feedback"><?= $validation->getError('jenjang') ?></div>
                                 </div>
@@ -55,6 +56,18 @@
                                 <label class="form-label fw-semibold">Website Sekolah</label>
                                 <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
                                 <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Akreditasi <span class="text-danger">*</span></label>
+                                <select name="akreditasi" class="form-select <?= ($validation->hasError('akreditasi')) ? 'is-invalid' : '' ?>">
+                                    <option value="">Pilih Akreditasi...</option>
+                                    <option value="A" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'A' ? 'selected' : '' ?>>A</option>
+                                    <option value="B" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'B' ? 'selected' : '' ?>>B</option>
+                                    <option value="C" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'C' ? 'selected' : '' ?>>C</option>
+                                    <option value="Belum Terakreditasi" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
+                                </select>
+                                <div class="invalid-feedback"><?= $validation->getError('akreditasi') ?></div>
                             </div>
 
                             <div class="mb-3">

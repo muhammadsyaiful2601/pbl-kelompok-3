@@ -43,7 +43,11 @@ function renderSchoolSearchList() {
         const jenjang = (school.jenjang || school.type || 'SD').toUpperCase();
         
         // Klasifikasi warna badge Bootstrap berdasarkan jenjang sekolah
-        const badgeColor = jenjang === 'SD' ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary';
+        const badgeColor = jenjang === 'SD'
+            ? 'bg-danger-subtle text-danger'
+            : jenjang === 'SMP'
+                ? 'bg-primary-subtle text-primary'
+                : 'bg-info-subtle text-info';
 
         const rowHtml = `
             <tr onclick="focusToMapMatrix(${school.latitude || school.lat}, ${school.longitude || school.lng}, '${nama}')">

@@ -28,7 +28,11 @@ function renderSchoolSearchList() {
         const nama = school.nama_sekolah || school.name;
         const alamat = school.alamat || school.addr || 'Alamat belum diatur';
         const jenjang = (school.jenjang || school.type || 'SD').toUpperCase();
-        const badgeColor = jenjang === 'SD' ? 'bg-success' : 'bg-primary';
+        const badgeColor = jenjang === 'SD'
+            ? 'bg-success'
+            : jenjang === 'SMP'
+                ? 'bg-primary'
+                : 'bg-info text-dark';
 
         const itemHtml = `
             <div class="school-search-item" onclick="focusToMapMatrix(${school.latitude || school.lat}, ${school.longitude || school.lng}, '${nama}')">

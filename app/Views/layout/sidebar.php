@@ -33,12 +33,12 @@
 
                 <?php if (session()->get('role') === 'admin' || session()->get('role') === 'superadmin') : ?>
                     <?php if (session()->get('role') === 'admin') : ?>
-                    <li class="nav-item">
-                        <a href="<?= base_url('admin/dashboard') ?>" class="nav-link <?= (url_is('admin/dashboard') ? 'active' : '') ?>">
-                            <i class="nav-icon fa-solid fa-gauge-high"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="<?= base_url('admin/dashboard') ?>" class="nav-link <?= (url_is('admin/dashboard') ? 'active' : '') ?>">
+                                <i class="nav-icon fa-solid fa-gauge-high"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
                     <?php endif; ?>
 
                     <li class="nav-item">
@@ -51,6 +51,12 @@
 
                 <li class="nav-header" style="color: #6c757d; font-weight: 700; font-size: 0.75rem; letter-spacing: 0.5px;">SISTEM</li>
 
+                <li class="nav-item">
+                    <a href="<?= base_url('profile') ?>" class="nav-link <?= (url_is('profile') ? 'active' : '') ?>">
+                        <i class="nav-icon fa-solid fa-user"></i>
+                        <p>Profil Saya</p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="<?= base_url('logout') ?>" class="nav-link logout-item-custom" style="color: #ff6b6b !important;">
                         <i class="nav-icon fa-solid fa-right-from-bracket text-danger"></i>

@@ -1,5 +1,20 @@
 <?= $this->extend('layout/template_publik') ?>
 
+<?php
+$sekolah = $sekolah ?? [
+    'foto' => '',
+    'nama_sekolah' => '',
+    'jenjang' => '',
+    'jumlah_siswa' => 0,
+    'alamat' => '',
+    'latitude' => 0,
+    'longitude' => 0,
+    'akreditasi' => '',
+    'deskripsi_sekolah' => '',
+    'website' => ''
+];
+?>
+
 <?= $this->section('styles') ?>
 <style>
     .detail-card {
@@ -86,7 +101,7 @@
                 <img src="<?= $sekolah['foto'] ? base_url('uploads/sekolah/' . $sekolah['foto']) : 'https://via.placeholder.com/800x400?text=No+Photo' ?>" class="detail-header-img" alt="<?= $sekolah['nama_sekolah'] ?>">
                 <div class="p-4 p-md-5">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <span class="badge <?= $sekolah['jenjang'] == 'SD' ? 'bg-danger' : 'bg-primary' ?> px-3 py-2 rounded-pill">
+                        <span class="badge <?= $sekolah['jenjang'] == 'SD' ? 'bg-danger' : ($sekolah['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> px-3 py-2 rounded-pill">
                             <?= $sekolah['jenjang'] ?>
                         </span>
                         <div class="stats-badge">
@@ -110,6 +125,12 @@
                             <div class="info-value">
                                 <i class="fa-solid fa-map-pin text-primary me-2"></i>
                                 <?= $sekolah['latitude'] ?>, <?= $sekolah['longitude'] ?>
+                            </div>
+                        </div>
+                        <div class="col-md-6 info-item">
+                            <span class="info-label">Akreditasi</span>
+                            <div class="info-value">
+                                <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?>
                             </div>
                         </div>
                     </div>
@@ -180,33 +201,42 @@
     // Load saved basemap or default
     var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
     if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
-    
+
     baseMaps[savedBasemap].addTo(map);
 
     var redIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
     var blueIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
-    var iconSekolah = <?= $sekolah['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
+    var lightblueIcon = L.icon({
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
+        shadowSize: [41, 41]
+    });
+
+    var iconSekolah = <?= $sekolah['jenjang'] == 'SD' ? 'redIcon' : ($sekolah['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
 
     L.marker([lat, lng], {
             icon: iconSekolah
         }).addTo(map)
-        .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b>').openPopup();
+        .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b><br><small>Akreditasi: <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?></small>').openPopup();
 
     // Render GeoJSON Layers (Wilayah)
     <?php if (!empty($active_geojson)) : ?>
@@ -215,18 +245,18 @@
                 .then(response => response.json())
                 .then(data => {
                     L.geoJSON(data, {
-                        style: function(feature) {
-                            return {
-                                color: "<?= $gj['warna_geojson'] ?>",
-                                weight: 1.5,
-                                opacity: 0.4,
-                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                fillColor: "<?= $gj['warna_geojson'] ?>"
-                            };
-                        }
-                    })
-                    .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>")
-                    .addTo(map);
+                            style: function(feature) {
+                                return {
+                                    color: "<?= $gj['warna_geojson'] ?>",
+                                    weight: 1.5,
+                                    opacity: 0.4,
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                };
+                            }
+                        })
+                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>")
+                        .addTo(map);
                 });
         <?php endforeach; ?>
     <?php endif; ?>

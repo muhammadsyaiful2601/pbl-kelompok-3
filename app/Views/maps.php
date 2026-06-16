@@ -1,5 +1,13 @@
 <?= $this->extend('layout/template_publik') ?>
 
+<?php
+$total_sekolah = $total_sekolah ?? 0;
+$total_sd = $total_sd ?? 0;
+$total_smp = $total_smp ?? 0;
+$total_tk = $total_tk ?? 0;
+$sekolah_list = $sekolah_list ?? [];
+?>
+
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="<?= base_url('assets/css/style-publik.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
@@ -14,7 +22,7 @@
                 <i class="fa-solid fa-map-location-dot me-1"></i> Sistem Informasi Geografis
             </span>
             <h1 class="display-5 fw-bold text-slate-800 mb-3" style="letter-spacing: -1px; line-height: 1.2;">
-                Pemetaan Digital Sekolah <br><span class="text-primary">Jenjang SD & SMP</span>
+                Pemetaan Digital Sekolah <br><span class="text-primary">Jenjang SD, SMP & TK</span>
             </h1>
             <p class="lead text-muted mb-4" style="font-size: 1.05rem;">
                 Platform resmi Dinas Pendidikan untuk memantau, menganalisis sebaran geografis, serta pemerataan mutu fasilitas dan akses pendidikan dasar secara akurat, transparan, dan terintegrasi.
@@ -42,6 +50,7 @@
                         <button type="button" class="btn btn-sm btn-light active rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('semua', this)">Semua</button>
                         <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SD', this)">SD</button>
                         <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
+                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('TK', this)">TK</button>
                     </div>
                 </div>
 
@@ -107,6 +116,15 @@
             <div class="col-6 col-lg-3">
                 <div class="stat-card p-4">
                     <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+                        <i class="fa-solid fa-child-reaching fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1"><?= number_format($total_tk, 0, ',', '.') ?></h3>
+                    <p class="text-muted small mb-0 fw-medium">Taman Kanak-kanak (TK)</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card p-4">
+                    <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
                         <i class="fa-solid fa-user-chalkboard fs-4"></i>
                     </div>
                     <h3 class="fw-bold mb-1">...</h3>
@@ -130,7 +148,7 @@
                 <div class="mb-4">
                     <div class="d-flex align-items-start mb-2">
                         <i class="fa-solid fa-circle-check text-success me-2 mt-1"></i>
-                        <span>Klasterisasi marker otomatis (SD dan SMP)</span>
+                        <span>Klasterisasi marker otomatis (SD, SMP, dan TK)</span>
                     </div>
                     <div class="d-flex align-items-start mb-2">
                         <i class="fa-solid fa-circle-check text-success me-2 mt-1"></i>
@@ -182,25 +200,34 @@
     // Load saved basemap or default
     var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
     if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
-    
+
     baseMaps[savedBasemap].addTo(map);
 
     // Definisi Icon Kustom Leaflet
     var redIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
     var blueIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
+        shadowSize: [41, 41]
+    });
+
+    var lightblueIcon = L.icon({
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
@@ -208,17 +235,20 @@
     <?php if (!empty($sekolah_list)): ?>
         <?php foreach ($sekolah_list as $sk): ?>
             <?php if (!empty($sk['latitude'])): ?>
-                var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : 'blueIcon' ?>;
+                var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : ($sk['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
 
                 var popupContent = `
                     <div class="custom-popup" style="width: 220px;">
                         <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/220x120?text=No+Image' ?>" 
                              style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px 8px 0 0;" class="mb-2">
                         <div class="px-2 pb-2">
-                            <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : 'bg-primary' ?> mb-1" style="font-size: 10px;"><?= $sk['jenjang'] ?></span>
+                                    <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-1" style="font-size: 10px;"><?= $sk['jenjang'] ?></span>
                             <h6 class="fw-bold mb-1 text-dark"><?= $sk['nama_sekolah'] ?></h6>
                             <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
                                 <i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?>
+                            </p>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
                                 <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>
@@ -247,17 +277,17 @@
                 .then(response => response.json())
                 .then(data => {
                     var layer = L.geoJSON(data, {
-                        style: function(feature) {
-                            return {
-                                color: "<?= $gj['warna_geojson'] ?>",
-                                weight: 2,
-                                opacity: 0.6,
-                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                fillColor: "<?= $gj['warna_geojson'] ?>"
-                            };
-                        }
-                    })
-                    .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+                            style: function(feature) {
+                                return {
+                                    color: "<?= $gj['warna_geojson'] ?>",
+                                    weight: 2,
+                                    opacity: 0.6,
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                };
+                            }
+                        })
+                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
 
                     // Check localStorage for visibility preference (Synced with Full Maps)
                     var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');

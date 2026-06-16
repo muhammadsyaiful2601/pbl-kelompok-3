@@ -44,6 +44,21 @@ class Sekolah extends BaseController
         return view('admin/sekolah/form', $data);
     }
 
+    public function inputData()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to(base_url('login'));
+        }
+
+        $data = [
+            'title'      => 'Tambah Sekolah | WebGIS',
+            'page_title' => 'Tambah Data Sekolah Baru',
+            'validation' => \Config\Services::validation(),
+        ];
+
+        return view('admin/input_data/index', $data);
+    }
+
     public function edit($id)
     {
         if (!session()->get('logged_in')) {
@@ -85,6 +100,12 @@ class Sekolah extends BaseController
                 'rules'  => 'required',
                 'errors' => [
                     'required' => 'Jenjang harus dipilih.'
+                ]
+            ],
+            'akreditasi' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Akreditasi harus dipilih.'
                 ]
             ],
             'latitude' => [
@@ -138,6 +159,7 @@ class Sekolah extends BaseController
         $saveData = [
             'nama_sekolah'      => $this->request->getPost('nama_sekolah'),
             'jenjang'           => $this->request->getPost('jenjang'),
+            'akreditasi'        => $this->request->getPost('akreditasi'),
             'latitude'          => $this->request->getPost('latitude'),
             'longitude'         => $this->request->getPost('longitude'),
             'alamat'            => $this->request->getPost('alamat'),

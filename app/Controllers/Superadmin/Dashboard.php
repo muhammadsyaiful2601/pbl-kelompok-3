@@ -34,8 +34,9 @@ class Dashboard extends BaseController
             'total_sekolah' => $this->sekolahModel->countAllResults(),
             'total_sd'      => $this->sekolahModel->where('jenjang', 'SD')->countAllResults(),
             'total_smp'     => $this->sekolahModel->where('jenjang', 'SMP')->countAllResults(),
+            'total_tk'      => $this->sekolahModel->where('jenjang', 'TK')->countAllResults(),
             'sekolah_list'  => $this->sekolahModel->findAll(),
-            'active_geojson'=> $this->geojsonModel->where('is_active', 1)->findAll(),
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('superadmin/dashboard', $data);

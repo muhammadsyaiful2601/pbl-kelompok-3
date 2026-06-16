@@ -1,5 +1,13 @@
 <?= $this->extend('layout/template') ?>
 
+<?php
+$total_sekolah = $total_sekolah ?? 0;
+$total_sd = $total_sd ?? 0;
+$total_smp = $total_smp ?? 0;
+$total_tk = $total_tk ?? 0;
+$sekolah_list = $sekolah_list ?? [];
+?>
+
 <?= $this->section('styles') ?>
 <!-- CDN CSS for Spasial Features -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -9,10 +17,12 @@
         border: none !important;
         cursor: pointer;
     }
+
     .modern-stat-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
     }
+
     .stat-icon-bg {
         position: absolute;
         right: -10px;
@@ -21,10 +31,12 @@
         opacity: 0.15;
         transform: rotate(-15deg);
     }
+
     #map {
         border-radius: 8px;
         border: 1px solid #eef2f6;
     }
+
     .table-custom th {
         background-color: #f8fafc;
         text-transform: uppercase;
@@ -89,6 +101,18 @@
                     <p class="small text-white-50 fw-bold mb-1">JENJANG SMP</p>
                     <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_smp, 0, ',', '.') ?></h2>
                     <div class="stat-icon-bg"><i class="fa-solid fa-graduation-cap"></i></div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <!-- TK -->
+    <div class="col-12 col-sm-6 col-md-4">
+        <a href="<?= base_url('admin/sekolah') ?>" class="text-decoration-none">
+            <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #38bdf8, #0ea5e9); border-radius: 15px;">
+                <div class="card-body p-4 text-center text-md-start">
+                    <p class="small text-white-50 fw-bold mb-1">JENJANG TK</p>
+                    <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_tk, 0, ',', '.') ?></h2>
+                    <div class="stat-icon-bg"><i class="fa-solid fa-child-reaching"></i></div>
                 </div>
             </div>
         </a>
@@ -198,6 +222,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    /* global Chart */
     // 1. Initializing Mini Map
     var map = L.map('map', {
         zoomControl: true,
@@ -210,20 +235,29 @@
 
     // Icon definitions
     var redIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
     var blueIcon = L.icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
+        shadowSize: [41, 41]
+    });
+
+    var lightblueIcon = L.icon({
+        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [50, 60],
+        iconAnchor: [25, 60],
+        popupAnchor: [0, -50],
         shadowSize: [41, 41]
     });
 
@@ -231,10 +265,12 @@
     <?php if (!empty($sekolah_list)) : ?>
         <?php foreach ($sekolah_list as $sk) : ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])) : ?>
-                var icon = '<?= $sk['jenjang'] ?>' === 'SD' ? redIcon : blueIcon;
-                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], { icon: icon })
-                 .addTo(map)
-                 .bindPopup("<b><?= $sk['nama_sekolah'] ?></b>");
+                var icon = '<?= $sk['jenjang'] ?>' === 'SD' ? redIcon : ('<?= $sk['jenjang'] ?>' === 'SMP' ? blueIcon : lightblueIcon);
+                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
+                        icon: icon
+                    })
+                    .addTo(map)
+                    .bindPopup("<b><?= $sk['nama_sekolah'] ?></b>");
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -244,10 +280,10 @@
     new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Sekolah Dasar (SD)', 'Sekolah Menengah (SMP)'],
+            labels: ['Sekolah Dasar (SD)', 'Sekolah Menengah (SMP)', 'Taman Kanak-kanak (TK)'],
             datasets: [{
-                data: [<?= $total_sd ?>, <?= $total_smp ?>],
-                backgroundColor: ['#10b981', '#f59e0b'],
+                data: [<?= $total_sd ?>, <?= $total_smp ?>, <?= $total_tk ?>],
+                backgroundColor: ['#10b981', '#f59e0b', '#38bdf8'],
                 borderWidth: 0,
                 hoverOffset: 12
             }]
@@ -261,14 +297,21 @@
                     labels: {
                         usePointStyle: true,
                         padding: 25,
-                        font: { size: 12, weight: '500' }
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
                     }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(30, 41, 59, 0.9)',
                     padding: 12,
-                    titleFont: { size: 13 },
-                    bodyFont: { size: 13 },
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
                     displayColors: false
                 }
             },

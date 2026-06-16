@@ -56,6 +56,17 @@
                         <select name="jenjang" id="jenjangSelect" class="form-select">
                             <option value="SD" <?= old('jenjang') == 'SD' ? 'selected' : '' ?>>SD</option>
                             <option value="SMP" <?= old('jenjang') == 'SMP' ? 'selected' : '' ?>>SMP</option>
+                            <option value="TK" <?= old('jenjang') == 'TK' ? 'selected' : '' ?>>TK</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Akreditasi</label>
+                        <select name="akreditasi" class="form-select">
+                            <option value="">Pilih Akreditasi...</option>
+                            <option value="A" <?= old('akreditasi') == 'A' ? 'selected' : '' ?>>A</option>
+                            <option value="B" <?= old('akreditasi') == 'B' ? 'selected' : '' ?>>B</option>
+                            <option value="C" <?= old('akreditasi') == 'C' ? 'selected' : '' ?>>C</option>
+                            <option value="Belum Terakreditasi" <?= old('akreditasi') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -73,7 +84,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Deskripsi</label>
-                        <textarea name="deskripsi" class="form-control"><?= old('deskripsi') ?></textarea>
+                        <textarea name="deskripsi_sekolah" class="form-control"><?= old('deskripsi_sekolah') ?></textarea>
                     </div>
 
                     <div class="mb-3">
@@ -98,6 +109,7 @@
 
 <?= $this->section('scripts') ?>
 <script>
+    /* global FileReader, L */
     document.addEventListener('DOMContentLoaded', function() {
         var defaultLatLng = [-0.941, 100.370];
         var map = L.map('input-map').setView(defaultLatLng, 12);
@@ -109,7 +121,11 @@
 
         function placeMarker(latlng) {
             var jenjang = document.getElementById('jenjangSelect').value || 'SD';
-            var color = jenjang.toLowerCase() === 'sd' ? '#ff3b30' : '#1e90ff';
+            var color = jenjang.toLowerCase() === 'sd' ?
+                '#ff3b30' :
+                jenjang.toLowerCase() === 'smp' ?
+                '#1e90ff' :
+                '#38bdf8';
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }

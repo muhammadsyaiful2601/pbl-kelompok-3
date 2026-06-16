@@ -374,15 +374,15 @@
         <div class="glass-panel legend-card">
             <h6 class="fw-bold mb-2" style="font-size: 0.85rem;">Legenda</h6>
             <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; margin-right: 10px;"></div>
+                <img src="<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>" style="width: 20px; height: 24px; margin-right: 10px; object-fit: contain;">
                 <span>Sekolah Dasar (SD)</span>
             </div>
             <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; margin-right: 10px;"></div>
+                <img src="<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>" style="width: 20px; height: 24px; margin-right: 10px; object-fit: contain;">
                 <span>Sekolah Menengah (SMP)</span>
             </div>
             <div class="d-flex align-items-center" style="font-size: 0.8rem;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: #38bdf8; margin-right: 10px;"></div>
+                <img src="<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>" style="width: 20px; height: 24px; margin-right: 10px; object-fit: contain;">
                 <span>Taman Kanak-kanak (TK)</span>
             </div>
         </div>
@@ -573,6 +573,7 @@
 
         // Global storage for GeoJSON layers
         var geojsonLayers = {};
+        var geojsonConfig = {}; // Stores original style settings for dynamic zoom opacity
 
         // Render GeoJSON Layers (Wilayah)
         <?php if (!empty($active_geojson)) : ?>
@@ -583,9 +584,9 @@
                         var layer = L.geoJSON(data, {
                                 style: function(feature) {
                                     return {
-                                        color: "<?= $gj['warna_geojson'] ?>",
+                                        color: "#000000", // Black boundary
                                         weight: 2,
-                                        opacity: 0.5,
+                                        opacity: 0.8, // Increased opacity for better visibility
                                         fillOpacity: <?= $gj['opacity_geojson'] ?>,
                                         fillColor: "<?= $gj['warna_geojson'] ?>"
                                     };
@@ -593,17 +594,29 @@
                             })
                             .bindPopup(" <?= $gj['nama_geojson'] ?>")
                             .on('mouseover', function(e) {
-                                this.setStyle({
-                                    fillOpacity: <?= min(1, $gj['opacity_geojson'] + 0.2) ?>
-                                });
+                                var config = geojsonConfig[<?= $gj['id_geojson'] ?>];
+                                if (map.getZoom() < 15) {
+                                    this.setStyle({
+                                        fillOpacity: Math.min(1, config.fillOpacity + 0.2)
+                                    });
+                                }
                             })
                             .on('mouseout', function(e) {
+                                var config = geojsonConfig[<?= $gj['id_geojson'] ?>];
                                 this.setStyle({
-                                    fillOpacity: <?= $gj['opacity_geojson'] ?>
+                                    fillOpacity: config ? config.fillOpacity : <?= $gj['opacity_geojson'] ?>
                                 });
                             });
 
                         geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                        geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                            fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                            opacity: 0.8, // Initial stroke opacity
+                            color: "#000000"
+                        };
+                        
+                        // Wait a bit to ensure layer is fully ready before initial visibility check
+                        setTimeout(updateMarkersVisibility, 100);
 
                         // Check localStorage for visibility preference
                         var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
@@ -613,9 +626,127 @@
                         } else {
                             $('#toggle_<?= $gj['id_geojson'] ?>').prop('checked', false);
                         }
+
+                        // Apply initial zoom-based opacity
+                        updateGeoJsonOpacity(map.getZoom());
                     });
             <?php endforeach; ?>
         <?php endif; ?>
+
+        /**
+         * Update GeoJSON opacity based on zoom level to see terrain better
+         */
+        function updateGeoJsonOpacity(zoom) {
+            Object.keys(geojsonLayers).forEach(function(id) {
+                var layer = geojsonLayers[id];
+                var config = geojsonConfig[id];
+                if (!config) return;
+
+                var newFillOpacity = config.fillOpacity;
+                var newStrokeOpacity = config.opacity;
+
+                if (zoom >= 17) {
+                    newFillOpacity = 0.05;
+                    newStrokeOpacity = 0.2;
+                } else if (zoom === 16) {
+                    newFillOpacity = config.fillOpacity * 0.3;
+                    newStrokeOpacity = 0.4;
+                } else if (zoom === 15) {
+                    newFillOpacity = config.fillOpacity * 0.6;
+                    newStrokeOpacity = 0.6;
+                }
+
+                layer.setStyle({
+                    fillOpacity: newFillOpacity,
+                    opacity: newStrokeOpacity
+                });
+            });
+        }
+
+        // Zoom change listener
+        map.on('zoomend', function() {
+            updateGeoJsonOpacity(map.getZoom());
+        });
+
+        /**
+         * Helper to check if a LatLng is inside a Leaflet layer (Polygon/MultiPolygon)
+         */
+        function isLatLngInLayer(latlng, layer) {
+            if (!layer) return false;
+            
+            var found = false;
+            layer.eachLayer(function(l) {
+                if (l instanceof L.Polygon || l instanceof L.Polyline) { // Polyline check just in case, though usually Polygons
+                    if (isLatLngInPolygon(latlng, l)) {
+                        found = true;
+                    }
+                }
+            });
+            return found;
+        }
+
+        /**
+         * Ray-casting algorithm to check if point is in polygon
+         */
+        function isLatLngInPolygon(latlng, polygon) {
+            var lat = latlng.lat;
+            var lng = latlng.lng;
+            var coords = polygon.getLatLngs();
+
+            // Recursive function to handle nested arrays for Holes/MultiPolygons
+            function checkInside(points) {
+                if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
+                    for (var i = 0; i < points.length; i++) {
+                        if (checkInside(points[i])) return true;
+                    }
+                    return false;
+                }
+
+                var inside = false;
+                for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+                    var xi = points[i].lat, yi = points[i].lng;
+                    var xj = points[j].lat, yj = points[j].lng;
+                    var intersect = ((yi > lng) != (yj > lng))
+                        && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            return checkInside(coords);
+        }
+
+        /**
+         * Update visibility of markers based on GeoJSON layer visibility
+         */
+        function updateMarkersVisibility() {
+            Object.keys(markers).forEach(function(schoolId) {
+                var marker = markers[schoolId];
+                var latlng = marker.getLatLng();
+                var shouldHide = false;
+
+                // Check each GeoJSON layer
+                Object.keys(geojsonLayers).forEach(function(gjId) {
+                    var isChecked = $('#toggle_' + gjId).is(':checked');
+                    if (!isChecked) {
+                        // If layer is disabled, check if school is inside it
+                        if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                            shouldHide = true;
+                        }
+                    }
+                });
+
+                if (shouldHide) {
+                    if (map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                } else {
+                    if (!map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
+                }
+            });
+        }
 
         // Handle GeoJSON Toggle
         $('.geojson-toggle').on('change', function() {
@@ -629,6 +760,9 @@
                     map.removeLayer(geojsonLayers[id]);
                 }
                 localStorage.setItem('geojson_vis_' + id, isChecked);
+                
+                // Update markers visibility whenever a layer is toggled
+                updateMarkersVisibility();
             }
         });
 

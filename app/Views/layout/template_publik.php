@@ -125,7 +125,7 @@
 
                 <div class="d-flex align-items-center">
                     <a href="<?= base_url('login') ?>" class="btn btn-login">
-                        <i class="fa-solid fa-right-to-bracket me-2"></i>Panel Admin
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>Login
                     </a>
                 </div>
             </div>

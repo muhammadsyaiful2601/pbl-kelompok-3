@@ -231,10 +231,15 @@ $sekolah_list = $sekolah_list ?? [];
         shadowSize: [41, 41]
     });
 
+    // Global storage for objects
+    var markers = {};
+    var geojsonLayers = {};
+    var geojsonConfig = {}; // Stores original style for dynamic opacity
+
     // Merender marker secara dinamis berdasarkan data PHP
     <?php if (!empty($sekolah_list)): ?>
         <?php foreach ($sekolah_list as $sk): ?>
-            <?php if (!empty($sk['latitude'])): ?>
+            <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])): ?>
                 var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : ($sk['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
 
                 var popupContent = `
@@ -258,7 +263,7 @@ $sekolah_list = $sekolah_list ?? [];
                     </div>
                 `;
 
-                L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
+                var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: iconSekolah
                     })
                     .addTo(map)
@@ -266,6 +271,8 @@ $sekolah_list = $sekolah_list ?? [];
                         maxWidth: 250,
                         className: 'modern-leaflet-popup'
                     });
+                
+                markers[<?= $sk['id_sekolah'] ?>] = marker;
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -279,9 +286,9 @@ $sekolah_list = $sekolah_list ?? [];
                     var layer = L.geoJSON(data, {
                             style: function(feature) {
                                 return {
-                                    color: "<?= $gj['warna_geojson'] ?>",
+                                    color: "#000000", // Black boundary
                                     weight: 2,
-                                    opacity: 0.6,
+                                    opacity: 0.8, // Increased opacity
                                     fillOpacity: <?= $gj['opacity_geojson'] ?>,
                                     fillColor: "<?= $gj['warna_geojson'] ?>"
                                 };
@@ -289,14 +296,119 @@ $sekolah_list = $sekolah_list ?? [];
                         })
                         .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
 
+                    geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                    geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                        opacity: 0.8,
+                        color: "#000000"
+                    };
+
                     // Check localStorage for visibility preference (Synced with Full Maps)
                     var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
                     if (isVisible === null || isVisible === 'true') {
                         layer.addTo(map);
                     }
+                    
+                    // Trigger initial zoom-based opacity
+                    updateGeoJsonOpacity(map.getZoom());
+                    
+                    // Trigger visibility update after each layer is loaded
+                    setTimeout(updateMarkersVisibility, 100);
                 });
         <?php endforeach; ?>
     <?php endif; ?>
+
+    /**
+     * Update GeoJSON opacity based on zoom level
+     */
+    function updateGeoJsonOpacity(zoom) {
+        Object.keys(geojsonLayers).forEach(function(id) {
+            var layer = geojsonLayers[id];
+            var config = geojsonConfig[id];
+            if (!config) return;
+
+            var newFillOpacity = config.fillOpacity;
+            var newStrokeOpacity = config.opacity;
+
+            if (zoom >= 17) {
+                newFillOpacity = 0.05;
+                newStrokeOpacity = 0.15;
+            } else if (zoom === 16) {
+                newFillOpacity = config.fillOpacity * 0.3;
+                newStrokeOpacity = 0.4;
+            } else if (zoom === 15) {
+                newFillOpacity = config.fillOpacity * 0.6;
+                newStrokeOpacity = 0.6;
+            }
+
+            layer.setStyle({
+                fillOpacity: newFillOpacity,
+                opacity: newStrokeOpacity
+            });
+        });
+    }
+
+    // Zoom listener
+    map.on('zoomend', function() {
+        updateGeoJsonOpacity(map.getZoom());
+    });
+
+    /**
+     * Point-in-Polygon Synchronization Logic
+     */
+    function isLatLngInLayer(latlng, layer) {
+        if (!layer) return false;
+        var found = false;
+        layer.eachLayer(function(l) {
+            if (l instanceof L.Polygon) {
+                if (isLatLngInPolygon(latlng, l)) found = true;
+            }
+        });
+        return found;
+    }
+
+    function isLatLngInPolygon(latlng, polygon) {
+        var lat = latlng.lat, lng = latlng.lng;
+        var coords = polygon.getLatLngs();
+        function checkInside(points) {
+            if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
+                for (var i = 0; i < points.length; i++) if (checkInside(points[i])) return true;
+                return false;
+            }
+            var inside = false;
+            for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+                var xi = points[i].lat, yi = points[i].lng;
+                var xj = points[j].lat, yj = points[j].lng;
+                var intersect = ((yi > lng) != (yj > lng)) && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+        return checkInside(coords);
+    }
+
+    function updateMarkersVisibility() {
+        Object.keys(markers).forEach(function(id) {
+            var marker = markers[id];
+            var latlng = marker.getLatLng();
+            var shouldHide = false;
+
+            Object.keys(geojsonLayers).forEach(function(gjId) {
+                var isVisible = localStorage.getItem('geojson_vis_' + gjId);
+                if (isVisible === 'false') { // specifically hidden
+                    if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                        shouldHide = true;
+                    }
+                }
+            });
+
+            if (shouldHide) {
+                if (map.hasLayer(marker)) map.removeLayer(marker);
+            } else {
+                if (!map.hasLayer(marker)) marker.addTo(map);
+            }
+        });
+    }
 </script>
 <script src="<?= base_url('assets/js/script-publik.js') ?>"></script>
 <script src="<?= base_url('assets/js/search-hero.js') ?>"></script>

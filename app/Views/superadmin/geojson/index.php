@@ -37,6 +37,7 @@
                                 <th class="ps-3">No</th>
                                 <th>Nama Wilayah/Layer</th>
                                 <th>File Path</th>
+                                <th class="text-center">Warna</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
@@ -47,6 +48,12 @@
                                     <td class="ps-3"><?= $no++ ?></td>
                                     <td><span class="fw-bold text-dark text-capitalize"><?= $gj['nama_geojson'] ?></span></td>
                                     <td><code class="small text-muted"><?= $gj['file_geojson'] ?></code></td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <div class="rounded-circle shadow-sm me-2" style="width: 18px; height: 18px; background-color: <?= $gj['warna_geojson'] ?>; border: 2px solid white;"></div>
+                                            <span class="small fw-bold text-muted"><?= strtoupper($gj['warna_geojson']) ?></span>
+                                        </div>
+                                    </td>
                                     <td class="text-center">
                                         <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>" 
                                            class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill px-3">

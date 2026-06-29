@@ -138,46 +138,74 @@ $sekolah_list = $sekolah_list ?? [];
     // Initializing Mini Map
     var map = L.map('map', {
         zoomControl: true,
-        scrollWheelZoom: false
-    }).setView([-0.4795, 100.6274], 12);
+        scrollWheelZoom: true
+    }).setView([-0.5278869336553939, 100.76173868221711], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OSM'
     }).addTo(map);
 
-    // Icon definitions
-    var redIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
+    // Prevent mouse wheel scroll from propagating to the page behind the map
+    document.getElementById('map').addEventListener('wheel', function(e) {
+        e.stopPropagation();
+    }, {
+        passive: true
     });
 
-    var blueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Calculate marker size based on zoom level to avoid overlapping
+     */
+    function getMarkerSize(zoom) {
+        if (zoom >= 17) return {
+            w: 65,
+            h: 78
+        };
+        if (zoom >= 15) return {
+            w: 50,
+            h: 60
+        };
+        if (zoom >= 13) return {
+            w: 38,
+            h: 46
+        };
+        if (zoom >= 11) return {
+            w: 28,
+            h: 34
+        };
+        return {
+            w: 22,
+            h: 27
+        };
+    }
 
-    var lightblueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Create an L.icon for a given jenjang and size
+     */
+    function createSchoolIcon(jenjang, size) {
+        var iconUrl = '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>';
+        if (jenjang === 'SMP') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>';
+        } else if (jenjang === 'TK') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>';
+        }
+        var w = size.w;
+        var h = size.h;
+        return L.icon({
+            iconUrl: iconUrl,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [w, h],
+            iconAnchor: [w / 2, h],
+            popupAnchor: [0, -h + 10],
+            shadowSize: [Math.round(w * 0.82), Math.round(h * 0.68)]
+        });
+    }
 
     // Render sekolah markers
     <?php if (!empty($sekolah_list)) : ?>
         <?php foreach ($sekolah_list as $sk) : ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])) : ?>
-                var icon = '<?= $sk['jenjang'] ?>' === 'SD' ? redIcon : ('<?= $sk['jenjang'] ?>' === 'SMP' ? blueIcon : lightblueIcon);
+                var initialSize = getMarkerSize(map.getZoom());
+                var icon = createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
                 L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: icon
                     })
@@ -187,27 +215,79 @@ $sekolah_list = $sekolah_list ?? [];
         <?php endforeach; ?>
     <?php endif; ?>
 
-    // Render GeoJSON Layers (Wilayah)
+    // Render GeoJSON Layers (Wilayah) - Full Maps Sync
+    var geojsonLayers = {};
+    var geojsonConfig = {};
     <?php if (!empty($active_geojson)) : ?>
         <?php foreach ($active_geojson as $gj) : ?>
             fetch('<?= base_url($gj['file_geojson']) ?>')
                 .then(response => response.json())
                 .then(data => {
-                    L.geoJSON(data, {
+                    var layer = L.geoJSON(data, {
                             style: function(feature) {
                                 return {
-                                    color: "<?= $gj['warna_geojson'] ?>",
+                                    color: "#000000", // Black boundary
                                     weight: 2,
-                                    opacity: 0.6,
+                                    opacity: 0.8,
                                     fillOpacity: <?= $gj['opacity_geojson'] ?>,
                                     fillColor: "<?= $gj['warna_geojson'] ?>"
                                 };
                             }
                         })
-                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>")
-                        .addTo(map);
+                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+
+                    geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                    geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                        opacity: 0.8,
+                        color: "#000000"
+                    };
+
+                    // Check localStorage for visibility preference (Synced with Full Maps)
+                    var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                    if (isVisible === null || isVisible === 'true') {
+                        layer.addTo(map);
+                    }
+
+                    // Apply initial zoom-based opacity
+                    updateGeoJsonOpacity(map.getZoom());
                 });
         <?php endforeach; ?>
     <?php endif; ?>
+
+    /**
+     * Update GeoJSON opacity based on zoom level
+     */
+    function updateGeoJsonOpacity(zoom) {
+        Object.keys(geojsonLayers).forEach(function(id) {
+            var layer = geojsonLayers[id];
+            var config = geojsonConfig[id];
+            if (!config) return;
+
+            var newFillOpacity = config.fillOpacity;
+            var newStrokeOpacity = config.opacity;
+
+            if (zoom >= 17) {
+                newFillOpacity = 0.05;
+                newStrokeOpacity = 0.15;
+            } else if (zoom === 16) {
+                newFillOpacity = config.fillOpacity * 0.3;
+                newStrokeOpacity = 0.4;
+            } else if (zoom === 15) {
+                newFillOpacity = config.fillOpacity * 0.6;
+                newStrokeOpacity = 0.6;
+            }
+
+            layer.setStyle({
+                fillOpacity: newFillOpacity,
+                opacity: newStrokeOpacity
+            });
+        });
+    }
+
+    // Zoom listener
+    map.on('zoomend', function() {
+        updateGeoJsonOpacity(map.getZoom());
+    });
 </script>
 <?= $this->endSection() ?>

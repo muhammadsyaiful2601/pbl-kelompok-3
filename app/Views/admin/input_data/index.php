@@ -130,7 +130,7 @@
 <script>
     /* global FileReader, L */
     document.addEventListener('DOMContentLoaded', function() {
-        var defaultLatLng = [-0.4610, 100.6320];
+        var defaultLatLng = [-0.5278869336553939, 100.76173868221711];
         var map = L.map('input-map', {
             zoomControl: true,
             scrollWheelZoom: true
@@ -140,7 +140,7 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Render GeoJSON Layers (Wilayah)
+        // Render GeoJSON Layers (Wilayah) - Full Maps Sync
         var geojsonLayers = {};
         var geojsonConfig = {};
         <?php if (!empty($active_geojson)) : ?>
@@ -148,32 +148,79 @@
                 fetch('<?= base_url($gj['file_geojson']) ?>')
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error("Gagal mengambil file berkas GeoJSON.");
+                            throw new Error("Gagal mengambil file GeoJSON.");
                         }
                         return response.json();
                     })
                     .then(data => {
                         var layer = L.geoJSON(data, {
                                 interactive: false,
-                                style: {
-                                    weight: 2,
-                                    color: '<?= $gj['warna_geojson'] ?>',
-                                    opacity: 0.8,
-                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                style: function(feature) {
+                                    return {
+                                        color: "#000000", // Black boundary
+                                        weight: 2,
+                                        opacity: 0.8,
+                                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                        fillColor: "<?= $gj['warna_geojson'] ?>"
+                                    };
                                 }
                             })
-                            .addTo(map);
+                            .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
 
                         geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
                         geojsonConfig[<?= $gj['id_geojson'] ?>] = {
-                            color: '<?= $gj['warna_geojson'] ?>',
-                            opacity: <?= $gj['opacity_geojson'] ?>
+                            fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                            opacity: 0.8,
+                            color: "#000000"
                         };
+
+                        // Check localStorage for visibility preference (Synced with Full Maps)
+                        var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                        if (isVisible === null || isVisible === 'true') {
+                            layer.addTo(map);
+                        }
+
+                        // Apply initial zoom-based opacity
+                        updateGeoJsonOpacity(map.getZoom());
                     })
-                    .catch(err => console.error("Error memuat GeoJSON Leaflet: ", err));
+                    .catch(err => console.error("Error memuat GeoJSON: ", err));
             <?php endforeach; ?>
         <?php endif; ?>
+
+        /**
+         * Update GeoJSON opacity based on zoom level
+         */
+        function updateGeoJsonOpacity(zoom) {
+            Object.keys(geojsonLayers).forEach(function(id) {
+                var layer = geojsonLayers[id];
+                var config = geojsonConfig[id];
+                if (!config) return;
+
+                var newFillOpacity = config.fillOpacity;
+                var newStrokeOpacity = config.opacity;
+
+                if (zoom >= 17) {
+                    newFillOpacity = 0.05;
+                    newStrokeOpacity = 0.15;
+                } else if (zoom === 16) {
+                    newFillOpacity = config.fillOpacity * 0.3;
+                    newStrokeOpacity = 0.4;
+                } else if (zoom === 15) {
+                    newFillOpacity = config.fillOpacity * 0.6;
+                    newStrokeOpacity = 0.6;
+                }
+
+                layer.setStyle({
+                    fillOpacity: newFillOpacity,
+                    opacity: newStrokeOpacity
+                });
+            });
+        }
+
+        // Zoom listener
+        map.on('zoomend', function() {
+            updateGeoJsonOpacity(map.getZoom());
+        });
 
         var currentMarker = null;
 

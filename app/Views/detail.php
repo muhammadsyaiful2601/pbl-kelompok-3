@@ -139,6 +139,24 @@ $sekolah = $sekolah ?? [
                                 <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </div>
                         </div>
+                        <?php if (!empty($sekolah['kontak'])) : ?>
+                            <div class="col-md-6 info-item">
+                                <span class="info-label">Kontak</span>
+                                <div class="info-value">
+                                    <i class="fa-solid fa-phone text-primary me-2"></i>
+                                    <?= $sekolah['kontak'] ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (!empty($sekolah['tahun_berdiri'])) : ?>
+                            <div class="col-md-6 info-item">
+                                <span class="info-label">Tahun Berdiri</span>
+                                <div class="info-value">
+                                    <i class="fa-solid fa-calendar text-success me-2"></i>
+                                    <?= $sekolah['tahun_berdiri'] ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <hr class="my-4 opacity-50">
@@ -149,6 +167,26 @@ $sekolah = $sekolah ?? [
                             <?= $sekolah['deskripsi_sekolah'] ?: 'Tidak ada deskripsi tersedia untuk sekolah ini.' ?>
                         </div>
                     </div>
+
+                    <?php if (!empty($sekolah['visi'])) : ?>
+                        <hr class="my-4 opacity-50">
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-eye text-primary me-2"></i>Visi</span>
+                            <div class="info-value text-dark" style="line-height: 1.8; font-size: 1rem;">
+                                <?= nl2br($sekolah['visi']) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($sekolah['misi'])) : ?>
+                        <hr class="my-4 opacity-50">
+                        <div class="info-item">
+                            <span class="info-label"><i class="fa-solid fa-list-check text-success me-2"></i>Misi</span>
+                            <div class="info-value text-dark" style="line-height: 1.8; font-size: 1rem;">
+                                <?= nl2br($sekolah['misi']) ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -158,6 +196,34 @@ $sekolah = $sekolah ?? [
                 <h5 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>Lokasi Geografis</h5>
                 <p class="text-muted small">Titik koordinat presisi sekolah dalam sistem pemetaan digital.</p>
                 <div id="detail-map"></div>
+
+                <?php if (!empty($sekolah['kontak']) || !empty($sekolah['tahun_berdiri'])) : ?>
+                    <div class="mt-4 pt-3 border-top">
+                        <?php if (!empty($sekolah['tahun_berdiri'])) : ?>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-calendar fa-sm"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Tahun Berdiri</small>
+                                    <span class="fw-bold text-dark"><?= $sekolah['tahun_berdiri'] ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (!empty($sekolah['kontak'])) : ?>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-phone fa-sm"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Kontak</small>
+                                    <span class="fw-bold text-dark"><?= $sekolah['kontak'] ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="mt-4">
                     <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $sekolah['latitude'] ?>,<?= $sekolah['longitude'] ?>" target="_blank" class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
                         <i class="fa-solid fa-directions me-2"></i>Petunjuk Arah (Google Maps)
@@ -210,44 +276,66 @@ $sekolah = $sekolah ?? [
 
     baseMaps[savedBasemap].addTo(map);
 
-    var redIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Calculate marker size based on zoom level
+     */
+    function getMarkerSize(zoom) {
+        if (zoom >= 17) return {
+            w: 65,
+            h: 78
+        };
+        if (zoom >= 15) return {
+            w: 50,
+            h: 60
+        };
+        if (zoom >= 13) return {
+            w: 38,
+            h: 46
+        };
+        if (zoom >= 11) return {
+            w: 28,
+            h: 34
+        };
+        return {
+            w: 22,
+            h: 27
+        };
+    }
 
-    var blueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
-
-    var lightblueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Create an L.icon for a given jenjang and size
+     */
+    function createSchoolIcon(jenjang, size) {
+        var iconUrl = '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>';
+        if (jenjang === 'SMP') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>';
+        } else if (jenjang === 'TK') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>';
+        }
+        var w = size.w;
+        var h = size.h;
+        return L.icon({
+            iconUrl: iconUrl,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [w, h],
+            iconAnchor: [w / 2, h],
+            popupAnchor: [0, -h + 10],
+            shadowSize: [Math.round(w * 0.82), Math.round(h * 0.68)]
+        });
+    }
 
     var markers = {};
     var geojsonLayers = {};
     var geojsonConfig = {}; // For dynamic zoom opacity
 
-    var iconSekolah = <?= $sekolah['jenjang'] == 'SD' ? 'redIcon' : ($sekolah['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
+    var initialSize = getMarkerSize(map.getZoom());
+    var iconSekolah = createSchoolIcon('<?= $sekolah['jenjang'] ?>', initialSize);
 
     var markerSekolah = L.marker([lat, lng], {
             icon: iconSekolah
         }).addTo(map)
         .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b><br><small>Akreditasi: <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?></small>').openPopup();
-    
+
     markers[<?= $sekolah['id_sekolah'] ?>] = markerSekolah;
 
     // Render GeoJSON Layers (Wilayah)
@@ -341,17 +429,22 @@ $sekolah = $sekolah ?? [
     }
 
     function isLatLngInPolygon(latlng, polygon) {
-        var lat = latlng.lat, lng = latlng.lng;
+        var lat = latlng.lat,
+            lng = latlng.lng;
         var coords = polygon.getLatLngs();
+
         function checkInside(points) {
             if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
-                for (var i = 0; i < points.length; i++) if (checkInside(points[i])) return true;
+                for (var i = 0; i < points.length; i++)
+                    if (checkInside(points[i])) return true;
                 return false;
             }
             var inside = false;
             for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
-                var xi = points[i].lat, yi = points[i].lng;
-                var xj = points[j].lat, yj = points[j].lng;
+                var xi = points[i].lat,
+                    yi = points[i].lng;
+                var xj = points[j].lat,
+                    yj = points[j].lng;
                 var intersect = ((yi > lng) != (yj > lng)) && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
                 if (intersect) inside = !inside;
             }

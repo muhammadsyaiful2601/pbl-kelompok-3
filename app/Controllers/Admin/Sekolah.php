@@ -80,6 +80,7 @@ class Sekolah extends BaseController
             'page_title' => 'Edit Data Sekolah',
             'sekolah'    => $sekolah,
             'validation' => \Config\Services::validation(),
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('admin/sekolah/form', $data);
@@ -176,8 +177,12 @@ class Sekolah extends BaseController
             'longitude'         => $this->request->getPost('longitude'),
             'alamat'            => $this->request->getPost('alamat'),
             'website'           => $this->request->getPost('website') ?: null,
+            'kontak'            => $this->request->getPost('kontak') ?: null,
+            'tahun_berdiri'     => $this->request->getPost('tahun_berdiri') ?: null,
             'jumlah_siswa'      => $this->request->getPost('jumlah_siswa') ?: null,
             'deskripsi_sekolah' => $this->request->getPost('deskripsi_sekolah') ?: null,
+            'visi'              => $this->request->getPost('visi') ?: null,
+            'misi'              => $this->request->getPost('misi') ?: null,
             'foto'              => $namaFoto,
         ];
 

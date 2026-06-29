@@ -45,10 +45,9 @@ $sekolah_list = $sekolah_list ?? [];
         color: #64748b;
     }
 </style>
-<?= $this->endSection() ?> l
+<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<!-- ROW 1: WELCOME BANNER -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-left: 5px solid #3b82f6 !important; border-radius: 12px;">
@@ -227,45 +226,66 @@ $sekolah_list = $sekolah_list ?? [];
     var map = L.map('map', {
         zoomControl: true,
         scrollWheelZoom: true
-    }).setView([-0.4795, 100.6274], 12);
+    }).setView([-0.5278869336553939, 100.76173868221711], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OSM'
     }).addTo(map);
 
-    // Icon definitions
-    var redIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Calculate marker size based on zoom level to avoid overlapping
+     */
+    function getMarkerSize(zoom) {
+        if (zoom >= 17) return {
+            w: 65,
+            h: 78
+        };
+        if (zoom >= 15) return {
+            w: 50,
+            h: 60
+        };
+        if (zoom >= 13) return {
+            w: 38,
+            h: 46
+        };
+        if (zoom >= 11) return {
+            w: 28,
+            h: 34
+        };
+        return {
+            w: 22,
+            h: 27
+        };
+    }
 
-    var blueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
-
-    var lightblueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Create an L.icon for a given jenjang and size
+     */
+    function createSchoolIcon(jenjang, size) {
+        var iconUrl = '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>';
+        if (jenjang === 'SMP') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>';
+        } else if (jenjang === 'TK') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>';
+        }
+        var w = size.w;
+        var h = size.h;
+        return L.icon({
+            iconUrl: iconUrl,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [w, h],
+            iconAnchor: [w / 2, h],
+            popupAnchor: [0, -h + 10],
+            shadowSize: [Math.round(w * 0.82), Math.round(h * 0.68)]
+        });
+    }
 
     // Render sekolah markers
     <?php if (!empty($sekolah_list)) : ?>
         <?php foreach ($sekolah_list as $sk) : ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])) : ?>
-                var icon = '<?= $sk['jenjang'] ?>' === 'SD' ? redIcon : ('<?= $sk['jenjang'] ?>' === 'SMP' ? blueIcon : lightblueIcon);
+                var initialSize = getMarkerSize(map.getZoom());
+                var icon = createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
                 L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: icon
                     })
@@ -275,7 +295,7 @@ $sekolah_list = $sekolah_list ?? [];
         <?php endforeach; ?>
     <?php endif; ?>
 
-    // 2. Render GeoJSON Layers (Wilayah)
+    // 2. Render GeoJSON Layers (Wilayah) - Full Maps Sync
     var geojsonLayers = {};
     var geojsonConfig = {};
     <?php if (!empty($active_geojson)) : ?>
@@ -284,24 +304,71 @@ $sekolah_list = $sekolah_list ?? [];
                 .then(response => response.json())
                 .then(data => {
                     var layer = L.geoJSON(data, {
-                            style: {
-                                weight: 2,
-                                color: '<?= $gj['warna_geojson'] ?>',
-                                opacity: 0.8,
-                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                fillColor: "<?= $gj['warna_geojson'] ?>"
+                            style: function(feature) {
+                                return {
+                                    color: "#000000", // Black boundary
+                                    weight: 2,
+                                    opacity: 0.8,
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                };
                             }
                         })
-                        .addTo(map)
-                        .bindPopup(" <?= $gj['nama_geojson'] ?>");
+                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+
                     geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
                     geojsonConfig[<?= $gj['id_geojson'] ?>] = {
-                        color: '<?= $gj['warna_geojson'] ?>',
-                        opacity: <?= $gj['opacity_geojson'] ?>
+                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                        opacity: 0.8,
+                        color: "#000000"
                     };
+
+                    // Check localStorage for visibility preference (Synced with Full Maps)
+                    var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                    if (isVisible === null || isVisible === 'true') {
+                        layer.addTo(map);
+                    }
+
+                    // Apply initial zoom-based opacity
+                    updateGeoJsonOpacity(map.getZoom());
                 });
         <?php endforeach; ?>
     <?php endif; ?>
+
+    /**
+     * Update GeoJSON opacity based on zoom level
+     */
+    function updateGeoJsonOpacity(zoom) {
+        Object.keys(geojsonLayers).forEach(function(id) {
+            var layer = geojsonLayers[id];
+            var config = geojsonConfig[id];
+            if (!config) return;
+
+            var newFillOpacity = config.fillOpacity;
+            var newStrokeOpacity = config.opacity;
+
+            if (zoom >= 17) {
+                newFillOpacity = 0.05;
+                newStrokeOpacity = 0.15;
+            } else if (zoom === 16) {
+                newFillOpacity = config.fillOpacity * 0.3;
+                newStrokeOpacity = 0.4;
+            } else if (zoom === 15) {
+                newFillOpacity = config.fillOpacity * 0.6;
+                newStrokeOpacity = 0.6;
+            }
+
+            layer.setStyle({
+                fillOpacity: newFillOpacity,
+                opacity: newStrokeOpacity
+            });
+        });
+    }
+
+    // Zoom listener
+    map.on('zoomend', function() {
+        updateGeoJsonOpacity(map.getZoom());
+    });
 
     // 3. Initializing Chart.js
     var ctx = document.getElementById('chartSebaran').getContext('2d');

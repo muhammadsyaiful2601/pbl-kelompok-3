@@ -203,33 +203,71 @@ $sekolah_list = $sekolah_list ?? [];
 
     baseMaps[savedBasemap].addTo(map);
 
-    // Definisi Icon Kustom Leaflet
-    var redIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Calculate marker size based on zoom level to avoid overlapping
+     * Smaller at low zoom, larger at high zoom
+     */
+    function getMarkerSize(zoom) {
+        if (zoom >= 17) return {
+            w: 65,
+            h: 78
+        };
+        if (zoom >= 15) return {
+            w: 50,
+            h: 60
+        };
+        if (zoom >= 13) return {
+            w: 38,
+            h: 46
+        };
+        if (zoom >= 11) return {
+            w: 28,
+            h: 34
+        };
+        return {
+            w: 22,
+            h: 27
+        };
+    }
 
-    var blueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+    /**
+     * Create an L.icon for a given jenjang and size
+     */
+    function createSchoolIcon(jenjang, size) {
+        var iconUrl = '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>';
+        if (jenjang === 'SMP') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>';
+        } else if (jenjang === 'TK') {
+            iconUrl = '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>';
+        }
 
-    var lightblueIcon = L.icon({
-        iconUrl: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [50, 60],
-        iconAnchor: [25, 60],
-        popupAnchor: [0, -50],
-        shadowSize: [41, 41]
-    });
+        var w = size.w;
+        var h = size.h;
+
+        return L.icon({
+            iconUrl: iconUrl,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [w, h],
+            iconAnchor: [w / 2, h],
+            popupAnchor: [0, -h + 10],
+            shadowSize: [Math.round(w * 0.82), Math.round(h * 0.68)]
+        });
+    }
+
+    /**
+     * Update all marker icon sizes based on current zoom level
+     */
+    function updateMarkerSizes(zoom) {
+        var size = getMarkerSize(zoom);
+        Object.keys(markers).forEach(function(id) {
+            var m = markers[id];
+            var jenjang = m.options.originalJenjang || (m.options.icon && m.options.icon.options && m.options.icon.options.iconUrl ?
+                (m.options.icon.options.iconUrl.indexOf('logo SD') > -1 ? 'SD' :
+                    m.options.icon.options.iconUrl.indexOf('Logo smp') > -1 ? 'SMP' : 'TK') : 'SD');
+            var newIcon = createSchoolIcon(jenjang, size);
+            m.setIcon(newIcon);
+        });
+    }
 
     // Global storage for objects
     var markers = {};
@@ -240,7 +278,8 @@ $sekolah_list = $sekolah_list ?? [];
     <?php if (!empty($sekolah_list)): ?>
         <?php foreach ($sekolah_list as $sk): ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])): ?>
-                var iconSekolah = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : ($sk['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
+                var initialSize = getMarkerSize(map.getZoom());
+                var iconSekolah = createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
 
                 var popupContent = `
                     <div class="custom-popup" style="width: 220px;">
@@ -258,6 +297,16 @@ $sekolah_list = $sekolah_list ?? [];
                             <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
                                 <strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </p>
+                            <?php if (!empty($sk['kontak'])) : ?>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <strong>Kontak:</strong> <?= $sk['kontak'] ?>
+                            </p>
+                            <?php endif; ?>
+                            <?php if (!empty($sk['tahun_berdiri'])) : ?>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <strong>Tahun Berdiri:</strong> <?= $sk['tahun_berdiri'] ?>
+                            </p>
+                            <?php endif; ?>
                             <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
                                 <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>
                                 <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
@@ -274,7 +323,7 @@ $sekolah_list = $sekolah_list ?? [];
                         maxWidth: 250,
                         className: 'modern-leaflet-popup'
                     });
-                
+
                 markers[<?= $sk['id_sekolah'] ?>] = marker;
             <?php endif; ?>
         <?php endforeach; ?>
@@ -311,10 +360,10 @@ $sekolah_list = $sekolah_list ?? [];
                     if (isVisible === null || isVisible === 'true') {
                         layer.addTo(map);
                     }
-                    
+
                     // Trigger initial zoom-based opacity
                     updateGeoJsonOpacity(map.getZoom());
-                    
+
                     // Trigger visibility update after each layer is loaded
                     setTimeout(updateMarkersVisibility, 100);
                 });
@@ -354,6 +403,7 @@ $sekolah_list = $sekolah_list ?? [];
     // Zoom listener
     map.on('zoomend', function() {
         updateGeoJsonOpacity(map.getZoom());
+        updateMarkerSizes(map.getZoom());
     });
 
     /**
@@ -371,17 +421,22 @@ $sekolah_list = $sekolah_list ?? [];
     }
 
     function isLatLngInPolygon(latlng, polygon) {
-        var lat = latlng.lat, lng = latlng.lng;
+        var lat = latlng.lat,
+            lng = latlng.lng;
         var coords = polygon.getLatLngs();
+
         function checkInside(points) {
             if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
-                for (var i = 0; i < points.length; i++) if (checkInside(points[i])) return true;
+                for (var i = 0; i < points.length; i++)
+                    if (checkInside(points[i])) return true;
                 return false;
             }
             var inside = false;
             for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
-                var xi = points[i].lat, yi = points[i].lng;
-                var xj = points[j].lat, yj = points[j].lng;
+                var xi = points[i].lat,
+                    yi = points[i].lng;
+                var xj = points[j].lat,
+                    yj = points[j].lng;
                 var intersect = ((yi > lng) != (yj > lng)) && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
                 if (intersect) inside = !inside;
             }

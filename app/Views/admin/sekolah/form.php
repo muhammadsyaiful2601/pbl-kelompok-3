@@ -61,10 +61,28 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Website Sekolah</label>
+                                    <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
+                                    <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Kontak Sekolah <small class="text-muted">(opsional)</small></label>
+                                    <input type="text" name="kontak" class="form-control" value="<?= old('kontak', $sekolah['kontak'] ?? '') ?>" placeholder="Telepon / WhatsApp / Email">
+                                    <div class="invalid-feedback"><?= $validation->getError('kontak') ?></div>
+                                </div>
+                            </div>
+
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Website Sekolah</label>
-                                <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
-                                <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
+                                <label class="form-label fw-semibold">Tahun Berdiri <small class="text-muted">(opsional)</small></label>
+                                <select name="tahun_berdiri" class="form-select">
+                                    <option value="">Pilih Tahun...</option>
+                                    <?php $selectedTahun = old('tahun_berdiri', $sekolah['tahun_berdiri'] ?? ''); ?>
+                                    <?php for ($t = date('Y'); $t >= 1900; $t--): ?>
+                                        <option value="<?= $t ?>" <?= $selectedTahun == $t ? 'selected' : '' ?>><?= $t ?></option>
+                                    <?php endfor; ?>
+                                </select>
                             </div>
 
                             <div class="mb-3">
@@ -75,6 +93,7 @@
                                     <option value="B" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'B' ? 'selected' : '' ?>>B</option>
                                     <option value="C" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'C' ? 'selected' : '' ?>>C</option>
                                     <option value="Belum Terakreditasi" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
+                                    <option value="Tidak Diketahui" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Tidak Diketahui' ? 'selected' : '' ?>>Tidak Diketahui</option>
                                 </select>
                                 <div class="invalid-feedback"><?= $validation->getError('akreditasi') ?></div>
                             </div>
@@ -88,6 +107,16 @@
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Deskripsi Sekolah</label>
                                 <textarea name="deskripsi_sekolah" class="form-control" rows="5" placeholder="Tuliskan profil singkat atau deskripsi sekolah..."><?= old('deskripsi_sekolah', $sekolah['deskripsi_sekolah'] ?? '') ?></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Visi <small class="text-muted">(opsional)</small></label>
+                                <textarea name="visi" class="form-control" rows="4" placeholder="Tuliskan visi sekolah..."><?= old('visi', $sekolah['visi'] ?? '') ?></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Misi <small class="text-muted">(opsional)</small></label>
+                                <textarea name="misi" class="form-control" rows="4" placeholder="Tuliskan misi sekolah..."><?= old('misi', $sekolah['misi'] ?? '') ?></textarea>
                             </div>
                         </div>
 
@@ -145,15 +174,96 @@
 <?= $this->section('scripts') ?>
 <script>
     // Inisialisasi Peta untuk Inputan
-    var defaultLat = <?= $sekolah['latitude'] ?? -0.4795 ?>;
-    var defaultLng = <?= $sekolah['longitude'] ?? 100.6274 ?>;
-    var zoomLevel = <?= isset($sekolah['latitude']) ? 16 : 13 ?>;
+    var defaultLat = <?= $sekolah['latitude'] ?? -0.5278869336553939 ?>;
+    var defaultLng = <?= $sekolah['longitude'] ?? 100.76173868221711 ?>;
+    var zoomLevel = <?= isset($sekolah['latitude']) ? 16 : 11 ?>;
 
     var map = L.map('map-input').setView([defaultLat, defaultLng], zoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+
+    // Render GeoJSON Layers (Wilayah) - Full Maps Sync
+    var geojsonLayers = {};
+    var geojsonConfig = {};
+    <?php if (!empty($active_geojson)) : ?>
+        <?php foreach ($active_geojson as $gj) : ?>
+            fetch('<?= base_url($gj['file_geojson']) ?>')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Gagal mengambil file GeoJSON.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var layer = L.geoJSON(data, {
+                        interactive: false,
+                        style: function(feature) {
+                            return {
+                                color: "#000000", // Black boundary
+                                weight: 2,
+                                opacity: 0.8,
+                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                fillColor: "<?= $gj['warna_geojson'] ?>"
+                            };
+                        }
+                    }).bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+
+                    geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                    geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                        opacity: 0.8,
+                        color: "#000000"
+                    };
+
+                    // Check localStorage for visibility preference (Synced with Full Maps)
+                    var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                    if (isVisible === null || isVisible === 'true') {
+                        layer.addTo(map);
+                    }
+
+                    // Apply initial zoom-based opacity
+                    updateGeoJsonOpacity(map.getZoom());
+                })
+                .catch(err => console.error("Error memuat GeoJSON: ", err));
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    /**
+     * Update GeoJSON opacity based on zoom level
+     */
+    function updateGeoJsonOpacity(zoom) {
+        Object.keys(geojsonLayers).forEach(function(id) {
+            var layer = geojsonLayers[id];
+            var config = geojsonConfig[id];
+            if (!config) return;
+
+            var newFillOpacity = config.fillOpacity;
+            var newStrokeOpacity = config.opacity;
+
+            if (zoom >= 17) {
+                newFillOpacity = 0.05;
+                newStrokeOpacity = 0.15;
+            } else if (zoom === 16) {
+                newFillOpacity = config.fillOpacity * 0.3;
+                newStrokeOpacity = 0.4;
+            } else if (zoom === 15) {
+                newFillOpacity = config.fillOpacity * 0.6;
+                newStrokeOpacity = 0.6;
+            }
+
+            layer.setStyle({
+                fillOpacity: newFillOpacity,
+                opacity: newStrokeOpacity
+            });
+        });
+    }
+
+    // Zoom listener
+    map.on('zoomend', function() {
+        updateGeoJsonOpacity(map.getZoom());
+    });
 
     var marker;
     var latInput = document.getElementById('latitude');

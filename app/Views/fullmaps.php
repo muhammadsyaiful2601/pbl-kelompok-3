@@ -305,12 +305,21 @@
         <div class="glass-panel school-panel">
             <div class="school-panel-header">
                 <h6 class="fw-bold mb-2"><i class="fa-solid fa-list-check text-primary me-2"></i>Daftar Sekolah</h6>
+
+                <!-- Jenjang Filter Buttons -->
+                <div class="btn-group w-100 mb-3 p-1 bg-light rounded-pill border-0" role="group">
+                    <button type="button" class="btn btn-xs btn-white active rounded-pill fw-bold filter-jenjang" style="font-size: 0.75rem;" data-jenjang="Semua">Semua</button>
+                    <button type="button" class="btn btn-xs btn-white rounded-pill fw-bold filter-jenjang" style="font-size: 0.75rem;" data-jenjang="SD">SD</button>
+                    <button type="button" class="btn btn-xs btn-white rounded-pill fw-bold filter-jenjang" style="font-size: 0.75rem;" data-jenjang="SMP">SMP</button>
+                    <button type="button" class="btn btn-xs btn-white rounded-pill fw-bold filter-jenjang" style="font-size: 0.75rem;" data-jenjang="TK">TK</button>
+                </div>
+
                 <input type="text" id="schoolSearch" class="form-control form-control-sm rounded-pill border-0 bg-light px-3" placeholder="Nama atau alamat sekolah...">
             </div>
             <div class="school-panel-content">
                 <?php if (!empty($sekolah_list)): ?>
                     <?php foreach ($sekolah_list as $sk): ?>
-                        <div class="school-item" onclick="focusOnSchool(<?= $sk['id_sekolah'] ?>, this)">
+                        <div class="school-item" data-jenjang="<?= $sk['jenjang'] ?>" onclick="focusOnSchool(<?= $sk['id_sekolah'] ?>, this)">
                             <div class="d-flex align-items-center mb-1">
                                 <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> me-2" style="font-size: 0.65rem;"><?= $sk['jenjang'] ?></span>
                                 <h6 class="fw-bold mb-0 text-dark small"><?= $sk['nama_sekolah'] ?></h6>
@@ -334,7 +343,7 @@
     <div class="map-overlay overlay-top-center">
         <div class="glass-panel title-badge">
             <h6 class="mb-0 fw-bold text-slate-800">
-                <i class="fa-solid fa-earth-asia text-primary me-2"></i> Peta Sebaran Sekolah (Full Mode)
+                <i class="fa-solid fa-earth-asia text-primary me-2"></i> Peta Geospasial Sebaran Sekolah Kabupaten Tanah Datar
             </h6>
         </div>
     </div>
@@ -399,7 +408,7 @@
         var map = L.map('map', {
             zoomControl: false,
             attributionControl: false
-        }).setView([-0.4795, 100.6274], 14);
+        }).setView([-0.5059920351014519, 100.74949926873911], 12);
 
         L.control.zoom({
             position: 'bottomright'
@@ -496,7 +505,9 @@
                     var icon = <?= $sk['jenjang'] == 'SD' ? 'redIcon' : ($sk['jenjang'] == 'SMP' ? 'blueIcon' : 'lightblueIcon') ?>;
 
                     var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
-                            icon: icon
+                            icon: icon,
+                            jenjang: '<?= $sk['jenjang'] ?>',
+                            nama: '<?= addslashes($sk['nama_sekolah']) ?>'
                         })
                         .addTo(map)
                         .bindPopup(`
@@ -541,13 +552,40 @@
             }
         }
 
-        $('#schoolSearch').on('keyup', function() {
-            var v = $(this).val().toLowerCase();
-            $('.school-item').each(function() {
-                var match = $(this).text().toLowerCase().indexOf(v) > -1;
-                $(this).toggle(match);
-            });
+        // Filter Selection
+        var currentFilter = 'Semua';
+
+        $('.filter-jenjang').on('click', function() {
+            $('.filter-jenjang').removeClass('active btn-white').addClass('btn-light');
+            $(this).addClass('active btn-white').removeClass('btn-light');
+            currentFilter = $(this).data('jenjang');
+
+            applyFilters();
         });
+
+        $('#schoolSearch').on('keyup', function() {
+            applyFilters();
+        });
+
+        function applyFilters() {
+            var searchVal = $('#schoolSearch').val().toLowerCase();
+
+            // Filter List Items
+            $('.school-item').each(function() {
+                var nameMatch = $(this).text().toLowerCase().indexOf(searchVal) > -1;
+                var jenjang = $(this).data('jenjang');
+                var jenjangMatch = (currentFilter === 'Semua' || jenjang === currentFilter);
+
+                if (nameMatch && jenjangMatch) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            // Update Markers Visibility
+            updateMarkersVisibility();
+        }
 
         // Toggle Panel Functionality
         $('#toggleSchoolPanel').on('click', function() {
@@ -614,7 +652,7 @@
                             opacity: 0.8, // Initial stroke opacity
                             color: "#000000"
                         };
-                        
+
                         // Wait a bit to ensure layer is fully ready before initial visibility check
                         setTimeout(updateMarkersVisibility, 100);
 
@@ -673,7 +711,7 @@
          */
         function isLatLngInLayer(latlng, layer) {
             if (!layer) return false;
-            
+
             var found = false;
             layer.eachLayer(function(l) {
                 if (l instanceof L.Polygon || l instanceof L.Polyline) { // Polyline check just in case, though usually Polygons
@@ -704,10 +742,12 @@
 
                 var inside = false;
                 for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
-                    var xi = points[i].lat, yi = points[i].lng;
-                    var xj = points[j].lat, yj = points[j].lng;
-                    var intersect = ((yi > lng) != (yj > lng))
-                        && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+                    var xi = points[i].lat,
+                        yi = points[i].lng;
+                    var xj = points[j].lat,
+                        yj = points[j].lng;
+                    var intersect = ((yi > lng) != (yj > lng)) &&
+                        (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
                     if (intersect) inside = !inside;
                 }
                 return inside;
@@ -717,24 +757,38 @@
         }
 
         /**
-         * Update visibility of markers based on GeoJSON layer visibility
+         * Update visibility of markers based on GeoJSON layer visibility AND Jenjang/Search filters
          */
         function updateMarkersVisibility() {
+            var searchVal = $('#schoolSearch').val().toLowerCase();
+
             Object.keys(markers).forEach(function(schoolId) {
                 var marker = markers[schoolId];
                 var latlng = marker.getLatLng();
                 var shouldHide = false;
 
-                // Check each GeoJSON layer
-                Object.keys(geojsonLayers).forEach(function(gjId) {
-                    var isChecked = $('#toggle_' + gjId).is(':checked');
-                    if (!isChecked) {
-                        // If layer is disabled, check if school is inside it
-                        if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
-                            shouldHide = true;
+                // 1. Check Jenjang and Search Filter
+                var jenjang = marker.options.jenjang;
+                var name = marker.options.nama ? marker.options.nama.toLowerCase() : '';
+
+                if (currentFilter !== 'Semua' && jenjang !== currentFilter) {
+                    shouldHide = true;
+                }
+                if (searchVal && name.indexOf(searchVal) === -1) {
+                    shouldHide = true;
+                }
+
+                // 2. Check GeoJSON layer visibility (if not already hidden)
+                if (!shouldHide) {
+                    Object.keys(geojsonLayers).forEach(function(gjId) {
+                        var isChecked = $('#toggle_' + gjId).is(':checked');
+                        if (!isChecked) {
+                            if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                                shouldHide = true;
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 if (shouldHide) {
                     if (map.hasLayer(marker)) {
@@ -760,7 +814,7 @@
                     map.removeLayer(geojsonLayers[id]);
                 }
                 localStorage.setItem('geojson_vis_' + id, isChecked);
-                
+
                 // Update markers visibility whenever a layer is toggled
                 updateMarkersVisibility();
             }

@@ -4,14 +4,17 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\SekolahModel;
+use App\Models\GeojsonModel;
 
 class Sekolah extends BaseController
 {
     protected $sekolahModel;
+    protected $geojsonModel;
 
     public function __construct()
     {
         $this->sekolahModel = new SekolahModel();
+        $this->geojsonModel = new GeojsonModel();
     }
 
     public function index()
@@ -54,6 +57,7 @@ class Sekolah extends BaseController
             'title'      => 'Tambah Sekolah | WebGIS',
             'page_title' => 'Tambah Data Sekolah Baru',
             'validation' => \Config\Services::validation(),
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('admin/input_data/index', $data);

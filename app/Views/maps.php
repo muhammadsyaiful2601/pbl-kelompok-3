@@ -19,13 +19,13 @@ $sekolah_list = $sekolah_list ?? [];
     <section class="hero-section row align-items-center mb-5">
         <div class="col-lg-6 mb-4 mb-lg-0">
             <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">
-                <i class="fa-solid fa-map-location-dot me-1"></i> Sistem Informasi Geografis
+                <i class="fa-solid fa-map-location-dot me-1"></i> Web GIS Geospasial Kabupaten Tanah Datar
             </span>
             <h1 class="display-5 fw-bold text-slate-800 mb-3" style="letter-spacing: -1px; line-height: 1.2;">
-                Pemetaan Digital Sekolah <br><span class="text-primary">Jenjang SD, SMP & TK</span>
+                Pusat Informasi Geospasial <br><span class="text-primary">Pendidikan Kabupaten Tanah Datar</span>
             </h1>
-            <p class="lead text-muted mb-4" style="font-size: 1.05rem;">
-                Platform resmi Dinas Pendidikan untuk memantau, menganalisis sebaran geografis, serta pemerataan mutu fasilitas dan akses pendidikan dasar secara akurat, transparan, dan terintegrasi.
+            <p class="lead text-muted mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                Platform Web GIS resmi milik Pemerintah Kabupaten Tanah Datar yang menyajikan visualisasi data geospasial pendidikan dasar secara komprehensif. Melalui integrasi data spasial yang presisi, sistem ini memungkinkan Dinas Pendidikan untuk melakukan pemantauan intensif, pemetaan sebaran institusi secara akurat, serta analisis mendalam terhadap aksesibilitas dan pemerataan mutu pendidikan di seluruh penjuru wilayah Luhak Nan Tuo guna mendukung pengambilan kebijakan strategi berbasis data.
             </p>
             <div class="d-flex flex-wrap gap-3">
                 <a href="#peta-section" class="btn btn-login px-4 py-2.5 fs-6">

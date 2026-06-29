@@ -60,6 +60,28 @@ function filterSearchList(jenjang, buttonElement) {
     }
 
     renderSchoolSearchList();
+    updateMapMarkers();
+}
+
+/* Fungsi untuk menyaring marker di peta berdasarkan jenjang yang dipilih */
+function updateMapMarkers() {
+    if (typeof markers === 'undefined' || typeof map === 'undefined') return;
+
+    Object.keys(markers).forEach(id => {
+        const marker = markers[id];
+        const school = window.sekolahData.find(s => s.id_sekolah == id);
+        
+        if (!school) return;
+
+        const jenjang = (school.jenjang || school.type || 'SD').toLowerCase();
+        const matchesJenjang = currentJenjangFilter === 'semua' || jenjang === currentJenjangFilter.toLowerCase();
+
+        if (matchesJenjang) {
+            if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+            if (map.hasLayer(marker)) map.removeLayer(marker);
+        }
+    });
 }
 
 /* Fungsi untuk memindahkan fokus tampilan peta koordinat dan menggulir halaman ke area peta */

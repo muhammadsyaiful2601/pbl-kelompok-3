@@ -112,10 +112,41 @@
     /* global FileReader, L */
     document.addEventListener('DOMContentLoaded', function() {
         var defaultLatLng = [-0.941, 100.370];
-        var map = L.map('input-map').setView(defaultLatLng, 12);
+        var map = L.map('input-map', {
+            zoomControl: true,
+            scrollWheelZoom: true
+        }).setView(defaultLatLng, 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
+
+        // Render GeoJSON Layers (Wilayah)
+        var geojsonLayers = {};
+        var geojsonConfig = {};
+        <?php if (!empty($active_geojson)) : ?>
+            <?php foreach ($active_geojson as $gj) : ?>
+                fetch('<?= base_url($gj['file_geojson']) ?>')
+                    .then(response => response.json())
+                    .then(data => {
+                        var layer = L.geoJSON(data, {
+                                style: {
+                                    weight: 2,
+                                    color: '<?= $gj['warna_geojson'] ?>',
+                                    opacity: 0.8,
+                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                                }
+                            })
+                            .addTo(map)
+                            .bindPopup(" <?= $gj['nama_geojson'] ?>");
+                        geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                        geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                            color: '<?= $gj['warna_geojson'] ?>',
+                            opacity: <?= $gj['opacity_geojson'] ?>
+                        };
+                    });
+            <?php endforeach; ?>
+        <?php endif; ?>
 
         var currentMarker = null;
 

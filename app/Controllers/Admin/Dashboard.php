@@ -4,14 +4,17 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\SekolahModel;
+use App\Models\GeojsonModel;
 
 class Dashboard extends BaseController
 {
     protected $sekolahModel;
+    protected $geojsonModel;
 
     public function __construct()
     {
         $this->sekolahModel = new SekolahModel();
+        $this->geojsonModel = new GeojsonModel();
     }
 
     public function index()
@@ -30,6 +33,7 @@ class Dashboard extends BaseController
             'total_tk'     => $this->sekolahModel->where('jenjang', 'TK')->countAllResults(),
             'total_sekolah' => $this->sekolahModel->countAllResults(),
             'sekolah_list'  => $this->sekolahModel->findAll(),
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('admin/dashboard', $data);

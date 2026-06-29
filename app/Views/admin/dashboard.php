@@ -226,7 +226,7 @@ $sekolah_list = $sekolah_list ?? [];
     // 1. Initializing Mini Map
     var map = L.map('map', {
         zoomControl: true,
-        scrollWheelZoom: false
+        scrollWheelZoom: true
     }).setView([-0.4795, 100.6274], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -275,7 +275,35 @@ $sekolah_list = $sekolah_list ?? [];
         <?php endforeach; ?>
     <?php endif; ?>
 
-    // 2. Initializing Chart.js
+    // 2. Render GeoJSON Layers (Wilayah)
+    var geojsonLayers = {};
+    var geojsonConfig = {};
+    <?php if (!empty($active_geojson)) : ?>
+        <?php foreach ($active_geojson as $gj) : ?>
+            fetch('<?= base_url($gj['file_geojson']) ?>')
+                .then(response => response.json())
+                .then(data => {
+                    var layer = L.geoJSON(data, {
+                            style: {
+                                weight: 2,
+                                color: '<?= $gj['warna_geojson'] ?>',
+                                opacity: 0.8,
+                                fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                                fillColor: "<?= $gj['warna_geojson'] ?>"
+                            }
+                        })
+                        .addTo(map)
+                        .bindPopup(" <?= $gj['nama_geojson'] ?>");
+                    geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
+                    geojsonConfig[<?= $gj['id_geojson'] ?>] = {
+                        color: '<?= $gj['warna_geojson'] ?>',
+                        opacity: <?= $gj['opacity_geojson'] ?>
+                    };
+                });
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    // 3. Initializing Chart.js
     var ctx = document.getElementById('chartSebaran').getContext('2d');
     new Chart(ctx, {
         type: 'doughnut',

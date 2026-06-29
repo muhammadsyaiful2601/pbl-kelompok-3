@@ -170,6 +170,7 @@ class Sekolah extends BaseController
 
         $saveData = [
             'nama_sekolah'      => $this->request->getPost('nama_sekolah'),
+            'kepala_sekolah'    => $this->request->getPost('kepala_sekolah') ?: null,
             'jenjang'           => $this->request->getPost('jenjang'),
             'kategori'          => $this->request->getPost('kategori'),
             'akreditasi'        => $this->request->getPost('akreditasi'),

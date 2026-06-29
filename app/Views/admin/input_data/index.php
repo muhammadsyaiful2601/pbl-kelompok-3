@@ -52,6 +52,10 @@
                         <label class="form-label">Nama Sekolah *</label>
                         <input type="text" name="nama_sekolah" class="form-control" placeholder="Masukkan nama sekolah lengkap" value="<?= old('nama_sekolah') ?>">
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Kepala Sekolah</label>
+                        <input type="text" name="kepala_sekolah" class="form-control" placeholder="Masukkan nama kepala sekolah" value="<?= old('kepala_sekolah') ?>">
+                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Jenjang *</label>

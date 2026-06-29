@@ -11,6 +11,7 @@ $sekolah = $sekolah ?? [
     'longitude' => 0,
     'akreditasi' => '',
     'deskripsi_sekolah' => '',
+    'kepala_sekolah' => '',
     'website' => ''
 ];
 ?>
@@ -139,6 +140,15 @@ $sekolah = $sekolah ?? [
                                 <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </div>
                         </div>
+                        <?php if (!empty($sekolah['kepala_sekolah'])) : ?>
+                            <div class="col-md-6 info-item">
+                                <span class="info-label">Kepala Sekolah</span>
+                                <div class="info-value">
+                                    <i class="fa-solid fa-user-tie text-primary me-2"></i>
+                                    <?= $sekolah['kepala_sekolah'] ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                         <?php if (!empty($sekolah['kontak'])) : ?>
                             <div class="col-md-6 info-item">
                                 <span class="info-label">Kontak</span>
@@ -197,8 +207,19 @@ $sekolah = $sekolah ?? [
                 <p class="text-muted small">Titik koordinat presisi sekolah dalam sistem pemetaan digital.</p>
                 <div id="detail-map"></div>
 
-                <?php if (!empty($sekolah['kontak']) || !empty($sekolah['tahun_berdiri'])) : ?>
+                <?php if (!empty($sekolah['kepala_sekolah']) || !empty($sekolah['kontak']) || !empty($sekolah['tahun_berdiri'])) : ?>
                     <div class="mt-4 pt-3 border-top">
+                        <?php if (!empty($sekolah['kepala_sekolah'])) : ?>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
+                                    <i class="fa-solid fa-user-tie fa-sm"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Kepala Sekolah</small>
+                                    <span class="fw-bold text-dark"><?= $sekolah['kepala_sekolah'] ?></span>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                         <?php if (!empty($sekolah['tahun_berdiri'])) : ?>
                             <div class="d-flex align-items-center mb-2">
                                 <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">

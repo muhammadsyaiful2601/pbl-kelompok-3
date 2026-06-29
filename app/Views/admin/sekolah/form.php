@@ -35,6 +35,11 @@
                                 <div class="invalid-feedback"><?= $validation->getError('nama_sekolah') ?></div>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Nama Kepala Sekolah <small class="text-muted">(opsional)</small></label>
+                                <input type="text" name="kepala_sekolah" class="form-control" value="<?= old('kepala_sekolah', $sekolah['kepala_sekolah'] ?? '') ?>" placeholder="Masukkan nama kepala sekolah">
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label fw-semibold">Jenjang <span class="text-danger">*</span></label>

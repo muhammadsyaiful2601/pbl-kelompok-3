@@ -297,6 +297,11 @@ $sekolah_list = $sekolah_list ?? [];
                             <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
                                 <strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </p>
+                            <?php if (!empty($sk['kepala_sekolah'])) : ?>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <strong>Kepala Sekolah:</strong> <?= $sk['kepala_sekolah'] ?>
+                            </p>
+                            <?php endif; ?>
                             <?php if (!empty($sk['kontak'])) : ?>
                             <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
                                 <strong>Kontak:</strong> <?= $sk['kontak'] ?>

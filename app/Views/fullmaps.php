@@ -518,6 +518,7 @@
                                     <h6 class="fw-bold mb-1"><?= $sk['nama_sekolah'] ?></h6>
                                     <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?></p>
                                     <p class="text-muted small mb-3"><strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></p>
+                                    <p class="text-muted small mb-3"><strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                                         <small class="text-muted"><i class="fa-solid fa-users"></i> <?= number_format($sk['jumlah_siswa'] ?? 0) ?></small>
                                         <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Detail</a>

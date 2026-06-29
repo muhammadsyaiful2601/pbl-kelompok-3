@@ -66,6 +66,8 @@ class Admin extends BaseController
             'nama_lengkap' => $this->request->getPost('nama_lengkap'),
             'role'         => 'admin',
         ]);
+        $insertId = $this->userModel->getInsertID();
+        log_activity('tambah', 'user', $insertId, 'Menambahkan akun admin baru: ' . $this->request->getPost('username'));
 
         return redirect()->to(base_url('superadmin/admin'))->with('success', 'Akun admin berhasil ditambahkan.');
     }
@@ -79,6 +81,7 @@ class Admin extends BaseController
         $user = $this->userModel->find($id);
         if ($user && $user['role'] === 'admin') {
             $this->userModel->delete($id);
+            log_activity('hapus', 'user', $id, 'Menghapus akun admin: ' . $user['username']);
             return redirect()->to(base_url('superadmin/admin'))->with('success', 'Akun admin berhasil dihapus.');
         }
 

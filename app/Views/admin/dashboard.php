@@ -45,7 +45,7 @@ $sekolah_list = $sekolah_list ?? [];
         color: #64748b;
     }
 </style>
-<?= $this->endSection() ?>
+<?= $this->endSection() ?> l
 
 <?= $this->section('content') ?>
 <!-- ROW 1: WELCOME BANNER -->

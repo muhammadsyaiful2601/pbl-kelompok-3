@@ -36,7 +36,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label fw-semibold">Jenjang <span class="text-danger">*</span></label>
                                     <select name="jenjang" class="form-select <?= ($validation->hasError('jenjang')) ? 'is-invalid' : '' ?>">
                                         <option value="">Pilih Jenjang...</option>
@@ -46,7 +46,16 @@
                                     </select>
                                     <div class="invalid-feedback"><?= $validation->getError('jenjang') ?></div>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                                    <select name="kategori" class="form-select <?= ($validation->hasError('kategori')) ? 'is-invalid' : '' ?>">
+                                        <option value="">Pilih Kategori...</option>
+                                        <option value="negri" <?= old('kategori', $sekolah['kategori'] ?? '') == 'negri' ? 'selected' : '' ?>>Negeri (Negri)</option>
+                                        <option value="swasta" <?= old('kategori', $sekolah['kategori'] ?? '') == 'swasta' ? 'selected' : '' ?>>Swasta</option>
+                                    </select>
+                                    <div class="invalid-feedback"><?= $validation->getError('kategori') ?></div>
+                                </div>
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label fw-semibold">Jumlah Siswa</label>
                                     <input type="number" name="jumlah_siswa" class="form-control" value="<?= old('jumlah_siswa', $sekolah['jumlah_siswa'] ?? '') ?>" placeholder="0">
                                 </div>

@@ -5,6 +5,7 @@
 <style>
     #input-map {
         height: 420px;
+        border-radius: 8px;
     }
 
     .img-preview {
@@ -48,52 +49,70 @@
             <div class="card">
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Nama Sekolah</label>
-                        <input type="text" name="nama_sekolah" class="form-control" value="<?= old('nama_sekolah') ?>">
+                        <label class="form-label">Nama Sekolah *</label>
+                        <input type="text" name="nama_sekolah" class="form-control" placeholder="Masukkan nama sekolah lengkap" value="<?= old('nama_sekolah') ?>">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenjang *</label>
+                            <select name="jenjang" id="jenjangSelect" class="form-select">
+                                <option value="">Pilih Jenjang</option>
+                                <option value="SD" <?= old('jenjang') == 'SD' ? 'selected' : '' ?>>SD</option>
+                                <option value="SMP" <?= old('jenjang') == 'SMP' ? 'selected' : '' ?>>SMP</option>
+                                <option value="TK" <?= old('jenjang') == 'TK' ? 'selected' : '' ?>>TK</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Kategori *</label>
+                            <select name="kategori" class="form-select">
+                                <option value="">Pilih Kategori</option>
+                                <option value="Negeri" <?= old('kategori') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
+                                <option value="Swasta" <?= old('kategori') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Jenjang</label>
-                        <select name="jenjang" id="jenjangSelect" class="form-select">
-                            <option value="SD" <?= old('jenjang') == 'SD' ? 'selected' : '' ?>>SD</option>
-                            <option value="SMP" <?= old('jenjang') == 'SMP' ? 'selected' : '' ?>>SMP</option>
-                            <option value="TK" <?= old('jenjang') == 'TK' ? 'selected' : '' ?>>TK</option>
-                        </select>
+                        <label class="form-label">Jumlah Siswa</label>
+                        <input type="number" name="jumlah_siswa" class="form-control" value="<?= old('jumlah_siswa', 0) ?>">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Akreditasi</label>
+                        <label class="form-label">Website Sekolah</label>
+                        <input type="text" name="website" class="form-control" placeholder="https://contohsekolah.sch.id" value="<?= old('website') ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Akreditasi *</label>
                         <select name="akreditasi" class="form-select">
                             <option value="">Pilih Akreditasi...</option>
                             <option value="A" <?= old('akreditasi') == 'A' ? 'selected' : '' ?>>A</option>
                             <option value="B" <?= old('akreditasi') == 'B' ? 'selected' : '' ?>>B</option>
                             <option value="C" <?= old('akreditasi') == 'C' ? 'selected' : '' ?>>C</option>
                             <option value="Belum Terakreditasi" <?= old('akreditasi') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
+                            <option value="Tidak Diketahui" <?= old('akreditasi') == 'Tidak Diketahui' ? 'selected' : '' ?>>Tidak Diketahui</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Foto (opsional)</label>
+                        <label class="form-label">Foto Sekolah (opsional)</label>
                         <input type="file" name="foto" id="fotoInput" class="form-control" accept="image/*">
                         <img id="fotoPreview" class="img-preview" src="#" alt="" style="display:none;">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea name="alamat" class="form-control"><?= old('alamat') ?></textarea>
+                        <label class="form-label">Alamat *</label>
+                        <textarea name="alamat" class="form-control" placeholder="Alamat lengkap sekolah..."><?= old('alamat') ?></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Jumlah Siswa</label>
-                        <input type="number" name="jumlah_siswa" class="form-control" value="<?= old('jumlah_siswa') ?>">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea name="deskripsi_sekolah" class="form-control"><?= old('deskripsi_sekolah') ?></textarea>
+                        <label class="form-label">Deskripsi Sekolah</label>
+                        <textarea name="deskripsi_sekolah" class="form-control" placeholder="Tuliskan profil singkat atau deskripsi sekolah..."><?= old('deskripsi_sekolah') ?></textarea>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Latitude</label>
-                        <input type="text" name="latitude" id="latitudeInput" class="form-control" readonly value="<?= old('latitude') ?>">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Longitude</label>
-                        <input type="text" name="longitude" id="longitudeInput" class="form-control" readonly value="<?= old('longitude') ?>">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Latitude</label>
+                            <input type="text" name="latitude" id="latitudeInput" class="form-control" readonly placeholder="Latitude" value="<?= old('latitude') ?>">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Longitude</label>
+                            <input type="text" name="longitude" id="longitudeInput" class="form-control" readonly placeholder="Longitude" value="<?= old('longitude') ?>">
+                        </div>
                     </div>
 
                     <div class="d-grid gap-2">
@@ -111,11 +130,12 @@
 <script>
     /* global FileReader, L */
     document.addEventListener('DOMContentLoaded', function() {
-        var defaultLatLng = [-0.941, 100.370];
+        var defaultLatLng = [-0.4610, 100.6320];
         var map = L.map('input-map', {
             zoomControl: true,
             scrollWheelZoom: true
-        }).setView(defaultLatLng, 12);
+        }).setView(defaultLatLng, 11);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
@@ -126,9 +146,15 @@
         <?php if (!empty($active_geojson)) : ?>
             <?php foreach ($active_geojson as $gj) : ?>
                 fetch('<?= base_url($gj['file_geojson']) ?>')
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Gagal mengambil file berkas GeoJSON.");
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         var layer = L.geoJSON(data, {
+                                interactive: false,
                                 style: {
                                     weight: 2,
                                     color: '<?= $gj['warna_geojson'] ?>',
@@ -137,14 +163,15 @@
                                     fillColor: "<?= $gj['warna_geojson'] ?>"
                                 }
                             })
-                            .addTo(map)
-                            .bindPopup(" <?= $gj['nama_geojson'] ?>");
+                            .addTo(map);
+
                         geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
                         geojsonConfig[<?= $gj['id_geojson'] ?>] = {
                             color: '<?= $gj['warna_geojson'] ?>',
                             opacity: <?= $gj['opacity_geojson'] ?>
                         };
-                    });
+                    })
+                    .catch(err => console.error("Error memuat GeoJSON Leaflet: ", err));
             <?php endforeach; ?>
         <?php endif; ?>
 
@@ -181,15 +208,14 @@
             }
         });
 
-        // If old values exist, place marker
         var oldLat = document.getElementById('latitudeInput').value;
         var oldLng = document.getElementById('longitudeInput').value;
         if (oldLat && oldLng) {
             placeMarker(L.latLng(parseFloat(oldLat), parseFloat(oldLng)));
-            map.setView([parseFloat(oldLat), parseFloat(oldLng)], 15);
+            map.setView([parseFloat(oldLat), parseFloat(oldLng)], 14);
         }
 
-        // Foto preview
+        // Preview Foto upload
         var fotoInput = document.getElementById('fotoInput');
         fotoInput.addEventListener('change', function(e) {
             var file = this.files && this.files[0];

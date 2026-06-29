@@ -54,6 +54,9 @@ class Geojson extends BaseController
                     $count++;
                 }
             }
+            if ($count > 0) {
+                log_activity('tambah', 'geojson', null, "Melakukan pemindaian GeoJSON, berhasil menambahkan $count file baru.");
+            }
             return redirect()->to(base_url('superadmin/geojson'))->with('success', "Berhasil memindai $count file GeoJSON baru.");
         }
 
@@ -77,6 +80,9 @@ class Geojson extends BaseController
                 $this->geojsonModel->update($gj['id_geojson'], ['nama_geojson' => $newName]);
                 $count++;
             }
+        }
+        if ($count > 0) {
+            log_activity('ubah', 'geojson', null, "Melakukan pembersihan nama lapisan wilayah GeoJSON, berhasil memperbarui $count nama wilayah.");
         }
 
         return redirect()->to(base_url('superadmin/geojson'))->with('success', "Berhasil membersihkan $count nama wilayah.");
@@ -123,6 +129,7 @@ class Geojson extends BaseController
             'warna_geojson'   => $this->request->getPost('warna_geojson'),
             'opacity_geojson' => $this->request->getPost('opacity_geojson'),
         ]);
+        log_activity('ubah', 'geojson', $id, "Mengubah pengaturan visual layer GeoJSON: " . $this->request->getPost('nama_geojson'));
 
         return redirect()->to(base_url('superadmin/geojson'))->with('success', 'Pengaturan visual berhasil disimpan.');
     }
@@ -138,6 +145,8 @@ class Geojson extends BaseController
             $this->geojsonModel->update($id, [
                 'is_active' => $geojson['is_active'] ? 0 : 1
             ]);
+            $statusStr = $geojson['is_active'] ? 'menonaktifkan' : 'mengaktifkan';
+            log_activity('ubah', 'geojson', $id, "Mengubah status layer GeoJSON, " . $statusStr . " layer: " . $geojson['nama_geojson']);
             return redirect()->to(base_url('superadmin/geojson'))->with('success', 'Status GeoJSON berhasil diperbarui.');
         }
 
@@ -150,7 +159,12 @@ class Geojson extends BaseController
             return redirect()->to(base_url('login'));
         }
 
-        $this->geojsonModel->delete($id);
-        return redirect()->to(base_url('superadmin/geojson'))->with('success', 'Data GeoJSON berhasil dihapus dari sistem.');
+        $geojson = $this->geojsonModel->find($id);
+        if ($geojson) {
+            $this->geojsonModel->delete($id);
+            log_activity('hapus', 'geojson', $id, "Menghapus data GeoJSON: " . $geojson['nama_geojson']);
+            return redirect()->to(base_url('superadmin/geojson'))->with('success', 'Data GeoJSON berhasil dihapus dari sistem.');
+        }
+        return redirect()->to(base_url('superadmin/geojson'))->with('error', 'Data tidak ditemukan.');
     }
 }

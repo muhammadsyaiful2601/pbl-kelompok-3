@@ -24,6 +24,12 @@ class CreateSekolahTable extends Migration
                 'constraint' => ['SD', 'SMP', 'TK'],
                 'null'       => false,
             ],
+            'kategori' => [
+                'type'       => 'ENUM',
+                'constraint' => ['negri', 'swasta'],
+                'null'       => true,
+                'default'    => null,
+            ],
             'foto' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
@@ -62,9 +68,8 @@ class CreateSekolahTable extends Migration
                 'null'       => false,
             ],
             'created_at' => [
-                'type'    => 'DATETIME',
-                'null'    => true,
-                'default' => 'CURRENT_TIMESTAMP',
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'tipe_objek' => [
                 'type'       => 'ENUM',

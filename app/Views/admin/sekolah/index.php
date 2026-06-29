@@ -39,6 +39,7 @@
                                 <th width="80">Foto</th>
                                 <th>Nama Sekolah</th>
                                 <th>Jenjang</th>
+                                <th>Kategori</th>
                                 <th>Alamat</th>
                                 <th class="text-center">Siswa</th>
                                 <th class="text-center" width="150">Aksi</th>
@@ -64,8 +65,13 @@
                                             <div class="text-muted small">Lat: <?= $s['latitude'] ?>, Lng: <?= $s['longitude'] ?></div>
                                         </td>
                                         <td>
-                                            <span class="badge <?= $s['jenjang'] == 'SD' ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' ?> border px-2 py-1">
+                                            <span class="badge <?= $s['jenjang'] == 'SD' ? 'bg-danger-subtle text-danger' : ($s['jenjang'] == 'SMP' ? 'bg-primary-subtle text-primary' : 'bg-info-subtle text-info') ?> border px-2 py-1">
                                                 <?= $s['jenjang'] ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge <?= $s['kategori'] == 'negri' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' ?> border px-2 py-1 text-capitalize">
+                                                <?= $s['kategori'] == 'negri' ? 'Negeri' : ($s['kategori'] == 'swasta' ? 'Swasta' : '-') ?>
                                             </span>
                                         </td>
                                         <td>

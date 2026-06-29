@@ -12,7 +12,7 @@ class AddAkreditasiToSekolahTable extends Migration
             $fields = [
                 'akreditasi' => [
                     'type'       => 'ENUM',
-                    'constraint' => ['A', 'B', 'C', 'Belum Terakreditasi'],
+                    'constraint' => ['A', 'B', 'C', 'Belum Terakreditasi', 'Tidak Diketahui'],
                     'null'       => false,
                     'default'    => 'Belum Terakreditasi',
                 ],

@@ -133,6 +133,12 @@ $sekolah = $sekolah ?? [
                                 <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?>
                             </div>
                         </div>
+                        <div class="col-md-6 info-item">
+                            <span class="info-label">Kategori</span>
+                            <div class="info-value text-capitalize">
+                                <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-4 opacity-50">

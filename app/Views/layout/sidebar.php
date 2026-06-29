@@ -29,6 +29,12 @@
                             <p>Kelola GeoJSON</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?= base_url('superadmin/logs') ?>" class="nav-link <?= (url_is('superadmin/logs*') ? 'active' : '') ?>">
+                            <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
+                            <p>Log Aktivitas</p>
+                        </a>
+                    </li>
                 <?php endif; ?>
 
                 <?php if (session()->get('role') === 'admin' || session()->get('role') === 'superadmin') : ?>

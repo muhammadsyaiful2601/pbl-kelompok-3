@@ -178,7 +178,7 @@ $sekolah_list = $sekolah_list ?? [];
 
 <script>
     // Inisialisasi Peta Utama Publik
-    var map = L.map('preview-map').setView([-0.4795, 100.6274], 13);
+    var map = L.map('preview-map').setView([-0.5059920351014519, 100.74949926873911], 11);
 
     // Initial Base Layers
     var baseMaps = {
@@ -254,6 +254,9 @@ $sekolah_list = $sekolah_list ?? [];
                             </p>
                             <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
                                 <strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?>
+                            </p>
+                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
+                                <strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
                                 <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>

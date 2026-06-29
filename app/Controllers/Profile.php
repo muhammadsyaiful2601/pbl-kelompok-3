@@ -84,6 +84,7 @@ class Profile extends BaseController
         }
 
         $this->userModel->save($saveData);
+        log_activity('ubah', 'user', $user['id_user'], 'Memperbarui profil pengguna');
 
         session()->set([
             'nama_lengkap' => $saveData['nama_lengkap'],

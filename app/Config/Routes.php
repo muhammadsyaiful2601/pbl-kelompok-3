@@ -37,6 +37,7 @@ $routes->group('superadmin', function ($routes) {
     $routes->get('admin/tambah', 'Superadmin\Admin::tambah');
     $routes->post('admin/simpan', 'Superadmin\Admin::simpan');
     $routes->get('admin/hapus/(:num)', 'Superadmin\Admin::hapus/$1');
+    $routes->get('logs', 'Superadmin\ActivityLog::index');
 
     $routes->get('geojson', 'Superadmin\Geojson::index');
     $routes->get('geojson/scan', 'Superadmin\Geojson::scan');

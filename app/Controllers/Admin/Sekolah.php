@@ -42,6 +42,7 @@ class Sekolah extends BaseController
             'title'      => 'Tambah Sekolah | WebGIS',
             'page_title' => 'Tambah Data Sekolah Baru',
             'validation' => \Config\Services::validation(),
+            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
         ];
 
         return view('admin/sekolah/form', $data);
@@ -106,6 +107,12 @@ class Sekolah extends BaseController
                     'required' => 'Jenjang harus dipilih.'
                 ]
             ],
+            'kategori' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'Kategori harus dipilih.'
+                ]
+            ],
             'akreditasi' => [
                 'rules'  => 'required',
                 'errors' => [
@@ -163,6 +170,7 @@ class Sekolah extends BaseController
         $saveData = [
             'nama_sekolah'      => $this->request->getPost('nama_sekolah'),
             'jenjang'           => $this->request->getPost('jenjang'),
+            'kategori'          => $this->request->getPost('kategori'),
             'akreditasi'        => $this->request->getPost('akreditasi'),
             'latitude'          => $this->request->getPost('latitude'),
             'longitude'         => $this->request->getPost('longitude'),
@@ -175,9 +183,12 @@ class Sekolah extends BaseController
 
         if ($id) {
             $this->sekolahModel->update($id, $saveData);
+            log_activity('ubah', 'sekolah', $id, 'Mengubah data sekolah: ' . $saveData['nama_sekolah']);
             $msg = 'Data berhasil diupdate';
         } else {
             $this->sekolahModel->insert($saveData);
+            $insertId = $this->sekolahModel->getInsertID();
+            log_activity('tambah', 'sekolah', $insertId, 'Menambahkan sekolah baru: ' . $saveData['nama_sekolah']);
             $msg = 'Data berhasil disimpan';
         }
 
@@ -196,6 +207,7 @@ class Sekolah extends BaseController
                 unlink('uploads/sekolah/' . $sekolah['foto']);
             }
             $this->sekolahModel->delete($id);
+            log_activity('hapus', 'sekolah', $id, 'Menghapus data sekolah: ' . $sekolah['nama_sekolah']);
             return redirect()->to(base_url('admin/sekolah'))->with('success', 'Data berhasil dihapus');
         }
 

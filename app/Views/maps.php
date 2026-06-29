@@ -316,7 +316,8 @@ $sekolah_list = $sekolah_list ?? [];
                 `;
 
                 var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
-                        icon: iconSekolah
+                        icon: iconSekolah,
+                        originalJenjang: '<?= $sk['jenjang'] ?>'
                     })
                     .addTo(map)
                     .bindPopup(popupContent, {

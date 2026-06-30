@@ -169,6 +169,7 @@
                             <i class="fa-solid fa-save me-2"></i> <?= isset($sekolah) ? 'Simpan Perubahan' : 'Simpan Data' ?>
                         </button>
                     </div>
+                    <div id="form-warning-container-form"></div>
                 </form>
             </div>
         </div>
@@ -293,8 +294,90 @@
         }
     }
 
+    // ===== VALIDASI WILAYAH =====
+    function isLatLngInLayer(latlng, layer) {
+        if (!layer) return false;
+        var found = false;
+        layer.eachLayer(function(l) {
+            if (l instanceof L.Polygon) {
+                if (isLatLngInPolygon(latlng, l)) found = true;
+            }
+        });
+        return found;
+    }
+
+    function isLatLngInPolygon(latlng, polygon) {
+        var lat = latlng.lat,
+            lng = latlng.lng;
+        var coords = polygon.getLatLngs();
+
+        function checkInside(points) {
+            if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
+                for (var i = 0; i < points.length; i++)
+                    if (checkInside(points[i])) return true;
+                return false;
+            }
+            var inside = false;
+            for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+                var xi = points[i].lat,
+                    yi = points[i].lng;
+                var xj = points[j].lat,
+                    yj = points[j].lng;
+                var intersect = ((yi > lng) != (yj > lng)) && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
+        }
+        return checkInside(coords);
+    }
+
+    function isInsideAllowedRegion(latlng) {
+        if (Object.keys(geojsonLayers).length === 0) return true;
+
+        var insideAny = false;
+        Object.keys(geojsonLayers).forEach(function(gjId) {
+            var isVisible = localStorage.getItem('geojson_vis_' + gjId);
+            if (isVisible === null || isVisible === 'true') {
+                if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                    insideAny = true;
+                }
+            }
+        });
+        return insideAny;
+    }
+
+    function removeWarningForm() {
+        var existingWarning = document.getElementById('region-warning-form');
+        if (existingWarning) {
+            existingWarning.remove();
+        }
+    }
+
+    function showWarningForm(message) {
+        removeWarningForm();
+        var warningDiv = document.createElement('div');
+        warningDiv.id = 'region-warning-form';
+        warningDiv.className = 'alert alert-warning alert-dismissible fade show mt-2';
+        warningDiv.setAttribute('role', 'alert');
+        warningDiv.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            <strong>Peringatan!</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        var mapContainer = document.getElementById('map-input');
+        mapContainer.parentNode.insertBefore(warningDiv, mapContainer.nextSibling);
+    }
+
     // Event Klik Peta
     map.on('click', function(e) {
+        removeWarningForm();
+
+        // Validasi: cek apakah titik berada di dalam wilayah yang diizinkan
+        if (!isInsideAllowedRegion(e.latlng)) {
+            showWarningForm('Lokasi yang Anda pilih berada di luar wilayah yang diizinkan. Silakan pilih lokasi di dalam wilayah yang telah ditentukan.');
+            return;
+        }
+
         var lat = e.latlng.lat;
         var lng = e.latlng.lng;
 
@@ -333,6 +416,78 @@
         // Inisialisasi saat load
         updateMarkerFromInputs();
     }
+
+    // ===== VALIDASI FORM SEBELUM SUBMIT (INLINE) =====
+    function resetInlineValidationForm() {
+        document.querySelectorAll('.is-invalid').forEach(function(el) {
+            el.classList.remove('is-invalid');
+        });
+        document.querySelectorAll('.invalid-feedback-field').forEach(function(el) {
+            el.remove();
+        });
+    }
+
+    function markInvalidForm(field, message) {
+        field.classList.add('is-invalid');
+        var parent = field.closest('.mb-3') || field.parentElement;
+        var feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback invalid-feedback-field';
+        feedback.textContent = message;
+        parent.appendChild(feedback);
+    }
+
+    // Validasi form saat submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        resetInlineValidationForm();
+        var hasError = false;
+
+        var namaField = this.querySelector('[name="nama_sekolah"]');
+        var jenjangField = this.querySelector('[name="jenjang"]');
+        var kategoriField = this.querySelector('[name="kategori"]');
+        var akreditasiField = this.querySelector('[name="akreditasi"]');
+        var alamatField = this.querySelector('[name="alamat"]');
+        var latField = document.getElementById('latitude');
+        var lngField = document.getElementById('longitude');
+
+        if (!namaField.value.trim()) {
+            markInvalidForm(namaField, 'Nama Sekolah wajib diisi.');
+            hasError = true;
+        }
+        if (!jenjangField.value) {
+            markInvalidForm(jenjangField, 'Jenjang wajib dipilih.');
+            hasError = true;
+        }
+        if (!kategoriField.value) {
+            markInvalidForm(kategoriField, 'Kategori wajib dipilih.');
+            hasError = true;
+        }
+        if (!akreditasiField.value) {
+            markInvalidForm(akreditasiField, 'Akreditasi wajib dipilih.');
+            hasError = true;
+        }
+        if (!alamatField.value.trim()) {
+            markInvalidForm(alamatField, 'Alamat wajib diisi.');
+            hasError = true;
+        }
+        if (!latField.value.trim() || !lngField.value.trim()) {
+            markInvalidForm(latField, 'Lokasi sekolah (koordinat) belum dipilih. Klik pada peta.');
+            hasError = true;
+        }
+
+        if (hasError) {
+            e.preventDefault();
+            var firstError = document.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.focus({
+                    preventScroll: true
+                });
+                firstError.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+    });
 
     // Preview Gambar
     function previewImage() {

@@ -36,18 +36,17 @@
                             <tr>
                                 <th class="ps-3">No</th>
                                 <th>Nama Wilayah/Layer</th>
-                                <th>File Path</th>
                                 <th class="text-center">Warna</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; foreach ($geojsons as $gj) : ?>
+                            <?php $no = 1;
+                            foreach ($geojsons as $gj) : ?>
                                 <tr>
                                     <td class="ps-3"><?= $no++ ?></td>
                                     <td><span class="fw-bold text-dark text-capitalize"><?= $gj['nama_geojson'] ?></span></td>
-                                    <td><code class="small text-muted"><?= $gj['file_geojson'] ?></code></td>
                                     <td class="text-center">
                                         <div class="d-flex align-items-center justify-content-center">
                                             <div class="rounded-circle shadow-sm me-2" style="width: 18px; height: 18px; background-color: <?= $gj['warna_geojson'] ?>; border: 2px solid white;"></div>
@@ -55,22 +54,22 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>" 
-                                           class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill px-3">
+                                        <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>"
+                                            class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill px-3">
                                             <?= $gj['is_active'] ? '<i class="fa-solid fa-eye me-1"></i>Aktif' : '<i class="fa-solid fa-eye-slash me-1"></i>Nonaktif' ?>
                                         </a>
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <a href="<?= base_url('superadmin/geojson/edit/' . $gj['id_geojson']) ?>" 
-                                               class="btn btn-sm btn-outline-primary rounded-circle p-2" 
-                                               title="Atur Gaya Visual">
+                                            <a href="<?= base_url('superadmin/geojson/edit/' . $gj['id_geojson']) ?>"
+                                                class="btn btn-sm btn-outline-primary rounded-circle p-2"
+                                                title="Atur Gaya Visual">
                                                 <i class="fa-solid fa-palette"></i>
                                             </a>
-                                            <a href="<?= base_url('superadmin/geojson/hapus/' . $gj['id_geojson']) ?>" 
-                                               class="btn btn-sm btn-outline-danger rounded-circle p-2" 
-                                               onclick="return confirm('Hapus data ini dari sistem?')"
-                                               title="Hapus">
+                                            <a href="<?= base_url('superadmin/geojson/hapus/' . $gj['id_geojson']) ?>"
+                                                class="btn btn-sm btn-outline-danger rounded-circle p-2"
+                                                onclick="return confirm('Hapus data ini dari sistem?')"
+                                                title="Hapus">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </a>
                                         </div>
@@ -79,7 +78,7 @@
                             <?php endforeach; ?>
                             <?php if (empty($geojsons)) : ?>
                                 <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
+                                    <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fs-1 opacity-25 mb-3 d-block"></i>
                                         Belum ada data GeoJSON terdaftar. Klik <strong>Pindai File Lokal</strong> untuk mengimpor dari <code>assets/geojson/</code>.
                                     </td>

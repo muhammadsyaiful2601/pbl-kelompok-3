@@ -286,6 +286,16 @@ $sekolah = $sekolah ?? [
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script>
+    /* Konfigurasi marker icon untuk API Maps */
+    window.MAP_CONFIG = {
+        markerIcons: {
+            SD: '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>',
+            SMP: '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>',
+            TK: '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>'
+        }
+    };
+</script>
 <script src="<?= base_url('assets/api/api_maps.js') ?>"></script>
 <script>
     // Inisialisasi Peta Detail
@@ -296,82 +306,17 @@ $sekolah = $sekolah ?? [
     var map = L.map('detail-map').setView([lat, lng], zoom);
 
     // Dynamic Base Layers
-    var baseMaps = {
-        "Standard Map": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }),
-        "Satellite View": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-            attribution: '&copy; Google Maps'
-        })
-    };
-
-    // Inject MapTiler layers
-    if (typeof window.getMapTilerLayers === 'function') {
-        Object.assign(baseMaps, window.getMapTilerLayers());
-    }
+    var baseMaps = window.getAllBaseMaps();
 
     // Load saved basemap or default
-    var savedBasemap = localStorage.getItem('selectedBasemap') || "Standard Map";
-    if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
-
-    baseMaps[savedBasemap].addTo(map);
-
-    /**
-     * Calculate marker size based on zoom level
-     */
-    function getMarkerSize(zoom) {
-        if (zoom >= 17) return {
-            w: 65,
-            h: 78
-        };
-        if (zoom >= 15) return {
-            w: 50,
-            h: 60
-        };
-        if (zoom >= 13) return {
-            w: 38,
-            h: 46
-        };
-        if (zoom >= 11) return {
-            w: 28,
-            h: 34
-        };
-        return {
-            w: 22,
-            h: 27
-        };
-    }
-
-    /**
-     * Create an L.icon for a given jenjang and size
-     */
-    function createSchoolIcon(jenjang, size) {
-        var iconUrl = '<?= base_url('marker/' . rawurlencode('logo SD.png')) ?>';
-        if (jenjang === 'SMP') {
-            iconUrl = '<?= base_url('marker/' . rawurlencode('Logo smp.png')) ?>';
-        } else if (jenjang === 'TK') {
-            iconUrl = '<?= base_url('marker/' . rawurlencode('logo TK.png')) ?>';
-        }
-        var w = size.w;
-        var h = size.h;
-        return L.icon({
-            iconUrl: iconUrl,
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [w, h],
-            iconAnchor: [w / 2, h],
-            popupAnchor: [0, -h + 10],
-            shadowSize: [Math.round(w * 0.82), Math.round(h * 0.68)]
-        });
-    }
+    window.loadSavedBasemap(baseMaps, map);
 
     var markers = {};
     var geojsonLayers = {};
     var geojsonConfig = {}; // For dynamic zoom opacity
 
-    var initialSize = getMarkerSize(map.getZoom());
-    var iconSekolah = createSchoolIcon('<?= $sekolah['jenjang'] ?>', initialSize);
+    var initialSize = window.getMarkerSize(map.getZoom());
+    var iconSekolah = window.createSchoolIcon('<?= $sekolah['jenjang'] ?>', initialSize);
 
     var markerSekolah = L.marker([lat, lng], {
             icon: iconSekolah
@@ -383,139 +328,28 @@ $sekolah = $sekolah ?? [
     // Render GeoJSON Layers (Wilayah)
     <?php if (!empty($active_geojson)) : ?>
         <?php foreach ($active_geojson as $gj) : ?>
-            fetch('<?= base_url($gj['file_geojson']) ?>')
-                .then(response => response.json())
-                .then(data => {
-                    var layer = L.geoJSON(data, {
-                            style: function(feature) {
-                                return {
-                                    color: "#000000", // Black boundary
-                                    weight: 1.5,
-                                    opacity: 0.8, // Initial stroke opacity
-                                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                                    fillColor: "<?= $gj['warna_geojson'] ?>"
-                                };
-                            }
-                        })
-                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
-
-                    geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
-                    geojsonConfig[<?= $gj['id_geojson'] ?>] = {
-                        fillOpacity: <?= $gj['opacity_geojson'] ?>,
-                        opacity: 0.8,
-                        color: "#000000"
-                    };
-
-                    // Check localStorage for visibility preference
-                    var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
-                    if (isVisible === null || isVisible === 'true') {
-                        layer.addTo(map);
-                    }
-
-                    // Apply initial zoom-based opacity
-                    updateGeoJsonOpacity(map.getZoom());
-
-                    // Sync school visibility
-                    setTimeout(updateMarkersVisibility, 100);
-                });
+            window.loadGeoJsonLayer(
+                '<?= base_url($gj['file_geojson']) ?>',
+                {
+                    color: "#000000",
+                    weight: 1.5,
+                    opacity: 0.8,
+                    fillOpacity: <?= $gj['opacity_geojson'] ?>,
+                    fillColor: "<?= $gj['warna_geojson'] ?>"
+                },
+                "<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>",
+                geojsonLayers,
+                geojsonConfig,
+                <?= $gj['id_geojson'] ?>,
+                map,
+                markers
+            );
         <?php endforeach; ?>
     <?php endif; ?>
 
-    /**
-     * Update GeoJSON opacity based on zoom level
-     */
-    function updateGeoJsonOpacity(zoom) {
-        Object.keys(geojsonLayers).forEach(function(id) {
-            var layer = geojsonLayers[id];
-            var config = geojsonConfig[id];
-            if (!config) return;
-
-            var newFillOpacity = config.fillOpacity;
-            var newStrokeOpacity = config.opacity;
-
-            if (zoom >= 17) {
-                newFillOpacity = 0.05;
-                newStrokeOpacity = 0.15;
-            } else if (zoom === 16) {
-                newFillOpacity = config.fillOpacity * 0.3;
-                newStrokeOpacity = 0.4;
-            } else if (zoom === 15) {
-                newFillOpacity = config.fillOpacity * 0.6;
-                newStrokeOpacity = 0.6;
-            }
-
-            layer.setStyle({
-                fillOpacity: newFillOpacity,
-                opacity: newStrokeOpacity
-            });
-        });
-    }
-
     // Zoom listener
     map.on('zoomend', function() {
-        updateGeoJsonOpacity(map.getZoom());
+        window.updateGeoJsonOpacity(geojsonLayers, geojsonConfig, map.getZoom());
     });
-
-    /**
-     * Point-in-Polygon Synchronization Logic
-     */
-    function isLatLngInLayer(latlng, layer) {
-        if (!layer) return false;
-        var found = false;
-        layer.eachLayer(function(l) {
-            if (l instanceof L.Polygon) {
-                if (isLatLngInPolygon(latlng, l)) found = true;
-            }
-        });
-        return found;
-    }
-
-    function isLatLngInPolygon(latlng, polygon) {
-        var lat = latlng.lat,
-            lng = latlng.lng;
-        var coords = polygon.getLatLngs();
-
-        function checkInside(points) {
-            if (points.length > 0 && Array.isArray(points[0]) && !points[0].hasOwnProperty('lat')) {
-                for (var i = 0; i < points.length; i++)
-                    if (checkInside(points[i])) return true;
-                return false;
-            }
-            var inside = false;
-            for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
-                var xi = points[i].lat,
-                    yi = points[i].lng;
-                var xj = points[j].lat,
-                    yj = points[j].lng;
-                var intersect = ((yi > lng) != (yj > lng)) && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
-                if (intersect) inside = !inside;
-            }
-            return inside;
-        }
-        return checkInside(coords);
-    }
-
-    function updateMarkersVisibility() {
-        Object.keys(markers).forEach(function(id) {
-            var marker = markers[id];
-            var latlng = marker.getLatLng();
-            var shouldHide = false;
-
-            Object.keys(geojsonLayers).forEach(function(gjId) {
-                var isVisible = localStorage.getItem('geojson_vis_' + gjId);
-                if (isVisible === 'false') {
-                    if (isLatLngInLayer(latlng, geojsonLayers[gjId])) {
-                        shouldHide = true;
-                    }
-                }
-            });
-
-            if (shouldHide) {
-                if (map.hasLayer(marker)) map.removeLayer(marker);
-            } else {
-                if (!map.hasLayer(marker)) marker.addTo(map);
-            }
-        });
-    }
 </script>
 <?= $this->endSection() ?>

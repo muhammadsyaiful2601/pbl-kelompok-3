@@ -5,7 +5,6 @@ $sekolah = $sekolah ?? [
     'foto' => '',
     'nama_sekolah' => '',
     'jenjang' => '',
-    'jumlah_siswa' => 0,
     'alamat' => '',
     'latitude' => 0,
     'longitude' => 0,
@@ -99,15 +98,15 @@ $sekolah = $sekolah ?? [
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="detail-card mb-4">
-                <img src="<?= $sekolah['foto'] ? base_url('uploads/sekolah/' . $sekolah['foto']) : 'https://via.placeholder.com/800x400?text=No+Photo' ?>" class="detail-header-img" alt="<?= $sekolah['nama_sekolah'] ?>">
+<img src="<?= $sekolah['foto'] ? base_url('uploads/sekolah/' . $sekolah['foto']) : base_url('gambar/Tidak ada gambar.png') ?>" class="detail-header-img" alt="<?= $sekolah['nama_sekolah'] ?>">
                 <div class="p-4 p-md-5">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span class="badge <?= $sekolah['jenjang'] == 'SD' ? 'bg-danger' : ($sekolah['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> px-3 py-2 rounded-pill">
                             <?= $sekolah['jenjang'] ?>
                         </span>
                         <div class="stats-badge">
-                            <i class="fa-solid fa-users me-2 text-primary"></i>
-                            <?= number_format($sekolah['jumlah_siswa'], 0, ',', '.') ?> Siswa
+                            <i class="fa-solid fa-book me-2 text-primary"></i>
+                            <?= $sekolah['kurikulum'] ?: 'Belum Ada Kurikulum' ?>
                         </div>
                     </div>
 
@@ -140,6 +139,15 @@ $sekolah = $sekolah ?? [
                                 <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
                             </div>
                         </div>
+                        <?php if (!empty($sekolah['kurikulum'])) : ?>
+                        <div class="col-md-6 info-item">
+                            <span class="info-label">Kurikulum</span>
+                            <div class="info-value">
+                                <i class="fa-solid fa-book text-primary me-2"></i>
+                                <?= $sekolah['kurikulum'] ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         <?php if (!empty($sekolah['kepala_sekolah'])) : ?>
                             <div class="col-md-6 info-item">
                                 <span class="info-label">Kepala Sekolah</span>

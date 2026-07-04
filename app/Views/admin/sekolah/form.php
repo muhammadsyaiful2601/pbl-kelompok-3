@@ -61,8 +61,8 @@
                                     <div class="invalid-feedback"><?= $validation->getError('kategori') ?></div>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-semibold">Jumlah Siswa</label>
-                                    <input type="number" name="jumlah_siswa" class="form-control" value="<?= old('jumlah_siswa', $sekolah['jumlah_siswa'] ?? '') ?>" placeholder="0">
+                                    <label class="form-label fw-semibold">Kurikulum</label>
+                                    <input type="text" name="kurikulum" class="form-control" value="<?= old('kurikulum', $sekolah['kurikulum'] ?? '') ?>" placeholder="Contoh: Kurikulum Merdeka">
                                 </div>
                             </div>
 

@@ -283,7 +283,7 @@ $sekolah_list = $sekolah_list ?? [];
 
                 var popupContent = `
                     <div class="custom-popup" style="width: 220px;">
-                        <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/220x120?text=No+Image' ?>" 
+<img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : base_url('gambar/Tidak ada gambar.png') ?>"
                              style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px 8px 0 0;" class="mb-2">
                         <div class="px-2 pb-2">
                                     <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-1" style="font-size: 10px;"><?= $sk['jenjang'] ?></span>
@@ -312,8 +312,8 @@ $sekolah_list = $sekolah_list ?? [];
                                 <strong>Tahun Berdiri:</strong> <?= $sk['tahun_berdiri'] ?>
                             </p>
                             <?php endif; ?>
-                            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
-                                <small class="text-muted"><i class="fa-solid fa-users me-1"></i> <?= number_format($sk['jumlah_siswa'] ?? 0, 0, ',', '.') ?> Siswa</small>
+                                <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                                    <small class="text-muted"><i class="fa-solid fa-book me-1"></i> <?= $sk['kurikulum'] ?? '-' ?></small>
                                 <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
                             </div>
                         </div>

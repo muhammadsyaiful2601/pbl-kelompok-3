@@ -76,8 +76,8 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Jumlah Siswa</label>
-                        <input type="number" name="jumlah_siswa" class="form-control" value="<?= old('jumlah_siswa', 0) ?>">
+                        <label class="form-label">Kurikulum</label>
+                        <input type="text" name="kurikulum" class="form-control" value="<?= old('kurikulum', '') ?>" placeholder="Contoh: Kurikulum Merdeka">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Website Sekolah</label>

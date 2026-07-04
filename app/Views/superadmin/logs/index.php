@@ -8,7 +8,14 @@
                 <h6 class="fw-bold mb-0">
                     <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Log Aktivitas Administrator
                 </h6>
-                <span class="badge bg-light text-dark border p-2 rounded-pill">Total Log: <?= count($logs) ?></span>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-light text-dark border p-2 rounded-pill">Total Log: <?= count($logs) ?></span>
+                    <a href="<?= base_url('superadmin/logs/hapus-semua') ?>" 
+                       class="btn btn-sm btn-outline-danger rounded-pill"
+                       onclick="return confirm('Hapus SEMUA log aktivitas? Tindakan ini tidak bisa dibatalkan.')">
+                        <i class="fa-solid fa-trash me-1"></i>Hapus Semua
+                    </a>
+                </div>
             </div>
             <div class="card-body p-4">
                 <div class="table-responsive">
@@ -22,6 +29,7 @@
                                 <th>Deskripsi Aktivitas</th>
                                 <th style="width: 15%;">Alamat IP</th>
                                 <th class="text-end pe-3" style="width: 15%;">Waktu Kejadian</th>
+                                <th class="text-center" style="width: 5%;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,11 +107,19 @@
                                             <?= date('H:i:s', strtotime($log['created_at'])) ?>
                                         </small>
                                     </td>
+                                    <td class="text-center">
+                                        <a href="<?= base_url('superadmin/logs/hapus/' . $log['id']) ?>" 
+                                           class="btn btn-sm btn-outline-danger rounded-circle p-2"
+                                           onclick="return confirm('Hapus log ini?')"
+                                           title="Hapus Log">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($logs)) : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
+                                    <td colspan="8" class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-inbox fa-2x mb-3 text-secondary d-block"></i>
                                         Belum ada aktivitas yang tercatat dalam sistem.
                                     </td>

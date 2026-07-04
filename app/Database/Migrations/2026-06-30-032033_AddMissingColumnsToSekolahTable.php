@@ -39,11 +39,7 @@ class AddMissingColumnsToSekolahTable extends Migration
                 'null'    => true,
                 'default' => null,
             ],
-            'nama_lengkap' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-                'null'       => false, // set ke true jika opsional
-            ],
+
         ]);
     }
 

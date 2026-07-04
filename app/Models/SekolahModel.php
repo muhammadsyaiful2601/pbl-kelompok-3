@@ -15,7 +15,7 @@ class SekolahModel extends Model
         'kategori',
         'foto',
         'alamat',
-        'jumlah_siswa',
+        'kurikulum',
         'deskripsi_sekolah',
         'website',
         'latitude',

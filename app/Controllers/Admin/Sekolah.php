@@ -180,7 +180,7 @@ class Sekolah extends BaseController
             'website'           => $this->request->getPost('website') ?: null,
             'kontak'            => $this->request->getPost('kontak') ?: null,
             'tahun_berdiri'     => $this->request->getPost('tahun_berdiri') ?: null,
-            'jumlah_siswa'      => $this->request->getPost('jumlah_siswa') ?: null,
+            'kurikulum'         => $this->request->getPost('kurikulum') ?: null,
             'deskripsi_sekolah' => $this->request->getPost('deskripsi_sekolah') ?: null,
             'visi'              => $this->request->getPost('visi') ?: null,
             'misi'              => $this->request->getPost('misi') ?: null,

@@ -38,6 +38,8 @@ $routes->group('superadmin', function ($routes) {
     $routes->post('admin/simpan', 'Superadmin\Admin::simpan');
     $routes->get('admin/hapus/(:num)', 'Superadmin\Admin::hapus/$1');
     $routes->get('logs', 'Superadmin\ActivityLog::index');
+    $routes->get('logs/hapus/(:num)', 'Superadmin\ActivityLog::delete/$1');
+    $routes->get('logs/hapus-semua', 'Superadmin\ActivityLog::deleteAll');
 
     $routes->get('geojson', 'Superadmin\Geojson::index');
     $routes->get('geojson/scan', 'Superadmin\Geojson::scan');

@@ -41,7 +41,7 @@
                                 <th>Jenjang</th>
                                 <th>Kategori</th>
                                 <th>Alamat</th>
-                                <th class="text-center">Siswa</th>
+                                <th class="text-center">Kurikulum</th>
                                 <th class="text-center" width="150">Aksi</th>
                             </tr>
                         </thead>
@@ -55,9 +55,7 @@
                                             <?php if ($s['foto']) : ?>
                                                 <img src="<?= base_url('uploads/sekolah/' . $s['foto']) ?>" alt="Foto" class="rounded shadow-sm" width="60" height="45" style="object-fit: cover;">
                                             <?php else : ?>
-                                                <div class="bg-light rounded d-flex align-items-center justify-content-center border" style="width: 60px; height: 45px;">
-                                                    <i class="fa-solid fa-image text-muted small"></i>
-                                                </div>
+                                                <img src="<?= base_url('gambar/Tidak ada gambar.png') ?>" alt="No Photo" class="rounded shadow-sm" width="60" height="45" style="object-fit: cover;">
                                             <?php endif; ?>
                                         </td>
                                         <td>
@@ -78,7 +76,7 @@
                                             <div class="text-truncate" style="max-width: 250px;"><?= $s['alamat'] ?></div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="fw-semibold text-dark"><?= number_format($s['jumlah_siswa'] ?? 0, 0, ',', '.') ?></span>
+                                            <span class="fw-semibold text-dark"><?= $s['kurikulum'] ?? '-' ?></span>
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group shadow-sm">
@@ -94,7 +92,7 @@
                                 <?php endforeach; ?>
                             <?php else : ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <div class="text-muted">
                                             <i class="fa-solid fa-folder-open fs-1 opacity-25 mb-3 d-block"></i>
                                             Belum ada data sekolah yang tersimpan.

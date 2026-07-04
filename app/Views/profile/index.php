@@ -29,7 +29,7 @@
 
                     <div class="text-center mb-4">
                         <?php $avatar = $user['foto'] ?? session()->get('foto'); ?>
-                        <img src="<?= $avatar ? base_url('uploads/user/' . $avatar) : 'https://via.placeholder.com/140x140?text=Profil' ?>" class="rounded-circle shadow-sm" alt="Foto Profil" style="width: 140px; height: 140px; object-fit: cover;">
+                        <img src="<?= $avatar ? base_url('uploads/user/' . $avatar) : base_url('gambar/Tidak ada gambar.png') ?>" class="rounded-circle shadow-sm" alt="Foto Profil" style="width: 140px; height: 140px; object-fit: cover;">
                     </div>
 
                     <input type="hidden" name="foto_lama" value="<?= old('foto_lama', $user['foto'] ?? '') ?>">

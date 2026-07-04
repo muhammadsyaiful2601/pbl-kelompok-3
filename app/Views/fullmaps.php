@@ -554,7 +554,7 @@
                         .addTo(map)
                         .bindPopup(`
                             <div class="custom-popup">
-                                <img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : 'https://via.placeholder.com/250x140?text=No+Image' ?>">
+<img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : base_url('gambar/Tidak ada gambar.png') ?>">
                                 <div class="popup-info">
                                     <div class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-2"><?= $sk['jenjang'] ?></div>
                                     <h6 class="fw-bold mb-1"><?= $sk['nama_sekolah'] ?></h6>
@@ -568,7 +568,7 @@
                                     <p class="text-muted small mb-3"><strong>Tahun Berdiri:</strong> <?= $sk['tahun_berdiri'] ?></p>
                                     <?php endif; ?>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                        <small class="text-muted"><i class="fa-solid fa-users"></i> <?= number_format($sk['jumlah_siswa'] ?? 0) ?></small>
+                                        <small class="text-muted"><i class="fa-solid fa-book me-1"></i> <?= $sk['kurikulum'] ?? '-' ?></small>
                                         <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Detail</a>
                                     </div>
                                 </div>

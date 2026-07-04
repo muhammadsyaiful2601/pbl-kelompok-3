@@ -48,22 +48,6 @@ class Sekolah extends BaseController
         return view('admin/sekolah/form', $data);
     }
 
-    public function inputData()
-    {
-        if (!session()->get('logged_in')) {
-            return redirect()->to(base_url('login'));
-        }
-
-        $data = [
-            'title'      => 'Tambah Sekolah | WebGIS',
-            'page_title' => 'Tambah Data Sekolah Baru',
-            'validation' => \Config\Services::validation(),
-            'active_geojson' => $this->geojsonModel->where('is_active', 1)->findAll(),
-        ];
-
-        return view('admin/input_data/index', $data);
-    }
-
     public function edit($id)
     {
         if (!session()->get('logged_in')) {

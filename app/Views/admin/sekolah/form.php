@@ -3,9 +3,76 @@
 <?= $this->section('styles') ?>
 <style>
     #map-input {
-        height: 350px;
-        border-radius: 12px;
-        border: 2px solid #e2e8f0;
+        height: 420px;
+        border-radius: 0;
+        border: none;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 0.6rem 0.85rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-light {
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    textarea.form-control {
+        min-height: 80px;
+    }
+
+    .card-body.p-4 {
+        padding: 1.5rem !important;
+    }
+
+    .border-dashed {
+        border: 2px dashed #cbd5e1 !important;
+        transition: all 0.3s ease;
+    }
+
+    .border-dashed:hover {
+        border-color: #007bff !important;
+        background-color: #f8f9fa !important;
     }
 </style>
 <?= $this->endSection() ?>
@@ -27,135 +94,187 @@
                     <input type="hidden" name="id_sekolah" value="<?= $sekolah['id_sekolah'] ?? '' ?>">
                     <input type="hidden" name="foto_lama" value="<?= $sekolah['foto'] ?? '' ?>">
 
+                    <!-- Section 1: Data Utama -->
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                            <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-circle-info me-2"></i>Data Utama</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nama Sekolah <span class="text-danger">*</span></label>
+                                        <input type="text" name="nama_sekolah" class="form-control <?= ($validation->hasError('nama_sekolah')) ? 'is-invalid' : '' ?>" value="<?= old('nama_sekolah', $sekolah['nama_sekolah'] ?? '') ?>" placeholder="Masukkan nama sekolah lengkap">
+                                        <div class="invalid-feedback"><?= $validation->getError('nama_sekolah') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nama Kepala Sekolah <small class="text-muted">(opsional)</small></label>
+                                        <input type="text" name="kepala_sekolah" class="form-control" value="<?= old('kepala_sekolah', $sekolah['kepala_sekolah'] ?? '') ?>" placeholder="Masukkan nama kepala sekolah">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Jenjang <span class="text-danger">*</span></label>
+                                        <select name="jenjang" class="form-select <?= ($validation->hasError('jenjang')) ? 'is-invalid' : '' ?>">
+                                            <option value="">Pilih...</option>
+                                            <option value="SD" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SD' ? 'selected' : '' ?>>SD</option>
+                                            <option value="SMP" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SMP' ? 'selected' : '' ?>>SMP</option>
+                                            <option value="TK" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'TK' ? 'selected' : '' ?>>TK</option>
+                                        </select>
+                                        <div class="invalid-feedback"><?= $validation->getError('jenjang') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
+                                        <select name="kategori" class="form-select <?= ($validation->hasError('kategori')) ? 'is-invalid' : '' ?>">
+                                            <option value="">Pilih...</option>
+                                            <option value="Negeri" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
+                                            <option value="Swasta" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
+                                        </select>
+                                        <div class="invalid-feedback"><?= $validation->getError('kategori') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Kurikulum</label>
+                                        <input type="text" name="kurikulum" class="form-control" value="<?= old('kurikulum', $sekolah['kurikulum'] ?? '') ?>" placeholder="Contoh: Kurikulum Merdeka">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Website Sekolah</label>
+                                        <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
+                                        <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Kontak Sekolah <small class="text-muted">(opsional)</small></label>
+                                        <input type="text" name="kontak" class="form-control" value="<?= old('kontak', $sekolah['kontak'] ?? '') ?>" placeholder="Telepon / WhatsApp / Email">
+                                        <div class="invalid-feedback"><?= $validation->getError('kontak') ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Tahun Berdiri <small class="text-muted">(opsional)</small></label>
+                                        <select name="tahun_berdiri" class="form-select">
+                                            <option value="">Pilih Tahun...</option>
+                                            <?php $selectedTahun = old('tahun_berdiri', $sekolah['tahun_berdiri'] ?? ''); ?>
+                                            <?php for ($t = date('Y'); $t >= 1900; $t--): ?>
+                                                <option value="<?= $t ?>" <?= $selectedTahun == $t ? 'selected' : '' ?>><?= $t ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Akreditasi <span class="text-danger">*</span></label>
+                                        <select name="akreditasi" class="form-select <?= ($validation->hasError('akreditasi')) ? 'is-invalid' : '' ?>">
+                                            <option value="">Pilih...</option>
+                                            <option value="A" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'A' ? 'selected' : '' ?>>A</option>
+                                            <option value="B" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'B' ? 'selected' : '' ?>>B</option>
+                                            <option value="C" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'C' ? 'selected' : '' ?>>C</option>
+                                            <option value="Belum Terakreditasi" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
+                                            <option value="Tidak Diketahui" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Tidak Diketahui' ? 'selected' : '' ?>>Tidak Diketahui</option>
+                                        </select>
+                                        <div class="invalid-feedback"><?= $validation->getError('akreditasi') ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Peta & Koordinat -->
+                    <div class="card bg-white border-0 mb-4 shadow-sm">
+                        <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                            <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-map-location-dot me-2"></i>Lokasi Sekolah</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="map-input" class="mb-3" style="height: 400px; border-radius: 8px; overflow: hidden;"></div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Latitude <span class="text-danger">*</span></label>
+                                        <input type="text" name="latitude" id="latitude" class="form-control <?= ($validation->hasError('latitude')) ? 'is-invalid' : '' ?>" value="<?= old('latitude', $sekolah['latitude'] ?? '') ?>" placeholder="Latitude">
+                                        <div class="invalid-feedback"><?= $validation->getError('latitude') ?></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Longitude <span class="text-danger">*</span></label>
+                                        <input type="text" name="longitude" id="longitude" class="form-control <?= ($validation->hasError('longitude')) ? 'is-invalid' : '' ?>" value="<?= old('longitude', $sekolah['longitude'] ?? '') ?>" placeholder="Longitude">
+                                        <div class="invalid-feedback"><?= $validation->getError('longitude') ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-0"><i class="fa-solid fa-circle-info me-1"></i> Klik pada peta atau ketik koordinat (format desimal) untuk menandai lokasi sekolah.</p>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Informasi Panjang & Upload -->
                     <div class="row g-4">
-                        <div class="col-md-7">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Nama Sekolah <span class="text-danger">*</span></label>
-                                <input type="text" name="nama_sekolah" class="form-control <?= ($validation->hasError('nama_sekolah')) ? 'is-invalid' : '' ?>" value="<?= old('nama_sekolah', $sekolah['nama_sekolah'] ?? '') ?>" placeholder="Masukkan nama sekolah lengkap">
-                                <div class="invalid-feedback"><?= $validation->getError('nama_sekolah') ?></div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Nama Kepala Sekolah <small class="text-muted">(opsional)</small></label>
-                                <input type="text" name="kepala_sekolah" class="form-control" value="<?= old('kepala_sekolah', $sekolah['kepala_sekolah'] ?? '') ?>" placeholder="Masukkan nama kepala sekolah">
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-semibold">Jenjang <span class="text-danger">*</span></label>
-                                    <select name="jenjang" class="form-select <?= ($validation->hasError('jenjang')) ? 'is-invalid' : '' ?>">
-                                        <option value="">Pilih Jenjang...</option>
-                                        <option value="SD" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SD' ? 'selected' : '' ?>>Sekolah Dasar (SD)</option>
-                                        <option value="SMP" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'SMP' ? 'selected' : '' ?>>Sekolah Menengah Pertama (SMP)</option>
-                                        <option value="TK" <?= old('jenjang', $sekolah['jenjang'] ?? '') == 'TK' ? 'selected' : '' ?>>Taman Kanak-kanak (TK)</option>
-                                    </select>
-                                    <div class="invalid-feedback"><?= $validation->getError('jenjang') ?></div>
+                        <div class="col-lg-8">
+                            <div class="card bg-light border-0 mb-4">
+                                <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                                    <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-align-left me-2"></i>Informasi Sekolah</h6>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
-                                    <select name="kategori" class="form-select <?= ($validation->hasError('kategori')) ? 'is-invalid' : '' ?>">
-                                        <option value="">Pilih Kategori...</option>
-                                        <option value="Negeri" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
-                                        <option value="Swasta" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
-                                    </select>
-                                    <div class="invalid-feedback"><?= $validation->getError('kategori') ?></div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
+                                        <textarea name="alamat" class="form-control <?= ($validation->hasError('alamat')) ? 'is-invalid' : '' ?>" rows="3" placeholder="Alamat lengkap sekolah..."><?= old('alamat', $sekolah['alamat'] ?? '') ?></textarea>
+                                        <div class="invalid-feedback"><?= $validation->getError('alamat') ?></div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Deskripsi Sekolah</label>
+                                        <textarea name="deskripsi_sekolah" class="form-control" rows="5" placeholder="Tuliskan profil singkat atau deskripsi sekolah..."><?= old('deskripsi_sekolah', $sekolah['deskripsi_sekolah'] ?? '') ?></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Visi <small class="text-muted">(opsional)</small></label>
+                                        <textarea name="visi" class="form-control" rows="4" placeholder="Tuliskan visi sekolah..."><?= old('visi', $sekolah['visi'] ?? '') ?></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Misi <small class="text-muted">(opsional)</small></label>
+                                        <textarea name="misi" class="form-control" rows="4" placeholder="Tuliskan misi sekolah..."><?= old('misi', $sekolah['misi'] ?? '') ?></textarea>
+                                    </div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label fw-semibold">Kurikulum</label>
-                                    <input type="text" name="kurikulum" class="form-control" value="<?= old('kurikulum', $sekolah['kurikulum'] ?? '') ?>" placeholder="Contoh: Kurikulum Merdeka">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-semibold">Website Sekolah</label>
-                                    <input type="text" name="website" class="form-control <?= ($validation->hasError('website')) ? 'is-invalid' : '' ?>" value="<?= old('website', $sekolah['website'] ?? '') ?>" placeholder="https://contohsekolah.sch.id">
-                                    <div class="invalid-feedback"><?= $validation->getError('website') ?></div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-semibold">Kontak Sekolah <small class="text-muted">(opsional)</small></label>
-                                    <input type="text" name="kontak" class="form-control" value="<?= old('kontak', $sekolah['kontak'] ?? '') ?>" placeholder="Telepon / WhatsApp / Email">
-                                    <div class="invalid-feedback"><?= $validation->getError('kontak') ?></div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Tahun Berdiri <small class="text-muted">(opsional)</small></label>
-                                <select name="tahun_berdiri" class="form-select">
-                                    <option value="">Pilih Tahun...</option>
-                                    <?php $selectedTahun = old('tahun_berdiri', $sekolah['tahun_berdiri'] ?? ''); ?>
-                                    <?php for ($t = date('Y'); $t >= 1900; $t--): ?>
-                                        <option value="<?= $t ?>" <?= $selectedTahun == $t ? 'selected' : '' ?>><?= $t ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Akreditasi <span class="text-danger">*</span></label>
-                                <select name="akreditasi" class="form-select <?= ($validation->hasError('akreditasi')) ? 'is-invalid' : '' ?>">
-                                    <option value="">Pilih Akreditasi...</option>
-                                    <option value="A" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'A' ? 'selected' : '' ?>>A</option>
-                                    <option value="B" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'B' ? 'selected' : '' ?>>B</option>
-                                    <option value="C" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'C' ? 'selected' : '' ?>>C</option>
-                                    <option value="Belum Terakreditasi" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Belum Terakreditasi' ? 'selected' : '' ?>>Belum Terakreditasi</option>
-                                    <option value="Tidak Diketahui" <?= old('akreditasi', $sekolah['akreditasi'] ?? '') == 'Tidak Diketahui' ? 'selected' : '' ?>>Tidak Diketahui</option>
-                                </select>
-                                <div class="invalid-feedback"><?= $validation->getError('akreditasi') ?></div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Alamat <span class="text-danger">*</span></label>
-                                <textarea name="alamat" class="form-control <?= ($validation->hasError('alamat')) ? 'is-invalid' : '' ?>" rows="3" placeholder="Alamat lengkap sekolah..."><?= old('alamat', $sekolah['alamat'] ?? '') ?></textarea>
-                                <div class="invalid-feedback"><?= $validation->getError('alamat') ?></div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Deskripsi Sekolah</label>
-                                <textarea name="deskripsi_sekolah" class="form-control" rows="5" placeholder="Tuliskan profil singkat atau deskripsi sekolah..."><?= old('deskripsi_sekolah', $sekolah['deskripsi_sekolah'] ?? '') ?></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Visi <small class="text-muted">(opsional)</small></label>
-                                <textarea name="visi" class="form-control" rows="4" placeholder="Tuliskan visi sekolah..."><?= old('visi', $sekolah['visi'] ?? '') ?></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Misi <small class="text-muted">(opsional)</small></label>
-                                <textarea name="misi" class="form-control" rows="4" placeholder="Tuliskan misi sekolah..."><?= old('misi', $sekolah['misi'] ?? '') ?></textarea>
                             </div>
                         </div>
 
-                        <div class="col-md-5">
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold d-block">Pilih Lokasi di Peta <span class="text-danger">*</span></label>
-                                <div id="map-input" class="mb-2"></div>
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <input type="text" name="latitude" id="latitude" class="form-control form-control-sm <?= ($validation->hasError('latitude')) ? 'is-invalid' : '' ?>" value="<?= old('latitude', $sekolah['latitude'] ?? '') ?>" placeholder="Latitude">
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="text" name="longitude" id="longitude" class="form-control form-control-sm <?= ($validation->hasError('longitude')) ? 'is-invalid' : '' ?>" value="<?= old('longitude', $sekolah['longitude'] ?? '') ?>" placeholder="Longitude">
-                                    </div>
+                        <div class="col-lg-4">
+                            <div class="card bg-light border-0 mb-4">
+                                <div class="card-header bg-transparent border-0 pt-3 pb-0">
+                                    <h6 class="fw-bold text-primary mb-0"><i class="fa-solid fa-camera me-2"></i>Foto Sekolah</h6>
                                 </div>
-                                <div class="text-danger small mt-1"><?= $validation->getError('latitude') ?: $validation->getError('longitude') ?></div>
-                                <p class="text-muted small mt-2"><i class="fa-solid fa-circle-info me-1"></i> Klik pada peta atau ketik koordinat (format desimal) untuk menandai lokasi sekolah.</p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Foto Sekolah</label>
-                                <div class="card border-dashed p-3 text-center bg-light" style="border: 2px dashed #cbd5e1; border-radius: 12px;">
-                                    <?php if (isset($sekolah['foto']) && $sekolah['foto']) : ?>
-                                        <img src="<?= base_url('uploads/sekolah/' . $sekolah['foto']) ?>" id="preview-foto" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 150px; object-fit: cover;">
-                                    <?php else : ?>
-                                        <img src="" id="preview-foto" class="img-fluid rounded mb-3 shadow-sm d-none" style="max-height: 150px; object-fit: cover;">
-                                        <div id="placeholder-foto">
-                                            <i class="fa-solid fa-cloud-arrow-up fs-1 text-muted opacity-50 mb-2"></i>
-                                            <p class="small text-muted mb-0">Drag & drop atau klik untuk upload foto</p>
-                                        </div>
-                                    <?php endif; ?>
-                                    <input type="file" name="foto" id="foto-input" class="form-control mt-2 <?= ($validation->hasError('foto')) ? 'is-invalid' : '' ?>" onchange="previewImage()">
-                                    <div class="invalid-feedback"><?= $validation->getError('foto') ?></div>
-                                    <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 2MB)</p>
+                                <div class="card-body">
+                                    <div class="card border-dashed p-3 text-center bg-white" style="border: 2px dashed #cbd5e1; border-radius: 12px;">
+                                        <?php if (isset($sekolah['foto']) && $sekolah['foto']) : ?>
+                                            <img src="<?= base_url('uploads/sekolah/' . $sekolah['foto']) ?>" id="preview-foto" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 180px; object-fit: cover;">
+                                        <?php else : ?>
+                                            <img src="" id="preview-foto" class="img-fluid rounded mb-3 shadow-sm d-none" style="max-height: 180px; object-fit: cover;">
+                                            <div id="placeholder-foto">
+                                                <i class="fa-solid fa-cloud-arrow-up fs-1 text-muted opacity-50 mb-2"></i>
+                                                <p class="small text-muted mb-0">Drag & drop atau klik untuk upload foto</p>
+                                            </div>
+                                        <?php endif; ?>
+                                        <input type="file" name="foto" id="foto-input" class="form-control mt-2 <?= ($validation->hasError('foto')) ? 'is-invalid' : '' ?>" onchange="previewImage()">
+                                        <div class="invalid-feedback"><?= $validation->getError('foto') ?></div>
+                                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 2MB)</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

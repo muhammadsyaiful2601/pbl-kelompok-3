@@ -22,10 +22,8 @@ $routes->get('admin/profile', 'Profile::index');
 $routes->post('admin/profile/update', 'Profile::update');
 $routes->get('admin/sekolah', 'Admin\Sekolah::index');
 $routes->get('admin/sekolah/tambah', 'Admin\Sekolah::tambah');
-$routes->get('admin/input-data', 'Admin\Sekolah::inputData');
 $routes->get('admin/sekolah/edit/(:num)', 'Admin\Sekolah::edit/$1');
 $routes->post('admin/sekolah/simpan', 'Admin\Sekolah::simpan');
-$routes->post('admin/input-data/store', 'Admin\Sekolah::simpan');
 $routes->get('admin/sekolah/hapus/(:num)', 'Admin\Sekolah::hapus/$1');
 
 // Rute Superadmin

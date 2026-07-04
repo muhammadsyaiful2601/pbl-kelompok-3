@@ -31,10 +31,10 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-circle me-2 bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; border-radius: 50%; font-size: 0.85rem;">
-                                                <?= strtoupper(substr($log['nama_lengkap'] ?? $log['username'] ?? 'U', 0, 1)) ?>
+                                                <?= strtoupper(substr($log['username'] ?? 'U', 0, 1)) ?>
                                             </div>
                                             <div>
-                                                <div class="fw-bold text-dark mb-0" style="font-size: 0.9rem;"><?= esc($log['nama_lengkap']) ?></div>
+                                                <div class="fw-bold text-dark mb-0" style="font-size: 0.9rem;"><?= esc($log['username']) ?></div>
                                                 <small class="text-muted" style="font-size: 0.75rem;">@<?= esc($log['username']) ?></small>
                                             </div>
                                         </div>

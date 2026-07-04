@@ -25,12 +25,12 @@
                         <input type="text" class="form-control" id="username" name="username" value="<?= old('username') ?>" required placeholder="Masukkan username">
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label small fw-bold">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required placeholder="Masukkan password">
-                    </div>
-                    <div class="mb-3">
                         <label for="nama_lengkap" class="form-label small fw-bold">Nama Lengkap</label>
                         <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="<?= old('nama_lengkap') ?>" required placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label small fw-bold">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Masukkan password">
                     </div>
                     
                     <div class="d-flex justify-content-end gap-2 mt-4">

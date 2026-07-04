@@ -55,8 +55,8 @@
                                     </td>
                                     <td class="text-center">
                                         <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>"
-                                            class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill px-3">
-                                            <?= $gj['is_active'] ? '<i class="fa-solid fa-eye me-1"></i>Aktif' : '<i class="fa-solid fa-eye-slash me-1"></i>Nonaktif' ?>
+                                            class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill p-2">
+                                            <?= $gj['is_active'] ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>' ?>
                                         </a>
                                     </td>
                                     <td class="text-center">

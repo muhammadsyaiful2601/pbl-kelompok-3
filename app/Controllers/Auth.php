@@ -38,7 +38,7 @@ class Auth extends BaseController
                 $sessionData = [
                     'id_user'      => $user['id_user'],
                     'username'     => $user['username'],
-                    'nama_lengkap' => $user['nama_lengkap'],
+                    'nama_lengkap' => $user['nama_lengkap'] ?? $user['username'],
                     'role'         => $user['role'],
                     'foto'         => $user['foto'] ?? null,
                     'logged_in'    => true

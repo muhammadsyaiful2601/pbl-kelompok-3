@@ -34,7 +34,7 @@
                                 <tr>
                                     <td class="ps-3"><?= $no++ ?></td>
                                     <td><span class="fw-bold text-dark"><?= $admin['username'] ?></span></td>
-                                    <td><?= $admin['nama_lengkap'] ?></td>
+                                    <td><?= $admin['nama_lengkap'] ?? '-' ?></td>
                                     <td><span class="badge bg-primary rounded-pill"><?= $admin['role'] ?></span></td>
                                     <td class="text-center">
                                         <a href="<?= base_url('superadmin/admin/hapus/' . $admin['id_user']) ?>" 

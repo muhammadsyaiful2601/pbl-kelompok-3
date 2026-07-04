@@ -13,7 +13,7 @@ if (!function_exists('log_activity')) {
             $logModel->save([
                 'id_user'      => $session->get('id_user') ?: null,
                 'username'     => $session->get('username') ?: null,
-                'nama_lengkap' => $session->get('nama_lengkap') ?: null,
+                'nama_lengkap' => $session->get('username') ?: null,
                 'role'         => $session->get('role') ?: null,
                 'action'       => $action,
                 'target_table' => $targetTable,

@@ -11,7 +11,8 @@ class TestUserSeeder extends Seeder
         $data = [
             'username'     => 'tester',
             'password'     => password_hash('pbl123', PASSWORD_BCRYPT),
-            'nama_lengkap' => 'Akun Percobaan'
+            'nama_lengkap' => 'Akun Percobaan',
+            'role'         => 'admin'
         ];
 
         // Menyisipkan data ke dalam tabel user

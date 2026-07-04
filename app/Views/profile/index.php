@@ -35,8 +35,8 @@
                     <input type="hidden" name="foto_lama" value="<?= old('foto_lama', $user['foto'] ?? '') ?>">
 
                     <div class="mb-3">
-                        <label for="nama_lengkap" class="form-label small fw-bold">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" value="<?= old('nama_lengkap', $user['nama_lengkap']) ?>" required>
+                        <label for="username" class="form-label small fw-bold">Username</label>
+                        <input type="text" class="form-control" value="<?= $user['username'] ?>" disabled>
                     </div>
 
                     <div class="mb-3">

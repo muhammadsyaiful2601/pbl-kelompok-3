@@ -8,19 +8,12 @@ class AddRoleToUserTable extends Migration
 {
     public function up()
     {
-        $fields = [
-            'role' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '20',
-                'default'    => 'admin',
-                'after'      => 'nama_lengkap',
-            ],
-        ];
-        $this->forge->addColumn('user', $fields);
+        // Role sudah ditambahkan di migrasi CreateUserTable
+        // Tidak perlu ditambahkan lagi
     }
 
     public function down()
     {
-        $this->forge->dropColumn('user', 'role');
+        // Role sudah di-drop bersama tabel user
     }
 }

@@ -16,44 +16,29 @@ $sekolah = $sekolah ?? [
 ?>
 
 <?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-    .detail-card {
-        border: none;
-        border-radius: 16px;
+    .detail-image-wrapper {
+        max-height: 320px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        background: white;
     }
 
     .detail-header-img {
         width: 100%;
-        height: 400px;
+        height: 320px;
         object-fit: cover;
     }
 
-    .info-item {
-        margin-bottom: 25px;
-    }
-
-    .info-label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #94a3b8;
-        margin-bottom: 5px;
-        display: block;
-    }
-
-    .info-value {
-        font-size: 1.1rem;
-        color: #1e293b;
-        font-weight: 500;
+    .img-placeholder {
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     #detail-map {
-        height: 350px;
-        border-radius: 12px;
-        margin-top: 20px;
+        height: 280px;
         border: 1px solid #e2e8f0;
     }
 
@@ -74,15 +59,35 @@ $sekolah = $sekolah ?? [
         color: #2563eb;
     }
 
-    .stats-badge {
-        display: inline-flex;
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
         align-items: center;
-        padding: 5px 15px;
-        border-radius: 50px;
-        background: #f1f5f9;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #475569;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .section-title i {
+        font-size: 1.2rem;
+    }
+
+    .section-body {
+        color: #64748b;
+        line-height: 1.8;
+        font-size: 0.95rem;
+    }
+
+    .sidebar-info-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        flex-shrink: 0;
+        font-size: 1rem;
     }
 </style>
 <?= $this->endSection() ?>
@@ -96,111 +101,114 @@ $sekolah = $sekolah ?? [
     </div>
 
     <div class="row g-4">
+        <!-- ========== KOLOM KIRI: Detail Konten ========== -->
         <div class="col-lg-8">
-            <div class="detail-card mb-4">
-<img src="<?= $sekolah['foto'] ? base_url('uploads/sekolah/' . $sekolah['foto']) : base_url('gambar/Tidak ada gambar.png') ?>" class="detail-header-img" alt="<?= $sekolah['nama_sekolah'] ?>">
+            <div class="shadow-sm rounded-4 bg-white mb-4 overflow-hidden">
+                <?php if (!empty($sekolah['foto'])) : ?>
+                    <div class="detail-image-wrapper">
+                        <img src="<?= base_url('uploads/sekolah/' . $sekolah['foto']) ?>" class="detail-header-img" alt="<?= $sekolah['nama_sekolah'] ?>">
+                    </div>
+                <?php else : ?>
+                    <div class="img-placeholder bg-light">
+                        <i class="fa-solid fa-school text-secondary opacity-25 fs-1 mb-2"></i>
+                        <span class="text-muted small">Foto belum tersedia</span>
+                    </div>
+                <?php endif; ?>
+
                 <div class="p-4 p-md-5">
-                    <div class="d-flex align-items-center gap-2 mb-3">
+                    <!-- Nama Sekolah + Badge -->
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                         <span class="badge <?= $sekolah['jenjang'] == 'SD' ? 'bg-danger' : ($sekolah['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> px-3 py-2 rounded-pill">
                             <?= $sekolah['jenjang'] ?>
                         </span>
-                        <div class="stats-badge">
-                            <i class="fa-solid fa-book me-2 text-primary"></i>
-                            <?= $sekolah['kurikulum'] ?: 'Belum Ada Kurikulum' ?>
-                        </div>
-                    </div>
-
-                    <h1 class="display-6 fw-bold text-slate-800 mb-4"><?= $sekolah['nama_sekolah'] ?></h1>
-
-                    <div class="row">
-                        <div class="col-md-6 info-item">
-                            <span class="info-label">Alamat Lengkap</span>
-                            <div class="info-value">
-                                <i class="fa-solid fa-location-dot text-danger me-2"></i>
-                                <?= $sekolah['alamat'] ?>
-                            </div>
-                        </div>
-                        <div class="col-md-6 info-item">
-                            <span class="info-label">Koordinat Lokasi</span>
-                            <div class="info-value">
-                                <i class="fa-solid fa-map-pin text-primary me-2"></i>
-                                <?= $sekolah['latitude'] ?>, <?= $sekolah['longitude'] ?>
-                            </div>
-                        </div>
-                        <div class="col-md-6 info-item">
-                            <span class="info-label">Akreditasi</span>
-                            <div class="info-value">
-                                <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?>
-                            </div>
-                        </div>
-                        <div class="col-md-6 info-item">
-                            <span class="info-label">Kategori</span>
-                            <div class="info-value text-capitalize">
-                                <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
-                            </div>
-                        </div>
+                        <span class="badge bg-secondary px-3 py-2 rounded-pill text-capitalize">
+                            <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
+                        </span>
                         <?php if (!empty($sekolah['kurikulum'])) : ?>
-                        <div class="col-md-6 info-item">
-                            <span class="info-label">Kurikulum</span>
-                            <div class="info-value">
-                                <i class="fa-solid fa-book text-primary me-2"></i>
-                                <?= $sekolah['kurikulum'] ?>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        <?php if (!empty($sekolah['kepala_sekolah'])) : ?>
-                            <div class="col-md-6 info-item">
-                                <span class="info-label">Kepala Sekolah</span>
-                                <div class="info-value">
-                                    <i class="fa-solid fa-user-tie text-primary me-2"></i>
-                                    <?= $sekolah['kepala_sekolah'] ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($sekolah['kontak'])) : ?>
-                            <div class="col-md-6 info-item">
-                                <span class="info-label">Kontak</span>
-                                <div class="info-value">
-                                    <i class="fa-solid fa-phone text-primary me-2"></i>
-                                    <?= $sekolah['kontak'] ?>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($sekolah['tahun_berdiri'])) : ?>
-                            <div class="col-md-6 info-item">
-                                <span class="info-label">Tahun Berdiri</span>
-                                <div class="info-value">
-                                    <i class="fa-solid fa-calendar text-success me-2"></i>
-                                    <?= $sekolah['tahun_berdiri'] ?>
-                                </div>
-                            </div>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-book me-1"></i><?= $sekolah['kurikulum'] ?>
+                            </span>
                         <?php endif; ?>
                     </div>
 
-                    <hr class="my-4 opacity-50">
+                    <h1 class="display-6 fw-bold text-dark mb-4"><?= $sekolah['nama_sekolah'] ?></h1>
 
-                    <div class="info-item">
-                        <span class="info-label">Deskripsi Sekolah</span>
-                        <div class="info-value text-muted" style="line-height: 1.8; font-size: 1rem;">
+                    <!-- Info Ringkas 3 Kolom: Akreditasi, Kategori, Kurikulum -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;"><i class="bi bi-award me-1"></i>Akreditasi</small>
+                                <span class="fw-semibold text-dark"><?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;"><i class="bi bi-tag me-1"></i>Kategori</small>
+                                <span class="fw-semibold text-dark text-capitalize"><?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light rounded-3 p-3">
+                                <small class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;"><i class="bi bi-book me-1"></i>Kurikulum</small>
+                                <span class="fw-semibold text-dark"><?= $sekolah['kurikulum'] ?: 'Belum Ada Kurikulum' ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alamat & Koordinat -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-geo-alt-fill text-danger mt-1" style="font-size: 1.1rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Alamat Lengkap</small>
+                                    <span class="fw-medium text-dark"><?= $sekolah['alamat'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="bi bi-pin-map-fill text-primary mt-1" style="font-size: 1.1rem;"></i>
+                                <div>
+                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Koordinat</small>
+                                    <span class="fw-medium text-dark"><?= $sekolah['latitude'] ?>, <?= $sekolah['longitude'] ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deskripsi Sekolah -->
+                    <div class="mb-4">
+                        <div class="section-title">
+                            <i class="bi bi-file-text text-primary"></i>
+                            Deskripsi Sekolah
+                        </div>
+                        <div class="section-body">
                             <?= $sekolah['deskripsi_sekolah'] ?: 'Tidak ada deskripsi tersedia untuk sekolah ini.' ?>
                         </div>
                     </div>
 
+                    <!-- Visi -->
                     <?php if (!empty($sekolah['visi'])) : ?>
-                        <hr class="my-4 opacity-50">
-                        <div class="info-item">
-                            <span class="info-label"><i class="fa-solid fa-eye text-primary me-2"></i>Visi</span>
-                            <div class="info-value text-dark" style="line-height: 1.8; font-size: 1rem;">
+                        <div class="mb-4">
+                            <div class="section-title">
+                                <i class="bi bi-eye text-warning"></i>
+                                Visi
+                            </div>
+                            <div class="section-body">
                                 <?= nl2br($sekolah['visi']) ?>
                             </div>
                         </div>
                     <?php endif; ?>
 
+                    <!-- Misi -->
                     <?php if (!empty($sekolah['misi'])) : ?>
-                        <hr class="my-4 opacity-50">
-                        <div class="info-item">
-                            <span class="info-label"><i class="fa-solid fa-list-check text-success me-2"></i>Misi</span>
-                            <div class="info-value text-dark" style="line-height: 1.8; font-size: 1rem;">
+                        <div class="mb-4">
+                            <div class="section-title">
+                                <i class="bi bi-list-check text-success"></i>
+                                Misi
+                            </div>
+                            <div class="section-body">
                                 <?= nl2br($sekolah['misi']) ?>
                             </div>
                         </div>
@@ -209,63 +217,68 @@ $sekolah = $sekolah ?? [
             </div>
         </div>
 
+        <!-- ========== KOLOM KANAN: Sidebar Peta & Informasi ========== -->
         <div class="col-lg-4">
-            <div class="detail-card p-4">
-                <h5 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>Lokasi Geografis</h5>
-                <p class="text-muted small">Titik koordinat presisi sekolah dalam sistem pemetaan digital.</p>
-                <div id="detail-map"></div>
+            <div class="sticky-top" style="top: 20px;">
+                <div class="shadow-sm rounded-4 bg-white p-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-map text-primary me-2"></i>Lokasi Geografis
+                    </h5>
+                    <p class="text-muted small mb-3">Titik koordinat presisi sekolah dalam sistem pemetaan digital.</p>
+                    <div id="detail-map" class="rounded-3"></div>
 
-                <?php if (!empty($sekolah['kepala_sekolah']) || !empty($sekolah['kontak']) || !empty($sekolah['tahun_berdiri'])) : ?>
-                    <div class="mt-4 pt-3 border-top">
+                    <!-- Informasi Tambahan: list-group-flush -->
+                    <ul class="list-group list-group-flush mt-4">
                         <?php if (!empty($sekolah['kepala_sekolah'])) : ?>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-info-subtle text-info rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
-                                    <i class="fa-solid fa-user-tie fa-sm"></i>
+                            <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                                <div class="sidebar-info-icon bg-info-subtle text-info">
+                                    <i class="bi bi-person-badge"></i>
                                 </div>
                                 <div>
-                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Kepala Sekolah</small>
+                                    <small class="text-muted d-block fw-semibold" style="font-size: 0.65rem; line-height: 1.2; letter-spacing: 0.3px;">KEPALA SEKOLAH</small>
                                     <span class="fw-bold text-dark"><?= $sekolah['kepala_sekolah'] ?></span>
                                 </div>
-                            </div>
+                            </li>
                         <?php endif; ?>
+
                         <?php if (!empty($sekolah['tahun_berdiri'])) : ?>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
-                                    <i class="fa-solid fa-calendar fa-sm"></i>
+                            <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                                <div class="sidebar-info-icon bg-success-subtle text-success">
+                                    <i class="bi bi-calendar-check"></i>
                                 </div>
                                 <div>
-                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Tahun Berdiri</small>
+                                    <small class="text-muted d-block fw-semibold" style="font-size: 0.65rem; line-height: 1.2; letter-spacing: 0.3px;">TAHUN BERDIRI</small>
                                     <span class="fw-bold text-dark"><?= $sekolah['tahun_berdiri'] ?></span>
                                 </div>
-                            </div>
+                            </li>
                         <?php endif; ?>
+
                         <?php if (!empty($sekolah['kontak'])) : ?>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; flex-shrink: 0;">
-                                    <i class="fa-solid fa-phone fa-sm"></i>
+                            <li class="list-group-item d-flex align-items-center gap-3 px-0 py-3">
+                                <div class="sidebar-info-icon bg-primary-subtle text-primary">
+                                    <i class="bi bi-telephone"></i>
                                 </div>
                                 <div>
-                                    <small class="text-muted d-block" style="font-size: 0.65rem; line-height: 1.2;">Kontak</small>
+                                    <small class="text-muted d-block fw-semibold" style="font-size: 0.65rem; line-height: 1.2; letter-spacing: 0.3px;">KONTAK</small>
                                     <span class="fw-bold text-dark"><?= $sekolah['kontak'] ?></span>
                                 </div>
-                            </div>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+
+                    <!-- Tombol Aksi -->
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $sekolah['latitude'] ?>,<?= $sekolah['longitude'] ?>" target="_blank" class="btn btn-primary rounded-pill fw-semibold py-2">
+                            <i class="bi bi-signpost-2 me-2"></i>Petunjuk Arah (Google Maps)
+                        </a>
+                        <?php if (!empty($sekolah['website'])) : ?>
+                            <?php $link = preg_match('/^https?:\/\//i', $sekolah['website']) ? $sekolah['website'] : 'https://' . $sekolah['website']; ?>
+                            <a href="<?= $link ?>" target="_blank" class="btn btn-outline-success rounded-pill fw-semibold py-2">
+                                <i class="bi bi-globe2 me-2"></i>Kunjungi Website Sekolah
+                            </a>
                         <?php endif; ?>
                     </div>
-                <?php endif; ?>
-
-                <div class="mt-4">
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $sekolah['latitude'] ?>,<?= $sekolah['longitude'] ?>" target="_blank" class="btn btn-outline-primary w-100 rounded-pill fw-semibold">
-                        <i class="fa-solid fa-directions me-2"></i>Petunjuk Arah (Google Maps)
-                    </a>
                 </div>
-                <?php if (!empty($sekolah['website'])) : ?>
-                    <?php $link = preg_match('/^https?:\/\//i', $sekolah['website']) ? $sekolah['website'] : 'https://' . $sekolah['website']; ?>
-                    <div class="mt-3">
-                        <a href="<?= $link ?>" target="_blank" class="btn btn-outline-success w-100 rounded-pill fw-semibold">
-                            <i class="fa-solid fa-globe me-2"></i> Kunjungi Website Sekolah
-                        </a>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>

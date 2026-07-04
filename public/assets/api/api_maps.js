@@ -21,8 +21,8 @@
       crossOrigin: crossOrigin
     });
 
-    layers['Citra Satelit (MapTiler)'] = L.tileLayer('https://api.maptiler.com/tiles/uk-osgb63k1885/{z}/{x}/{y}.png?key=' + key, {
-      attribution: '&copy; MapTiler',
+    layers['Citra Satelit (MapTiler)'] = L.tileLayer('https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=' + key, {
+      attribution: '&copy; MapTiler &copy; OpenStreetMap contributors',
       crossOrigin: crossOrigin
     });
 

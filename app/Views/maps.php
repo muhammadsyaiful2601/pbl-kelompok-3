@@ -9,29 +9,79 @@ $sekolah_list = $sekolah_list ?? [];
 ?>
 
 <?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="<?= base_url('assets/css/style-publik.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
+<style>
+    #preview-map {
+        height: 400px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-card-modern {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card-modern:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .tracking-wider {
+        letter-spacing: 0.05em;
+    }
+
+    .lh-relaxed {
+        line-height: 1.8;
+    }
+
+    .search-table-wrapper {
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .search-table-wrapper::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .search-table-wrapper::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .search-table-wrapper::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .search-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <div class="container py-2">
 
-    <section class="hero-section row align-items-center mb-5">
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero-section row align-items-center mb-5 py-5">
         <div class="col-lg-6 mb-4 mb-lg-0">
             <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold mb-3">
                 <i class="fa-solid fa-map-location-dot me-1"></i> Web GIS Geospasial Kabupaten Tanah Datar
             </span>
-            <h1 class="display-5 fw-bold text-slate-800 mb-3" style="letter-spacing: -1px; line-height: 1.2;">
+            <h1 class="display-5 fw-bold text-dark mb-3" style="letter-spacing: -1px; line-height: 1.2;">
                 Pusat Informasi Geospasial <br><span class="text-primary">Pendidikan Kabupaten Tanah Datar</span>
             </h1>
-            <p class="lead text-muted mb-4" style="font-size: 1.1rem; line-height: 1.6;">
-                Platform Web GIS resmi milik Pemerintah Kabupaten Tanah Datar yang menyajikan visualisasi data geospasial pendidikan dasar secara komprehensif. Melalui integrasi data spasial yang presisi, sistem ini memungkinkan Dinas Pendidikan untuk melakukan pemantauan intensif, pemetaan sebaran institusi secara akurat, serta analisis mendalam terhadap aksesibilitas dan pemerataan mutu pendidikan di seluruh penjuru wilayah Luhak Nan Tuo guna mendukung pengambilan kebijakan strategi berbasis data.
-            </p>
+            <div class="mb-4" style="max-width: 650px;">
+                <p class="lead text-secondary lh-relaxed mb-0">
+                    Platform Web GIS resmi yang menyajikan visualisasi data spasial dan pemetaan sebaran institusi pendidikan dasar secara akurat. Sistem ini dirancang untuk memudahkan pemantauan, analisis aksesibilitas, serta mendukung pengambilan kebijakan strategis berbasis data.
+                </p>
+            </div>
             <div class="d-flex flex-wrap gap-3">
-                <a href="#peta-section" class="btn btn-login px-4 py-2.5 fs-6">
+                <a href="#peta-section" class="btn btn-primary px-4 py-2 fw-semibold rounded-pill shadow-sm">
                     <i class="fa-solid fa-earth-asia me-2"></i>Jelajahi Peta Interaktif
                 </a>
-                <a href="#statistik-section" class="btn btn-outline-secondary px-4 py-2.5 rounded-3 fw-medium bg-white">
+                <a href="#statistik-section" class="btn btn-outline-secondary px-4 py-2 fw-semibold rounded-pill bg-white">
                     <i class="fa-solid fa-chart-simple me-2"></i>Lihat Statistik
                 </a>
             </div>
@@ -40,22 +90,22 @@ $sekolah_list = $sekolah_list ?? [];
         <div class="col-lg-6">
             <div class="search-list-container">
                 <div class="search-box-wrapper">
-                    <div class="input-group mb-2">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-white border-end-0 text-muted rounded-start-pill">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" id="searchSchoolInput" class="form-select border-start-0 ps-0" placeholder="Cari nama atau alamat sekolah..." style="box-shadow: none; border-color: #dee2e6;">
+                        <input type="text" id="searchSchoolInput" class="form-control border-start-0 ps-0" placeholder="Cari nama atau alamat sekolah..." style="box-shadow: none; border-color: #dee2e6;">
                     </div>
-                    <div class="btn-group w-100 shadow-sm p-1 bg-white rounded-3 border" role="group">
-                        <button type="button" class="btn btn-sm btn-light active rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('semua', this)">Semua</button>
-                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SD', this)">SD</button>
-                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
-                        <button type="button" class="btn btn-sm btn-light rounded-2 py-1.5 fw-semibold filter-btn" onclick="filterSearchList('TK', this)">TK</button>
+                    <div class="btn-group w-100" role="group" aria-label="Filter jenjang sekolah">
+                        <button type="button" class="btn btn-outline-primary btn-sm active fw-semibold filter-btn" onclick="filterSearchList('semua', this)">Semua</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('SD', this)">SD</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('TK', this)">TK</button>
                     </div>
                 </div>
 
                 <div class="school-table-container">
-                    <div class="table-responsive m-0">
+                    <div class="search-table-wrapper">
                         <table class="table table-custom-3d align-middle mb-0" id="schoolSearchTable" style="display: none;">
                             <thead>
                                 <tr>
@@ -77,69 +127,76 @@ $sekolah_list = $sekolah_list ?? [];
         </div>
     </section>
 
-    <hr class="my-5 opacity-25">
-
-    <section id="statistik-section" class="mb-5 scroll-margin">
+    <!-- ==================== STATISTIK SECTION ==================== -->
+    <section id="statistik-section" class="py-5 mb-4 scroll-margin">
         <div class="text-center mb-5">
             <span class="text-primary fw-bold text-uppercase tracking-wider" style="font-size: 0.85rem;">Ikhtisar Data</span>
             <h2 class="fw-bold mt-1">Statistik Pendidikan Terkini</h2>
             <p class="text-muted mx-auto" style="max-width: 500px;">Ringkasan akumulasi data kelembagaan sekolah yang telah diverifikasi dan dipetakan di dalam sistem.</p>
         </div>
-        <div class="row g-4 text-center">
-            <div class="col-6 col-lg-3">
-                <div class="stat-card p-4">
-                    <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3 justify-content-center text-center">
+            <div class="col">
+                <div class="border-0 shadow-sm rounded-3 p-4 bg-white stat-card-modern h-100">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                         <i class="fa-solid fa-school fs-4"></i>
                     </div>
                     <h3 class="fw-bold mb-1"><?= number_format($total_sekolah, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Total Sekolah</p>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card p-4">
-                    <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+            <div class="col">
+                <div class="border-0 shadow-sm rounded-3 p-4 bg-white stat-card-modern h-100">
+                    <div class="p-3 bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                         <i class="fa-solid fa-children fs-4"></i>
                     </div>
                     <h3 class="fw-bold mb-1"><?= number_format($total_sd, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Sekolah Dasar (SD)</p>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card p-4">
-                    <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+            <div class="col">
+                <div class="border-0 shadow-sm rounded-3 p-4 bg-white stat-card-modern h-100">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                         <i class="fa-solid fa-graduation-cap fs-4"></i>
                     </div>
                     <h3 class="fw-bold mb-1"><?= number_format($total_smp, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Sekolah Menengah (SMP)</p>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card p-4">
-                    <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
+            <div class="col">
+                <div class="border-0 shadow-sm rounded-3 p-4 bg-white stat-card-modern h-100">
+                    <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                         <i class="fa-solid fa-child-reaching fs-4"></i>
                     </div>
                     <h3 class="fw-bold mb-1"><?= number_format($total_tk, 0, ',', '.') ?></h3>
                     <p class="text-muted small mb-0 fw-medium">Taman Kanak-kanak (TK)</p>
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card p-4">
-                    <div class="p-3 bg-info-subtle text-info rounded-circle d-inline-block mb-3" style="width: 60px; height: 60px; line-height: 30px;">
-                        <i class="fa-solid fa-user-chalkboard fs-4"></i>
-                    </div>
-                    <h3 class="fw-bold mb-1">...</h3>
-                    <p class="text-muted small mb-0 fw-medium">Data Terverifikasi</p>
-                </div>
-            </div>
         </div>
     </section>
 
-    <hr class="my-5 opacity-25">
-
-    <section id="peta-section" class="mb-5 scroll-margin">
+    <!-- ==================== PETA SECTION ==================== -->
+    <section id="peta-section" class="py-5 mb-4 scroll-margin">
         <div class="row align-items-center g-4">
             <div class="col-lg-8 order-2 order-lg-1">
-                <div id="preview-map"></div>
+                <div class="position-relative">
+                    <!-- Basemap Switcher Dropdown -->
+                    <div class="position-absolute top-0 end-0 m-3" style="z-index: 1000;">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light bg-white shadow-sm rounded-pill px-3 dropdown-toggle fw-semibold" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="basemapDropdownBtn">
+                                <i class="fa-solid fa-layer-group me-1 text-primary"></i> Standar (OSM)
+                            </button>
+                            <ul class="dropdown-menu shadow-sm border-0 rounded-3 py-2" style="min-width: 200px;" id="basemapDropdownMenu">
+                                <li><a class="dropdown-item active small py-2" href="#" data-basemap="Standard Map"><i class="fa-solid fa-map me-2 text-primary"></i> Standar (OSM)</a></li>
+                                <li><a class="dropdown-item small py-2" href="#" data-basemap="Satellite View"><i class="fa-solid fa-satellite me-2 text-danger"></i> Satelit (Google)</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item small py-2" href="#" data-basemap="Peta Jalan (MapTiler)"><i class="fa-solid fa-road me-2 text-success"></i> Jalan (MapTiler)</a></li>
+                                <li><a class="dropdown-item small py-2" href="#" data-basemap="Peta Jalan Detail (MapTiler)"><i class="fa-solid fa-road me-2 text-success"></i> Jalan Detail (MapTiler)</a></li>
+                                <li><a class="dropdown-item small py-2" href="#" data-basemap="Citra Satelit (MapTiler)"><i class="fa-solid fa-globe me-2 text-info"></i> Citra Satelit (MapTiler)</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="preview-map" class="rounded-4 shadow-sm"></div>
+                </div>
             </div>
             <div class="col-lg-4 order-1 order-lg-2">
                 <span class="text-primary fw-bold text-uppercase tracking-wider" style="font-size: 0.85rem;">Geospasial</span>
@@ -147,19 +204,19 @@ $sekolah_list = $sekolah_list ?? [];
                 <p class="text-muted">Visualisasi titik koordinat presisi mempermudah evaluasi jangkauan zonasi, kapasitas daya tampung wilayah, serta validasi lokasi sekolah guna menghindari tumpang tindih area pelayanan.</p>
                 <div class="mb-4">
                     <div class="d-flex align-items-start mb-2">
-                        <i class="fa-solid fa-circle-check text-success me-2 mt-1"></i>
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                         <span>Klasterisasi marker otomatis (SD, SMP, dan TK)</span>
                     </div>
                     <div class="d-flex align-items-start mb-2">
-                        <i class="fa-solid fa-circle-check text-success me-2 mt-1"></i>
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                         <span>Informasi popup profil ringkas sekolah</span>
                     </div>
                     <div class="d-flex align-items-start mb-2">
-                        <i class="fa-solid fa-circle-check text-success me-2 mt-1"></i>
+                        <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                         <span>Integrasi peta dasar Google Maps / OpenStreetMap</span>
                     </div>
                 </div>
-                <a href="<?= base_url('fullmaps') ?>" class="btn btn-outline-primary w-100 py-2.5 fw-semibold rounded-3 shadow-sm bg-white">
+                <a href="<?= base_url('fullmaps') ?>" class="btn btn-outline-primary w-100 fw-semibold rounded-pill shadow-sm bg-white">
                     <i class="fa-solid fa-expand-arrows-alt me-2"></i>Buka Peta Mode Penuh
                 </a>
             </div>
@@ -202,6 +259,33 @@ $sekolah_list = $sekolah_list ?? [];
     if (!baseMaps[savedBasemap]) savedBasemap = "Standard Map";
 
     baseMaps[savedBasemap].addTo(map);
+
+    // Basemap Dropdown Handler
+    document.querySelectorAll('#basemapDropdownMenu .dropdown-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            var key = this.getAttribute('data-basemap');
+            if (!baseMaps[key]) return;
+
+            // Remove all current base layers
+            Object.keys(baseMaps).forEach(function(k) {
+                if (map.hasLayer(baseMaps[k])) map.removeLayer(baseMaps[k]);
+            });
+
+            // Add selected
+            baseMaps[key].addTo(map);
+            localStorage.setItem('selectedBasemap', key);
+
+            // Update button text
+            document.getElementById('basemapDropdownBtn').innerHTML = '<i class="fa-solid fa-layer-group me-1 text-primary"></i> ' + this.textContent.trim();
+
+            // Update active state
+            document.querySelectorAll('#basemapDropdownMenu .dropdown-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
 
     /**
      * Calculate marker size based on zoom level to avoid overlapping
@@ -281,44 +365,45 @@ $sekolah_list = $sekolah_list ?? [];
                 var initialSize = getMarkerSize(map.getZoom());
                 var iconSekolah = createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
 
-                var popupContent = `
-                    <div class="custom-popup" style="width: 220px;">
-<img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : base_url('gambar/Tidak ada gambar.png') ?>"
-                             style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px 8px 0 0;" class="mb-2">
-                        <div class="px-2 pb-2">
-                                    <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-1" style="font-size: 10px;"><?= $sk['jenjang'] ?></span>
-                            <h6 class="fw-bold mb-1 text-dark"><?= $sk['nama_sekolah'] ?></h6>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?>
-                            </p>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?>
-                            </p>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
-                            </p>
-                            <?php if (!empty($sk['kepala_sekolah'])) : ?>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <strong>Kepala Sekolah:</strong> <?= $sk['kepala_sekolah'] ?>
-                            </p>
+                var popupContent = `<?php ob_start(); ?>
+                    <div class="card border-0" style="width: 260px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <div class="position-relative" style="height: 120px; overflow: hidden; background: #f8f9fa;">
+                            <?php if (!empty($sk['foto'])) : ?>
+                                <img src="<?= base_url('uploads/sekolah/' . $sk['foto']) ?>" alt="<?= $sk['nama_sekolah'] ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php else : ?>
+                                <div class="img-placeholder bg-light d-flex flex-column align-items-center justify-content-center" style="width:100%;height:100%;">
+                                    <i class="fa-solid fa-school text-secondary opacity-25 fs-1 mb-2"></i>
+                                    <span class="text-muted small">Foto belum tersedia</span>
+                                </div>
                             <?php endif; ?>
-                            <?php if (!empty($sk['kontak'])) : ?>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <strong>Kontak:</strong> <?= $sk['kontak'] ?>
+                            <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> position-absolute top-0 start-0 m-2 rounded-pill px-2 py-1" style="font-size: 0.65rem; z-index: 5;">
+                                <?= $sk['jenjang'] ?>
+                            </span>
+                        </div>
+                        <div class="p-3">
+                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;"><?= $sk['nama_sekolah'] ?></h6>
+                            <p class="text-muted small mb-2" style="font-size: 0.75rem; line-height: 1.4;">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= $sk['alamat'] ?>
                             </p>
-                            <?php endif; ?>
-                            <?php if (!empty($sk['tahun_berdiri'])) : ?>
-                            <p class="text-muted mb-2" style="font-size: 11px; line-height: 1.4;">
-                                <strong>Tahun Berdiri:</strong> <?= $sk['tahun_berdiri'] ?>
-                            </p>
-                            <?php endif; ?>
-                                <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2">
-                                    <small class="text-muted"><i class="fa-solid fa-book me-1"></i> <?= $sk['kurikulum'] ?? '-' ?></small>
-                                <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 10px;">Detail</a>
+                            <div class="row g-0 border-top border-bottom py-2 my-2">
+                                <div class="col-6 text-center border-end">
+                                    <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Akreditasi</small>
+                                    <span class="fw-semibold text-dark" style="font-size: 0.8rem;"><?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></span>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Kategori</small>
+                                    <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></span>
+                                </div>
+                            </div>
+                            <div class="d-grid mt-2">
+                                <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill shadow-sm fw-semibold" style="font-size: 0.75rem;">
+                                    <i class="bi bi-eye me-1"></i>Lihat Detail
+                                </a>
                             </div>
                         </div>
                     </div>
-                `;
+                <?php $popupStr = ob_get_clean();
+                echo str_replace(["\n", "\r"], '', $popupStr); ?>`;
 
                 var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: iconSekolah,
@@ -326,7 +411,7 @@ $sekolah_list = $sekolah_list ?? [];
                     })
                     .addTo(map)
                     .bindPopup(popupContent, {
-                        maxWidth: 250,
+                        maxWidth: 260,
                         className: 'modern-leaflet-popup'
                     });
 

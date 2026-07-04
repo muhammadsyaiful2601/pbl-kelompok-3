@@ -411,7 +411,7 @@
         }).setView([-0.5059920351014519, 100.74949926873911], 12);
 
         L.control.zoom({
-            position: 'bottomright'
+            position: 'topright'
         }).addTo(map);
 
         // Base Layers Initialization
@@ -553,23 +553,39 @@
                         })
                         .addTo(map)
                         .bindPopup(`
-                            <div class="custom-popup">
-<img src="<?= $sk['foto'] ? base_url('uploads/sekolah/' . $sk['foto']) : base_url('gambar/Tidak ada gambar.png') ?>">
-                                <div class="popup-info">
-                                    <div class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> mb-2"><?= $sk['jenjang'] ?></div>
-                                    <h6 class="fw-bold mb-1"><?= $sk['nama_sekolah'] ?></h6>
-                                    <p class="text-muted small mb-3"><i class="fa-solid fa-location-dot me-1"></i> <?= $sk['alamat'] ?></p>
-                                    <p class="text-muted small mb-3"><strong>Akreditasi:</strong> <?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></p>
-                                    <p class="text-muted small mb-3"><strong>Kategori:</strong> <?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></p>
-                                    <?php if (!empty($sk['kontak'])) : ?>
-                                    <p class="text-muted small mb-3"><strong>Kontak:</strong> <?= $sk['kontak'] ?></p>
+                            <div class="card border-0" style="width: 260px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                                <div class="position-relative" style="height: 120px; overflow: hidden; background: #f8f9fa;">
+                                    <?php if (!empty($sk['foto'])) : ?>
+                                        <img src="<?= base_url('uploads/sekolah/' . $sk['foto']) ?>" alt="<?= $sk['nama_sekolah'] ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <?php else : ?>
+                                        <div class="img-placeholder bg-light d-flex flex-column align-items-center justify-content-center" style="width:100%;height:100%;">
+                                            <i class="fa-solid fa-school text-secondary opacity-25 fs-1 mb-2"></i>
+                                            <span class="text-muted small">Foto belum tersedia</span>
+                                        </div>
                                     <?php endif; ?>
-                                    <?php if (!empty($sk['tahun_berdiri'])) : ?>
-                                    <p class="text-muted small mb-3"><strong>Tahun Berdiri:</strong> <?= $sk['tahun_berdiri'] ?></p>
-                                    <?php endif; ?>
-                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                        <small class="text-muted"><i class="fa-solid fa-book me-1"></i> <?= $sk['kurikulum'] ?? '-' ?></small>
-                                        <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill px-3" style="font-size: 0.7rem;">Detail</a>
+                                    <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> position-absolute top-0 start-0 m-2 rounded-pill px-2 py-1" style="font-size: 0.65rem; z-index: 5;">
+                                        <?= $sk['jenjang'] ?>
+                                    </span>
+                                </div>
+                                <div class="p-3">
+                                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;"><?= $sk['nama_sekolah'] ?></h6>
+                                    <p class="text-muted small mb-2" style="font-size: 0.75rem; line-height: 1.4;">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= $sk['alamat'] ?>
+                                    </p>
+                                    <div class="row g-0 border-top border-bottom py-2 my-2">
+                                        <div class="col-6 text-center border-end">
+                                            <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Akreditasi</small>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.8rem;"><?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></span>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Kategori</small>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid mt-2">
+                                        <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill shadow-sm fw-semibold" style="font-size: 0.75rem;">
+                                            <i class="bi bi-eye me-1"></i>Lihat Detail
+                                        </a>
                                     </div>
                                 </div>
                             </div>

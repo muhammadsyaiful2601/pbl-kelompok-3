@@ -55,8 +55,8 @@
                                     <label class="form-label fw-semibold">Kategori <span class="text-danger">*</span></label>
                                     <select name="kategori" class="form-select <?= ($validation->hasError('kategori')) ? 'is-invalid' : '' ?>">
                                         <option value="">Pilih Kategori...</option>
-                                        <option value="negri" <?= old('kategori', $sekolah['kategori'] ?? '') == 'negri' ? 'selected' : '' ?>>Negeri (Negri)</option>
-                                        <option value="swasta" <?= old('kategori', $sekolah['kategori'] ?? '') == 'swasta' ? 'selected' : '' ?>>Swasta</option>
+                                        <option value="Negeri" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Negeri' ? 'selected' : '' ?>>Negeri</option>
+                                        <option value="Swasta" <?= old('kategori', $sekolah['kategori'] ?? '') == 'Swasta' ? 'selected' : '' ?>>Swasta</option>
                                     </select>
                                     <div class="invalid-feedback"><?= $validation->getError('kategori') ?></div>
                                 </div>

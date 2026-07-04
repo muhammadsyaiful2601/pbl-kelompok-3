@@ -1,14 +1,21 @@
 <?= $this->extend('layout/template') ?>
 
 <?= $this->section('content') ?>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-end">
+            <a href="<?= base_url('superadmin/admin/tambah') ?>" class="btn btn-primary rounded-pill px-4">
+                <i class="fa-solid fa-plus me-2"></i>Tambah Admin
+            </a>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+            <div class="card-header bg-transparent border-0 pt-0 px-4">
                 <h6 class="fw-bold mb-0"><i class="fa-solid fa-users-gear text-primary me-2"></i>Daftar Administrator</h6>
-                <a href="<?= base_url('superadmin/admin/tambah') ?>" class="btn btn-primary rounded-pill px-4">
-                    <i class="fa-solid fa-plus me-2"></i>Tambah Admin
-                </a>
             </div>
             <div class="card-body p-4">
                 <?php if (session()->getFlashdata('success')) : ?>
@@ -30,17 +37,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; foreach ($admins as $admin) : ?>
-                                <tr>
+                            <?php $no = 1;
+                            foreach ($admins as $admin) : ?>
+                                <tr class="py-4">
                                     <td class="ps-3"><?= $no++ ?></td>
-                                    <td><span class="fw-bold text-dark"><?= $admin['username'] ?></span></td>
+                                    <td><span class="text-dark"><?= $admin['username'] ?></span></td>
                                     <td><?= $admin['nama_lengkap'] ?? '-' ?></td>
-                                    <td><span class="badge bg-primary rounded-pill"><?= $admin['role'] ?></span></td>
+                                    <td><span class="badge rounded-pill" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Admin</span></td>
                                     <td class="text-center">
-                                        <a href="<?= base_url('superadmin/admin/hapus/' . $admin['id_user']) ?>" 
-                                           class="btn btn-sm btn-outline-danger rounded-circle p-2" 
-                                           onclick="return confirm('Apakah Anda yakin ingin menghapus admin ini?')"
-                                           title="Hapus Admin">
+                                        <a href="<?= base_url('superadmin/admin/hapus/' . $admin['id_user']) ?>"
+                                            class="text-danger text-decoration-none"
+                                            onclick="return confirm('Apakah Anda yakin ingin menghapus admin ini?')"
+                                            title="Hapus Admin">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </a>
                                     </td>

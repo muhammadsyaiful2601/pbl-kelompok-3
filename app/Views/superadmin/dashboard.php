@@ -13,26 +13,6 @@ $sekolah_list = $sekolah_list ?? [];
 <!-- CDN CSS for Spasial Features -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    .modern-stat-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: none !important;
-        cursor: pointer;
-    }
-
-    .modern-stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .stat-icon-bg {
-        position: absolute;
-        right: -10px;
-        bottom: -10px;
-        font-size: 5rem;
-        opacity: 0.15;
-        transform: rotate(-15deg);
-    }
-
     #map {
         border-radius: 8px;
         border: 1px solid #eef2f6;
@@ -45,7 +25,7 @@ $sekolah_list = $sekolah_list ?? [];
 <div class="row mb-4">
     <div class="col-12">
         <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-left: 5px solid #6366f1 !important; border-radius: 12px;">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div class="card-body py-4 d-flex align-items-center justify-content-between">
                 <div>
                     <h5 class="fw-bold text-dark mb-1">
                         Panel <span class="text-indigo">Super Admin</span>, <span class="text-primary"><?= session()->get('nama_lengkap') ?></span>!
@@ -62,55 +42,63 @@ $sekolah_list = $sekolah_list ?? [];
 
 <!-- ROW 2: INFO CARDS -->
 <div class="row g-3 mb-4">
-    <!-- Total Admin -->
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-4">
         <a href="<?= base_url('superadmin/admin') ?>" class="text-decoration-none">
-            <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #6366f1, #4f46e5); border-radius: 15px;">
-                <div class="card-body p-4 text-center text-md-start">
-                    <p class="small text-white-50 fw-bold mb-1">TOTAL ADMIN</p>
-                    <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_admin, 0, ',', '.') ?></h2>
-                    <div class="stat-icon-bg"><i class="fa-solid fa-users-gear"></i></div>
+            <div class="card bg-white shadow-sm border-0 border-start border-4 border-primary h-100">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="small text-muted fw-semibold mb-1">TOTAL ADMIN</p>
+                        <h3 class="fw-bold mb-0 text-primary"><?= number_format($total_admin, 0, ',', '.') ?></h3>
+                    </div>
+                    <i class="fa-solid fa-users-gear text-primary opacity-75 fs-3"></i>
                 </div>
             </div>
         </a>
     </div>
-    <!-- Total Sekolah -->
-    <div class="col-12 col-md-3">
-        <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #3b82f6, #2563eb); border-radius: 15px;">
-            <div class="card-body p-4 text-center text-md-start">
-                <p class="small text-white-50 fw-bold mb-1">TOTAL SEKOLAH</p>
-                <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_sekolah, 0, ',', '.') ?></h2>
-                <div class="stat-icon-bg"><i class="fa-solid fa-school"></i></div>
+    <div class="col-12 col-md-4">
+        <div class="card bg-white shadow-sm border-0 border-start border-4 border-info h-100">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="small text-muted fw-semibold mb-1">TOTAL SEKOLAH</p>
+                    <h3 class="fw-bold mb-0 text-info"><?= number_format($total_sekolah, 0, ',', '.') ?></h3>
+                </div>
+                <i class="fa-solid fa-school text-info opacity-75 fs-3"></i>
             </div>
         </div>
     </div>
-    <!-- SD -->
-    <div class="col-12 col-md-3">
-        <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #10b981, #059669); border-radius: 15px;">
-            <div class="card-body p-4 text-center text-md-start">
-                <p class="small text-white-50 fw-bold mb-1">JENJANG SD</p>
-                <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_sd, 0, ',', '.') ?></h2>
-                <div class="stat-icon-bg"><i class="fa-solid fa-children"></i></div>
+    <div class="col-12 col-md-4">
+        <div class="card bg-white shadow-sm border-0 border-start border-4 border-success h-100">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="small text-muted fw-semibold mb-1">JENJANG SD</p>
+                    <h3 class="fw-bold mb-0 text-success"><?= number_format($total_sd, 0, ',', '.') ?></h3>
+                </div>
+                <i class="fa-solid fa-children text-success opacity-75 fs-3"></i>
             </div>
         </div>
     </div>
-    <!-- SMP -->
-    <div class="col-12 col-md-3">
-        <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #f59e0b, #d97706); border-radius: 15px;">
-            <div class="card-body p-4 text-center text-md-start">
-                <p class="small text-white-50 fw-bold mb-1">JENJANG SMP</p>
-                <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_smp, 0, ',', '.') ?></h2>
-                <div class="stat-icon-bg"><i class="fa-solid fa-graduation-cap"></i></div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card bg-white shadow-sm border-0 border-start border-4 border-warning h-100">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="small text-muted fw-semibold mb-1">JENJANG SMP</p>
+                    <h3 class="fw-bold mb-0 text-warning"><?= number_format($total_smp, 0, ',', '.') ?></h3>
+                </div>
+                <i class="fa-solid fa-graduation-cap text-warning opacity-75 fs-3"></i>
             </div>
         </div>
     </div>
-    <!-- TK -->
-    <div class="col-12 col-md-3">
-        <div class="card modern-stat-card h-100 shadow-sm text-white" style="background: linear-gradient(45deg, #38bdf8, #0ea5e9); border-radius: 15px;">
-            <div class="card-body p-4 text-center text-md-start">
-                <p class="small text-white-50 fw-bold mb-1">JENJANG TK</p>
-                <h2 class="fw-extrabold mb-0" style="font-size: 2.5rem;"><?= number_format($total_tk, 0, ',', '.') ?></h2>
-                <div class="stat-icon-bg"><i class="fa-solid fa-child-reaching"></i></div>
+    <div class="col-12 col-md-6">
+        <div class="card bg-white shadow-sm border-0 border-start border-4 border-info h-100">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="small text-muted fw-semibold mb-1">JENJANG TK</p>
+                    <h3 class="fw-bold mb-0 text-info"><?= number_format($total_tk, 0, ',', '.') ?></h3>
+                </div>
+                <i class="fa-solid fa-child-reaching text-info opacity-75 fs-3"></i>
             </div>
         </div>
     </div>

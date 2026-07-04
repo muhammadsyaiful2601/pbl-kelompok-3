@@ -4,15 +4,17 @@
 <div class="row">
     <div class="col-12">
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0"><i class="fa-solid fa-layer-group text-primary me-2"></i>Daftar GeoJSON</h6>
-                <div>
-                    <a href="<?= base_url('superadmin/geojson/clean') ?>" class="btn btn-outline-secondary rounded-pill px-4 me-2">
-                        <i class="fa-solid fa-broom me-2"></i>Bersihkan Nama
-                    </a>
-                    <a href="<?= base_url('superadmin/geojson/scan') ?>" class="btn btn-outline-primary rounded-pill px-4 me-2">
-                        <i class="fa-solid fa-magnifying-glass-location me-2"></i>Pindai File Lokal
-                    </a>
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h6 class="fw-bold mb-0"><i class="fa-solid fa-layer-group text-primary me-2"></i>Daftar GeoJSON</h6>
+                    <div class="d-flex gap-2">
+                        <a href="<?= base_url('superadmin/geojson/clean') ?>" class="btn btn-outline-secondary rounded-pill px-4">
+                            <i class="fa-solid fa-broom me-2"></i>Bersihkan Nama
+                        </a>
+                        <a href="<?= base_url('superadmin/geojson/scan') ?>" class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-magnifying-glass-location me-2"></i>Pindai File
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="card-body p-4">
@@ -31,45 +33,36 @@
                 <?php endif; ?>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle border-light" style="border-bottom: 1px solid #f1f5f9;">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">No</th>
                                 <th>Nama Wilayah/Layer</th>
                                 <th class="text-center">Warna</th>
-                                <th class="text-center">Status</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no = 1;
                             foreach ($geojsons as $gj) : ?>
-                                <tr>
+                                <tr class="border-bottom border-light">
                                     <td class="ps-3"><?= $no++ ?></td>
-                                    <td><span class="fw-bold text-dark text-capitalize"><?= $gj['nama_geojson'] ?></span></td>
+                                    <td><span class="text-capitalize" style="font-weight: 500;"><?= $gj['nama_geojson'] ?></span></td>
                                     <td class="text-center">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <div class="rounded-circle shadow-sm me-2" style="width: 18px; height: 18px; background-color: <?= $gj['warna_geojson'] ?>; border: 2px solid white;"></div>
-                                            <span class="small fw-bold text-muted"><?= strtoupper($gj['warna_geojson']) ?></span>
+                                            <div class="rounded-circle me-2" style="width: 16px; height: 16px; background-color: <?= $gj['warna_geojson'] ?>; opacity: 0.9;"></div>
+                                            <span class="small text-muted"><?= strtoupper($gj['warna_geojson']) ?></span>
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>"
-                                            class="btn btn-sm <?= $gj['is_active'] ? 'btn-success' : 'btn-secondary' ?> rounded-pill p-2">
-                                            <?= $gj['is_active'] ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>' ?>
-                                        </a>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <a href="<?= base_url('superadmin/geojson/edit/' . $gj['id_geojson']) ?>"
-                                                class="btn btn-sm btn-outline-primary rounded-circle p-2"
-                                                title="Atur Gaya Visual">
+                                        <div class="d-flex justify-content-center gap-3">
+                                            <a href="<?= base_url('superadmin/geojson/toggle/' . $gj['id_geojson']) ?>" class="text-secondary text-decoration-none" title="<?= $gj['is_active'] ? 'Nonaktifkan' : 'Aktifkan' ?>">
+                                                <i class="fa-solid <?= $gj['is_active'] ? 'fa-eye' : 'fa-eye-slash' ?>"></i>
+                                            </a>
+                                            <a href="<?= base_url('superadmin/geojson/edit/' . $gj['id_geojson']) ?>" class="text-primary text-decoration-none" title="Atur Gaya Visual">
                                                 <i class="fa-solid fa-palette"></i>
                                             </a>
-                                            <a href="<?= base_url('superadmin/geojson/hapus/' . $gj['id_geojson']) ?>"
-                                                class="btn btn-sm btn-outline-danger rounded-circle p-2"
-                                                onclick="return confirm('Hapus data ini dari sistem?')"
-                                                title="Hapus">
+                                            <a href="<?= base_url('superadmin/geojson/hapus/' . $gj['id_geojson']) ?>" class="text-danger text-decoration-none" onclick="return confirm('Hapus data ini dari sistem?')" title="Hapus">
                                                 <i class="fa-solid fa-trash-can"></i>
                                             </a>
                                         </div>

@@ -29,7 +29,13 @@
 
                     <div class="text-center mb-4">
                         <?php $avatar = $user['foto'] ?? session()->get('foto'); ?>
-                        <img src="<?= $avatar ? base_url('uploads/user/' . $avatar) : base_url('gambar/Tidak ada gambar.png') ?>" class="rounded-circle shadow-sm" alt="Foto Profil" style="width: 140px; height: 140px; object-fit: cover;">
+                        <?php if ($avatar) : ?>
+                            <img src="<?= base_url('uploads/user/' . $avatar) ?>" class="rounded-circle shadow-sm" alt="Foto Profil" style="width: 140px; height: 140px; object-fit: cover;">
+                        <?php else : ?>
+                            <div class="rounded-circle shadow-sm mx-auto" style="width: 140px; height: 140px; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-user text-secondary opacity-25" style="font-size: 3rem;"></i>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <input type="hidden" name="foto_lama" value="<?= old('foto_lama', $user['foto'] ?? '') ?>">

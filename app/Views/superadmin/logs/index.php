@@ -3,8 +3,7 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3 class="fw-bold mb-0">Log Aktivitas Admin</h3>
+        <div class="d-flex justify-content-end align-items-center">
             <a href="<?= base_url('superadmin/logs/hapus-semua') ?>" 
                class="btn btn-sm btn-outline-danger rounded-pill"
                onclick="return confirm('Hapus SEMUA log aktivitas? Tindakan ini tidak bisa dibatalkan.')">

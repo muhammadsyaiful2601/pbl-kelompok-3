@@ -55,7 +55,9 @@
                                             <?php if ($s['foto']) : ?>
                                                 <img src="<?= base_url('uploads/sekolah/' . $s['foto']) ?>" alt="Foto" class="rounded shadow-sm" width="60" height="45" style="object-fit: cover;">
                                             <?php else : ?>
-                                                <img src="<?= base_url('gambar/Tidak ada gambar.png') ?>" alt="No Photo" class="rounded shadow-sm" width="60" height="45" style="object-fit: cover;">
+                                                <div class="img-thumb-placeholder">
+                                                    <i class="fa-solid fa-school text-secondary opacity-25"></i>
+                                                </div>
                                             <?php endif; ?>
                                         </td>
                                         <td>
@@ -122,6 +124,16 @@
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+    }
+
+    .img-thumb-placeholder {
+        width: 60px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+        border-radius: 0.375rem;
     }
 </style>
 <?= $this->endSection() ?>

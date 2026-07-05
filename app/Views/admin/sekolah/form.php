@@ -117,6 +117,15 @@
                             </div>
 
                             <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">NPSN <small class="text-muted">(opsional)</small></label>
+                                        <input type="text" name="npsn" class="form-control" value="<?= old('npsn', $sekolah['npsn'] ?? '') ?>" placeholder="Masukkan NPSN sekolah">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Jenjang <span class="text-danger">*</span></label>

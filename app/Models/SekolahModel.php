@@ -11,6 +11,7 @@ class SekolahModel extends Model
     protected $primaryKey       = 'id_sekolah'; // sesuaikan dengan primary key tabel Anda
     protected $allowedFields = [
         'nama_sekolah',
+        'npsn',
         'jenjang',
         'kategori',
         'foto',

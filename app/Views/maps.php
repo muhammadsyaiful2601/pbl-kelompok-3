@@ -313,7 +313,7 @@ $sekolah_list = $sekolah_list ?? [];
                                 </div>
                             </div>
                             <div class="d-grid mt-2">
-                                <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill shadow-sm fw-semibold" style="font-size: 0.75rem;">
+                                <a href="<?= base_url('sekolah/' . $sk['id_sekolah']) ?>" class="btn btn-primary btn-sm rounded-pill shadow-sm fw-semibold text-white" style="font-size: 0.75rem;">
                                     <i class="bi bi-eye me-1"></i>Lihat Detail
                                 </a>
                             </div>

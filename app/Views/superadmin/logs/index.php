@@ -13,19 +13,18 @@
                 </h6>
 
                 <!-- Container Tombol & Teks diletakkan di sisi kanan Card Header -->
-                <!-- Menggunakan flex-column dan align-items-end agar teks Total Log berada tepat di bawah tombol Hapus Semua -->
-                <div class="d-flex flex-column align-items-end gap-1">
-                    <!-- Tombol Hapus Semua (Atas) -->
+                <!-- Menggunakan flex-row dan align-items-center agar tombol Hapus Semua dan Total Log sejajar horizontal di kanan -->
+                <div class="d-flex flex-row align-items-center gap-2">
+                    <!-- Teks Total Log -->
+                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                        Total Log: <?= count($logs) ?>
+                    </span>
+                    <!-- Tombol Hapus Semua -->
                     <a href="<?= base_url('superadmin/logs/hapus-semua') ?>"
                         class="btn btn-sm btn-outline-danger rounded-pill"
                         onclick="return confirm('Hapus SEMUA log aktivitas? Tindakan ini tidak bisa dibatalkan.')">
                         <i class="fa-solid fa-trash me-1"></i>Hapus Semua
                     </a>
-
-                    <!-- Teks Total Log (Bawah) -->
-                    <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
-                        Total Log: <?= count($logs) ?>
-                    </span>
                 </div>
             </div>
 

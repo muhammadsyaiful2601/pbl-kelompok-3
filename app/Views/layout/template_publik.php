@@ -11,6 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="<?= base_url('adminlte/css/adminlte.min.css') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= base_url('gambar/favicon.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url('gambar/favicon.png') ?>">
+    <link rel="shortcut icon" href="<?= base_url('gambar/favicon.ico') ?>">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

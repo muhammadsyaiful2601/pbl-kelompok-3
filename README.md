@@ -48,6 +48,23 @@ FEATURE REQUESTS.
 This repository is a "distribution" one, built by our release preparation script.
 Problems with it can be raised on our forum, or as issues in the main repository.
 
+## Database Setup
+
+Aplikasi ini menggunakan CodeIgniter 4 Migration. Setup database hanya dengan:
+
+```bash
+php spark migrate
+```
+
+Migration akan membuat semua tabel yang dibutuhkan:
+- `user` - Data admin/user
+- `sekolah` - Data sekolah
+- `geojson` - Data GeoJSON
+- `activity_logs` - Log aktivitas
+- `ci_sessions` - Session database
+
+Database default: `pbl_kel3` (dapat diubah di `.env`)
+
 ## Server Requirements
 
 PHP version 8.2 or higher is required, with the following extensions installed:

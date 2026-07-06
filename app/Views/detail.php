@@ -122,7 +122,7 @@ $sekolah = $sekolah ?? [
                             <?= $sekolah['jenjang'] ?>
                         </span>
                         <span class="badge bg-secondary px-3 py-2 rounded-pill text-capitalize">
-                            <?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?>
+                            <?= !empty($sekolah['kategori']) ? $sekolah['kategori'] : '-' ?>
                         </span>
                         <?php if (!empty($sekolah['kurikulum'])) : ?>
                             <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
@@ -144,7 +144,7 @@ $sekolah = $sekolah ?? [
                         <div class="col-md-4">
                             <div class="bg-light rounded-3 p-3">
                                 <small class="text-muted fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;"><i class="bi bi-tag me-1"></i>Kategori</small>
-                                <span class="fw-semibold text-dark text-capitalize"><?= !empty($sekolah['kategori']) ? ($sekolah['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></span>
+                                <span class="fw-semibold text-dark text-capitalize"><?= !empty($sekolah['kategori']) ? $sekolah['kategori'] : '-' ?></span>
                             </div>
                         </div>
                         <div class="col-md-4">

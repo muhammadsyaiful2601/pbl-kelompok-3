@@ -309,7 +309,7 @@ $sekolah_list = $sekolah_list ?? [];
                                 </div>
                                 <div class="col-6 text-center">
                                     <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Kategori</small>
-                                    <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= !empty($sk['kategori']) ? ($sk['kategori'] == 'negri' ? 'Negeri' : 'Swasta') : '-' ?></span>
+                                     <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= !empty($sk['kategori']) ? $sk['kategori'] : '-' ?></span>
                                 </div>
                             </div>
                             <div class="d-grid mt-2">

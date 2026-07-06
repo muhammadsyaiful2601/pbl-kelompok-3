@@ -86,6 +86,12 @@ class Sekolah extends BaseController
                     'required' => 'Nama Sekolah harus diisi.'
                 ]
             ],
+            'npsn' => [
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => 'NPSN harus diisi.'
+                ]
+            ],
             'jenjang' => [
                 'rules'  => 'required',
                 'errors' => [

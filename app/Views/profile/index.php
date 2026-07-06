@@ -42,7 +42,12 @@
 
                     <div class="mb-3">
                         <label for="username" class="form-label small fw-bold">Username</label>
-                        <input type="text" class="form-control" value="<?= $user['username'] ?>" disabled>
+                        <input type="text" name="username" id="username" class="form-control" value="<?= old('username', $user['username'] ?? '') ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nama_lengkap" class="form-label small fw-bold">Nama Lengkap</label>
+                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" value="<?= old('nama_lengkap', $user['nama_lengkap'] ?? '') ?>">
                     </div>
 
                     <div class="mb-3">
@@ -53,6 +58,8 @@
                     <div class="mb-3">
                         <label for="foto" class="form-label small fw-bold">Foto Profil</label>
                         <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 5MB)</p>
+                        <div id="foto-warning-profile" class="alert alert-warning py-2 mt-2 mb-0 small d-none" style="border-radius: 8px;"></div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
@@ -64,4 +71,22 @@
         </div>
     </div>
 </div>
+
+<script>
+    const fotoInput = document.querySelector('#foto');
+    const fotoWarning = document.querySelector('#foto-warning-profile');
+
+    fotoInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                fotoWarning.textContent = 'Ukuran file melebihi 5MB. Silakan pilih file yang lebih kecil.';
+                fotoWarning.classList.remove('d-none');
+                this.value = '';
+            } else {
+                fotoWarning.classList.add('d-none');
+            }
+        }
+    });
+</script>
 <?= $this->endSection() ?>

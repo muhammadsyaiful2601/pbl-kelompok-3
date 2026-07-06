@@ -70,9 +70,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge <?= $s['kategori'] == 'negri' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' ?> border px-2 py-1 text-capitalize">
-                                                <?= $s['kategori'] == 'negri' ? 'Negeri' : ($s['kategori'] == 'swasta' ? 'Swasta' : '-') ?>
-                                            </span>
+                                        <span class="badge <?= $s['kategori'] == 'Negeri' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' ?> border px-2 py-1 text-capitalize">
+                                            <?= $s['kategori'] == 'Negeri' ? 'Negeri' : ($s['kategori'] == 'Swasta' ? 'Swasta' : '-') ?>
+                                        </span>
                                         </td>
                                         <td>
                                             <div class="text-truncate" style="max-width: 250px;"><?= $s['alamat'] ?></div>

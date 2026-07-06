@@ -119,8 +119,9 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold">NPSN <small class="text-muted">(opsional)</small></label>
-                                        <input type="text" name="npsn" class="form-control" value="<?= old('npsn', $sekolah['npsn'] ?? '') ?>" placeholder="Masukkan NPSN sekolah">
+                                        <label class="form-label fw-semibold">NPSN <span class="text-danger">*</span></label>
+                                        <input type="text" name="npsn" class="form-control <?= ($validation->hasError('npsn')) ? 'is-invalid' : '' ?>" value="<?= old('npsn', $sekolah['npsn'] ?? '') ?>" placeholder="Masukkan NPSN sekolah">
+                                        <div class="invalid-feedback"><?= $validation->getError('npsn') ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -282,7 +283,8 @@
                                         <?php endif; ?>
                                         <input type="file" name="foto" id="foto-input" class="form-control mt-2 <?= ($validation->hasError('foto')) ? 'is-invalid' : '' ?>" onchange="previewImage()">
                                         <div class="invalid-feedback"><?= $validation->getError('foto') ?></div>
-                                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 2MB)</p>
+                                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 5MB)</p>
+                                        <div id="foto-warning" class="alert alert-warning py-2 mt-2 mb-0 small d-none" style="border-radius: 8px;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -622,6 +624,18 @@
         const foto = document.querySelector('#foto-input');
         const imgPreview = document.querySelector('#preview-foto');
         const placeholder = document.querySelector('#placeholder-foto');
+        const warning = document.querySelector('#foto-warning');
+
+        if (foto.files && foto.files[0]) {
+            const file = foto.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                warning.textContent = 'Ukuran file melebihi 5MB. Silakan pilih file yang lebih kecil.';
+                warning.classList.remove('d-none');
+                foto.value = '';
+                return;
+            }
+            warning.classList.add('d-none');
+        }
 
         imgPreview.classList.remove('d-none');
         if (placeholder) placeholder.classList.add('d-none');

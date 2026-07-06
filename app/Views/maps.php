@@ -73,7 +73,7 @@ $sekolah_list = $sekolah_list ?? [];
                 Pusat Informasi Geospasial <br><span class="text-primary">Pendidikan Kabupaten Tanah Datar</span>
             </h1>
             <div class="mb-4" style="max-width: 650px;">
-                <p class="lead text-secondary lh-relaxed mb-0">
+                <p class="lead text-secondary lh-relaxed mb-0" style="text-align: justify;">
                     Platform Web GIS resmi yang menyajikan visualisasi data spasial dan pemetaan sebaran institusi pendidikan dasar secara akurat. Sistem ini dirancang untuk memudahkan pemantauan, analisis aksesibilitas, serta mendukung pengambilan kebijakan strategis berbasis data.
                 </p>
             </div>
@@ -201,19 +201,19 @@ $sekolah_list = $sekolah_list ?? [];
             <div class="col-lg-4 order-1 order-lg-2">
                 <span class="text-primary fw-bold text-uppercase tracking-wider" style="font-size: 0.85rem;">Geospasial</span>
                 <h2 class="fw-bold mt-1 mb-3">Analisis Sebaran Spasial</h2>
-                <p class="text-muted">Visualisasi titik koordinat presisi mempermudah evaluasi jangkauan zonasi, kapasitas daya tampung wilayah, serta validasi lokasi sekolah guna menghindari tumpang tindih area pelayanan.</p>
+                <p class="text-muted" style="text-align: justify;">Visualisasi titik koordinat presisi mempermudah evaluasi jangkauan zonasi, kapasitas daya tampung wilayah, serta validasi lokasi sekolah guna menghindari tumpang tindih area pelayanan.</p>
                 <div class="mb-4">
                     <div class="d-flex align-items-start mb-2">
                         <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                        <span>Klasterisasi marker otomatis (SD, SMP, dan TK)</span>
+                        <span style="text-align: justify;">Klasterisasi marker otomatis (SD, SMP, dan TK)</span>
                     </div>
                     <div class="d-flex align-items-start mb-2">
                         <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                        <span>Informasi popup profil ringkas sekolah</span>
+                        <span style="text-align: justify;">Informasi popup profil ringkas sekolah</span>
                     </div>
                     <div class="d-flex align-items-start mb-2">
                         <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                        <span>Integrasi peta dasar Google Maps / OpenStreetMap</span>
+                        <span style="text-align: justify;">Integrasi peta dasar Google Maps / OpenStreetMap</span>
                     </div>
                 </div>
                 <a href="<?= base_url('fullmaps') ?>" class="btn btn-outline-primary w-100 fw-semibold rounded-pill shadow-sm bg-white">

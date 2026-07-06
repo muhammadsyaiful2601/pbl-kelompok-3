@@ -39,29 +39,39 @@ class Profile extends BaseController
             return redirect()->to(base_url('login'));
         }
 
+        $user = $this->userModel->find(session()->get('id_user'));
+        if (!$user) {
+            return redirect()->to(base_url('login'));
+        }
+
         $validation = \Config\Services::validation();
+        $usernameChanged = $this->request->getPost('username') !== $user['username'];
+        $passwordRequired = $usernameChanged || $this->request->getPost('password');
+
         $rules = [
-            'nama_lengkap' => 'required',
+            'nama_lengkap' => 'permit_empty|min_length[3]',
             'foto'         => 'max_size[foto,5120]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
         ];
 
-        if ($this->request->getPost('password')) {
-            $rules['password'] = 'min_length[6]';
+        if ($passwordRequired) {
+            $rules['password'] = 'required|min_length[6]';
         }
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
-        $user = $this->userModel->find(session()->get('id_user'));
-        if (!$user) {
-            return redirect()->to(base_url('login'));
+        $saveData = [
+            'id_user' => $user['id_user'],
+        ];
+
+        if ($this->request->getPost('username') !== null) {
+            $saveData['username'] = $this->request->getPost('username');
         }
 
-        $saveData = [
-            'id_user'      => $user['id_user'],
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
-        ];
+        if ($this->request->getPost('nama_lengkap') !== null) {
+            $saveData['nama_lengkap'] = $this->request->getPost('nama_lengkap');
+        }
 
         if ($this->request->getPost('password')) {
             $saveData['password'] = password_hash($this->request->getPost('password'), PASSWORD_BCRYPT);
@@ -87,6 +97,7 @@ class Profile extends BaseController
         log_activity('ubah', 'user', $user['id_user'], 'Memperbarui profil pengguna');
 
         session()->set([
+            'username'     => $saveData['username'],
             'nama_lengkap' => $saveData['nama_lengkap'],
         ]);
 

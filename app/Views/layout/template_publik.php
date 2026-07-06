@@ -29,6 +29,7 @@
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            z-index: 1030;
         }
 
         .navbar-custom .navbar-brand {

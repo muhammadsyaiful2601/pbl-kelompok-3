@@ -1,0 +1,19 @@
+# Allow access to uploaded images
+<IfModule mod_authz_core_module>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core_module>
+    Order Allow,Deny
+    Allow from all
+</IfModule>
+
+# Prevent PHP execution in uploads directory
+<FilesMatch "\.php$">
+    <IfModule mod_authz_core_module>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core_module>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

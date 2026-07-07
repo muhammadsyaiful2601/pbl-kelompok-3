@@ -30,6 +30,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-3">No</th>
+                                <th>Foto</th>
                                 <th>Username</th>
                                 <th>Nama Lengkap</th>
                                 <th>Role</th>
@@ -41,6 +42,15 @@
                             foreach ($admins as $admin) : ?>
                                 <tr class="py-4">
                                     <td class="ps-3"><?= $no++ ?></td>
+                                    <td>
+                                        <?php if ($admin['foto']) : ?>
+                                            <img src="<?= base_url('uploads/user/' . $admin['foto']) ?>" alt="Foto Profil" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <?php else : ?>
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #e2e8f0; color: #64748b;">
+                                                <i class="fa-solid fa-user" style="font-size: 1rem;"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><span class="text-dark"><?= $admin['username'] ?></span></td>
                                     <td><?= $admin['nama_lengkap'] ?? '-' ?></td>
                                     <td><span class="badge rounded-pill" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><?= ucfirst($admin['role']) ?></span></td>
@@ -56,7 +66,7 @@
                             <?php endforeach; ?>
                             <?php if (empty($admins)) : ?>
                                 <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">Belum ada admin yang terdaftar.</td>
+                                    <td colspan="6" class="text-center py-4 text-muted">Belum ada admin yang terdaftar.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

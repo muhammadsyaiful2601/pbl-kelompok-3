@@ -23,7 +23,7 @@ class Admin extends BaseController
         $data = [
             'title'      => 'Kelola Admin | WebGIS Sekolah',
             'page_title' => 'Manajemen Akun Admin',
-            'admins'     => $this->userModel->where('role', 'admin')->findAll(),
+            'admins'     => $this->userModel->whereIn('role', ['admin', 'superadmin'])->findAll(),
         ];
 
         return view('superadmin/admin/index', $data);

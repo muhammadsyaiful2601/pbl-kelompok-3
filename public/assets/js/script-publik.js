@@ -1,4 +1,41 @@
 let currentJenjangFilter = 'semua';
+let currentKecamatanFilter = 'semua';
+
+/* Cek apakah sekolah berada di dalam layer wilayah GeoJSON */
+function isSchoolInGeoJson(school, geojsonLayer) {
+    if (!school.latitude || !school.longitude || !geojsonLayer) return false;
+    const latlng = L.latLng(school.latitude, school.longitude);
+    return window.isLatLngInLayer(latlng, geojsonLayer);
+}
+
+/* Fungsi untuk menyaring marker di peta berdasarkan filter yang aktif */
+function updateMapMarkers() {
+    if (typeof markers === 'undefined' || typeof map === 'undefined') return;
+
+    Object.keys(markers).forEach(id => {
+        const marker = markers[id];
+        const school = window.sekolahData.find(s => s.id_sekolah == id);
+        
+        if (!school) return;
+
+        const jenjang = (school.jenjang || school.type || 'SD').toLowerCase();
+        const matchesJenjang = currentJenjangFilter === 'semua' || jenjang === currentJenjangFilter.toLowerCase();
+
+        let matchesKecamatan = true;
+        if (currentKecamatanFilter !== 'semua') {
+            const layer = geojsonLayers[currentKecamatanFilter];
+            if (layer) {
+                matchesKecamatan = isSchoolInGeoJson(school, layer);
+            }
+        }
+
+        if (matchesJenjang && matchesKecamatan) {
+            if (!map.hasLayer(marker)) marker.addTo(map);
+        } else {
+            if (map.hasLayer(marker)) map.removeLayer(marker);
+        }
+    });
+}
 
 /* Fungsi untuk merender daftar sekolah ke elemen HTML (Format Tabel Hover 3D) */
 function renderSchoolSearchList() {
@@ -21,7 +58,15 @@ function renderSchoolSearchList() {
         const matchesSearch = nama.includes(searchKeyword) || alamat.includes(searchKeyword);
         const matchesJenjang = currentJenjangFilter === 'semua' || jenjang === currentJenjangFilter.toLowerCase();
 
-        return matchesSearch && matchesJenjang;
+        let matchesKecamatan = true;
+        if (currentKecamatanFilter !== 'semua') {
+            const layer = geojsonLayers[currentKecamatanFilter];
+            if (layer) {
+                matchesKecamatan = isSchoolInGeoJson(school, layer);
+            }
+        }
+
+        return matchesSearch && matchesJenjang && matchesKecamatan;
     });
 
     // Validasi kondisi apabila data tidak ditemukan
@@ -82,6 +127,53 @@ function filterSearchList(jenjang, buttonElement) {
     }
 
     renderSchoolSearchList();
+    updateMapMarkers();
+}
+
+/* Fungsi untuk memfilter berdasarkan wilayah GeoJSON (Kecamatan) */
+function filterKecamatanList(kecId, zoomToKec = true) {
+    currentKecamatanFilter = kecId;
+
+    const selectEl = document.getElementById('filterKecamatanSelect');
+    if (selectEl) {
+        selectEl.value = kecId;
+    }
+
+    // Reset style semua wilayah
+    if (typeof geojsonLayers !== 'undefined') {
+        Object.keys(geojsonLayers).forEach(id => {
+            const layer = geojsonLayers[id];
+            const config = geojsonConfig[id];
+            if (layer && config) {
+                layer.setStyle({
+                    weight: 2,
+                    color: '#000000'
+                });
+            }
+        });
+
+        // Highlight wilayah terpilih
+        if (kecId !== 'semua') {
+            const activeLayer = geojsonLayers[kecId];
+            if (activeLayer) {
+                activeLayer.setStyle({
+                    weight: 4,
+                    color: '#0d6efd'
+                });
+                if (zoomToKec && typeof map !== 'undefined') {
+                    map.fitBounds(activeLayer.getBounds());
+                }
+            }
+        } else {
+            // Reset view jika pilih "Semua"
+            if (zoomToKec && typeof map !== 'undefined') {
+                map.setView([-0.5059920351014519, 100.74949926873911], 11);
+            }
+        }
+    }
+
+    renderSchoolSearchList();
+    updateMapMarkers();
 }
 
 /* Fungsi untuk memindahkan fokus tampilan peta koordinat dan menggulir halaman */

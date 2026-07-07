@@ -96,11 +96,23 @@ $sekolah_list = $sekolah_list ?? [];
                         </span>
                         <input type="text" id="searchSchoolInput" class="form-control border-start-0 ps-0" placeholder="Cari nama atau alamat sekolah..." style="box-shadow: none; border-color: #dee2e6;">
                     </div>
-                    <div class="btn-group w-100" role="group" aria-label="Filter jenjang sekolah">
+                    <div class="btn-group w-100 mb-3" role="group" aria-label="Filter jenjang sekolah">
                         <button type="button" class="btn btn-outline-primary btn-sm active fw-semibold filter-btn" onclick="filterSearchList('semua', this)">Semua</button>
                         <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('SD', this)">SD</button>
                         <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('SMP', this)">SMP</button>
                         <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('TK', this)">TK</button>
+                    </div>
+
+                    <div class="filter-kecamatan-wrapper text-start">
+                        <label for="filterKecamatanSelect" class="form-label small fw-bold text-secondary mb-1">Filter Wilayah (Kecamatan)</label>
+                        <select id="filterKecamatanSelect" class="form-select rounded-pill small mb-2" style="box-shadow: none; border-color: #dee2e6;" onchange="filterKecamatanList(this.value, true)">
+                            <option value="semua">-- Semua Wilayah/Kecamatan --</option>
+                            <?php if (!empty($active_geojson)) : ?>
+                                <?php foreach ($active_geojson as $gj) : ?>
+                                    <option value="<?= $gj['id_geojson'] ?>"><?= $gj['nama_geojson'] ?></option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
                     </div>
                 </div>
 
@@ -355,7 +367,14 @@ $sekolah_list = $sekolah_list ?? [];
                 <?= $gj['id_geojson'] ?>,
                 map,
                 markers
-            );
+            ).then(function(layer) {
+                if (layer) {
+                    layer.on('click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        filterKecamatanList(<?= $gj['id_geojson'] ?>, false);
+                    });
+                }
+            });
         <?php endforeach; ?>
     <?php endif; ?>
 
@@ -366,5 +385,5 @@ $sekolah_list = $sekolah_list ?? [];
     });
 </script>
 <script src="<?= base_url('assets/js/script-publik.js') ?>"></script>
-<script src="<?= base_url('assets/js/search-hero.js') ?>"></script>
+
 <?= $this->endSection() ?>

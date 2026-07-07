@@ -50,7 +50,7 @@ class Profile extends BaseController
 
         $rules = [
             'nama_lengkap' => 'permit_empty|min_length[3]',
-            'foto'         => 'max_size[foto,5120]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+            'foto'         => 'max_size[foto,10240]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
         ];
 
         if ($passwordRequired) {
@@ -79,6 +79,15 @@ class Profile extends BaseController
 
         $foto = $this->request->getFile('foto');
         if ($foto && $foto->getError() != 4) {
+            // Cek apakah upload file valid dan bebas kesalahan engine
+            if (!$foto->isValid()) {
+                $errorStr = $foto->getErrorString();
+                if ($foto->getError() === UPLOAD_ERR_INI_SIZE) {
+                    $errorStr = 'Ukuran berkas foto melebihi batas maksimal server (upload_max_filesize).';
+                }
+                return redirect()->back()->withInput()->with('errors', ['foto' => $errorStr]);
+            }
+
             $uploadPath = FCPATH . 'uploads/user/';
 
             // Ensure directory exists

@@ -131,9 +131,9 @@ class Sekolah extends BaseController
                 ]
             ],
             'foto' => [
-                'rules'  => 'max_size[foto,5120]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
+                'rules'  => 'max_size[foto,10240]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
                 'errors' => [
-                    'max_size' => 'Ukuran foto terlalu besar (Maks. 5MB).',
+                    'max_size' => 'Ukuran foto terlalu besar (Maks. 10MB).',
                     'is_image' => 'File yang dipilih bukan gambar.',
                     'mime_in'  => 'Format foto harus JPG, JPEG, atau PNG.'
                 ]
@@ -147,7 +147,16 @@ class Sekolah extends BaseController
         $foto = $this->request->getFile('foto');
         $namaFoto = $this->request->getPost('foto_lama');
 
-        if ($foto->getError() != 4) {
+        if ($foto && $foto->getError() != 4) {
+            // Cek apakah upload file valid dan bebas kesalahan engine
+            if (!$foto->isValid()) {
+                $errorStr = $foto->getErrorString();
+                if ($foto->getError() === UPLOAD_ERR_INI_SIZE) {
+                    $errorStr = 'Ukuran berkas foto melebihi batas maksimal server (upload_max_filesize).';
+                }
+                return redirect()->back()->withInput()->with('error', $errorStr);
+            }
+
             // Jika ada foto baru diupload
             $namaFoto = $foto->getRandomName();
             $uploadPath = FCPATH . 'uploads/sekolah/';

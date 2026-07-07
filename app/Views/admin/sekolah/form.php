@@ -283,7 +283,7 @@
                                         <?php endif; ?>
                                         <input type="file" name="foto" id="foto-input" class="form-control mt-2 <?= ($validation->hasError('foto')) ? 'is-invalid' : '' ?>" onchange="previewImage()">
                                         <div class="invalid-feedback"><?= $validation->getError('foto') ?></div>
-                                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 5MB)</p>
+                                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 10MB)</p>
                                         <div id="foto-warning" class="alert alert-warning py-2 mt-2 mb-0 small d-none" style="border-radius: 8px;"></div>
                                     </div>
                                 </div>
@@ -628,8 +628,8 @@
 
         if (foto.files && foto.files[0]) {
             const file = foto.files[0];
-            if (file.size > 5 * 1024 * 1024) {
-                warning.textContent = 'Ukuran file melebihi 5MB. Silakan pilih file yang lebih kecil.';
+            if (file.size > 10 * 1024 * 1024) {
+                warning.textContent = 'Ukuran file melebihi 10MB. Silakan pilih file yang lebih kecil.';
                 warning.classList.remove('d-none');
                 foto.value = '';
                 return;

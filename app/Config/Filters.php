@@ -25,6 +25,7 @@ class Filters extends BaseFilters
      * or [filter_name => [classname1, classname2, ...]]
      */
     public array $aliases = [
+        'uploadsize'    => \App\Filters\UploadSizeFilter::class,
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
         'honeypot'      => Honeypot::class,
@@ -72,6 +73,7 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
+            'uploadsize',
             // 'honeypot',
             'csrf' => ['except' => ['admin/sekolah/simpan', 'admin/sekolah/*']],
             // 'invalidchars',

@@ -17,3 +17,10 @@
         Deny from all
     </IfModule>
 </FilesMatch>
+
+# Bypass ModSecurity/WAF if supported by hosting.
+# helps prevent LiteSpeed Web Server from blocking images/uploads.
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>

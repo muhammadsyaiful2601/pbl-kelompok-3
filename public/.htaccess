@@ -47,3 +47,16 @@ Options -Indexes
 # Disable server signature start
 ServerSignature Off
 # Disable server signature end
+
+# ----------------------------------------------------------------------
+# ModSecurity / WAF Bypass (LiteSpeed)
+# ----------------------------------------------------------------------
+# Jika Anda mengalami error '403 Forbidden' saat menyimpan data/upload foto,
+# Barangkali ModSecurity (WAF) di hosting memblokir payload upload.
+# Hapus tanda komentar (#) di bawah ini untuk mencoba menonaktifkan ModSecurity.
+# PERINGATAN: Beberapa hosting memblokir perintah ini (akan menyebabkan Error 500).
+# <IfModule mod_security.c>
+#     SecRuleEngine Off
+#     SecFilterEngine Off
+#     SecFilterScanPOST Off
+# </IfModule>

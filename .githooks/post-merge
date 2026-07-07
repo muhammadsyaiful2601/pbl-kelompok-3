@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# Git Hook: post-merge
+# Deskripsi: Berjalan otomatis setelah git pull atau git merge pada hosting.
+#           Menjalankan script fix_permissions.sh untuk update folder/file/cache.
+# ==============================================================================
+
+# Dapatkan directory root dari repo
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+cd "$ROOT_DIR" || exit 1
+
+if [ -f "./fix_permissions.sh" ]; then
+    echo "====================================================="
+    echo "Git Post-Merge: Menjalankan perbaikan otomatis..."
+    bash ./fix_permissions.sh
+    echo "====================================================="
+else
+    echo "Git Post-Merge: fix_permissions.sh tidak ditemukan!"
+fi

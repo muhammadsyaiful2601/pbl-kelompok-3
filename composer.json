@@ -38,6 +38,9 @@
         "sort-packages": true
     },
     "scripts": {
+        "post-autoload-dump": [
+            "git config core.hooksPath .githooks || true"
+        ],
         "test": "phpunit"
     }
 }

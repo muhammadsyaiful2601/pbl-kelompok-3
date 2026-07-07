@@ -59,9 +59,10 @@ class Security extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Domain for CSRF protection cookie.
-     * Use leading dot for subdomains: .sisteminformasiduaa.my.id
+     * Use leading dot for subdomains: .example.com
+     * Leave null for default (current domain)
      */
-    public ?string $cookieDomain = '.sisteminformasiduaa.my.id';
+    public ?string $cookieDomain = null;
 
     /**
      * --------------------------------------------------------------------------

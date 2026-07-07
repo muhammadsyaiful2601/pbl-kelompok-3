@@ -1,59 +1,118 @@
-# Fix untuk Error 403 Forbidden saat Upload Foto
+# Panduan Deployment - Perbaikan Error 403 Forbidden
 
-## Masalah
-Error 403 Forbidden muncul ketika menyimpan data sekolah yang memiliki foto di website yang sudah di-hosting.
+## Ringkasan Perbaikan
 
-## Penyebab
-Terdapat beberapa penyebab yang memungkinkan:
+Dokumen ini menjelaskan perbaikan yang telah dilakukan untuk mengatasi error **403 Forbidden** pada saat upload foto sekolah dan foto profil.
 
-1. **CSRF Protection tidak aktif** - Filter CSRF dinonaktifkan di konfigurasi global
-2. **Token CSRF regenerasi** - Token CSRF yang regenerasi setiap submit menyebabkan mismatch
-3. **Upload directory tidak memiliki .htaccess** - Direktori upload tidak memiliki konfigurasi akses yang benar
-4. **Cookie CSRF tidak memiliki path yang benar** - Cookie CSRF hanya berlaku untuk path tertentu
+## Masalah yang Ditemukan
 
-## Solusi yang Telah Diterapkan
-
-### 1. Mengaktifkan CSRF Filter Global
-**File:** `app/Config/Filters.php`
-
-CSRF filter telah diaktifkan secara global untuk melindungi semua POST request:
-
-```php
-public array $globals = [
-    'before' => [
-        // 'honeypot',
-        'csrf',  // CSRF filter diaktifkan
-        // 'invalidchars',
-    ],
-    ...
-];
-```
-
-### 2. Menonaktifkan Regenerasi Token CSRF
+### 1. CSRF Cookie Domain Terbatas
 **File:** `app/Config/Security.php`
+- **Masalah:** CSRF cookie domain di-hardcode ke `.sisteminformasiduaa.my.id`
+- **Dampak:** Cookie CSRF tidak bekerja pada domain hosting lain
+- **Perbaikan:** Diubah menjadi `null` agar menggunakan domain otomatis
 
-Regenerasi token dinonaktifkan untuk mencegah token mismatch:
+### 2. Path Upload File Tidak Absolut
+**File:** `app/Controllers/Admin/Sekolah.php` dan `app/Controllers/Profile.php`
+- **Masalah:** Menggunakan path relatif (`uploads/sekolah/`, `uploads/user/`)
+- **Dampak:** File tidak terupload dengan benar di hosting
+- **Perbaikan:** Menggunakan `FCPATH` untuk path absolut
 
-```php
-public bool $regenerate = false;
+### 3. Missing Directory Creation
+**File:** `app/Controllers/Admin/Sekolah.php` dan `app/Controllers/Profile.php`
+- **Masalah:** Tidak ada pengecekan dan pembuatan direktori upload
+- **Dampak:** Upload gagal jika direktori belum ada
+- **Perbaikan:** Menambahkan `mkdir()` jika direktori belum ada
+
+## Langkah-langkah Deployment
+
+### 1. Upload File ke Hosting
+
+Upload semua file dan folder proyek ke hosting, pastikan struktur folder tetap sama:
+
+```
+public_html/ (atau www/ atau htdocs/)
+├── app/
+├── public/
+│   ├── uploads/
+│   │   ├── sekolah/
+│   │   │   └── .htaccess
+│   │   ├── user/
+│   │   │   └── .htaccess
+│   │   └── .htaccess
+│   ├── assets/
+│   ├── gambar/
+│   └── index.php
+├── writable/
+├── .env
+└── [file-file lainnya]
 ```
 
-### 3. Menambahkan Cookie Path untuk CSRF
-**File:** `app/Config/Security.php`
+### 2. Set Permission Folder
 
-Cookie path diatur agar berlaku untuk seluruh aplikasi:
+Jalankan perintah berikut via SSH atau File Manager:
 
-```php
-public string $cookiePath = '/';
+```bash
+# Set permission untuk folder uploads (penting!)
+chmod 755 public/uploads
+chmod 755 public/uploads/sekolah
+chmod 755 public/uploads/user
+
+# Set permission untuk folder writable
+chmod 755 writable
+chmod 755 writable/cache
+chmod 755 writable/logs
+chmod 755 writable/session
+chmod 755 writable/uploads
+
+# Jika menggunakan shared hosting, kadang perlu 775 atau 777
+# Coba 755 terlebih dahulu, jika gagal naikkan ke 775
 ```
 
-### 4. Membuat .htaccess untuk Direktori Upload
-**File:** `public/uploads/sekolah/.htaccess` (BARU)
+### 3. Konfigurasi .env
 
-File ini dibuat untuk mengizinkan akses publik ke file yang diupload:
+Edit file `.env` sesuai dengan konfigurasi hosting:
 
+```env
+CI_ENVIRONMENT = production
+
+app.baseURL = 'https://domain-anda.com/'  # Ganti dengan domain Anda
+
+database.default.hostname = localhost
+database.default.database = nama_database
+database.default.username = username_db
+database.default.password = password_db
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+
+# Session configuration
+session.driver = 'CodeIgniter\Session\Handlers\DatabaseHandler'
+session.savePath = 'ci_sessions'
+session.cookieName = 'ci_session'
+session.expiration = 7200
+session.matchIP = false
+session.timeToUpdate = 300
+
+# Encryption (generate dengan: php spark key:generate)
+encryption.key = 'GENERATE_KEY_DISINI'
+```
+
+**PENTING:** Generate encryption key dengan menjalankan:
+```bash
+php spark key:generate
+```
+
+### 4. Konfigurasi Database
+
+Import database dari file SQL yang disediakan. Pastikan tabel `ci_sessions` sudah dibuat untuk session handler.
+
+### 5. Verifikasi .htaccess
+
+Pastikan file `.htaccess` di folder uploads sudah benar:
+
+**public/uploads/.htaccess:**
 ```apache
-# Allow access to uploaded images
+# Allow access to files in uploads directory
 <IfModule mod_authz_core_module>
     Require all granted
 </IfModule>
@@ -74,73 +133,107 @@ File ini dibuat untuk mengizinkan akses publik ke file yang diupload:
 </FilesMatch>
 ```
 
-## Langkah-langkah Deployment ke Hosting
+### 6. Cek Konfigurasi PHP
 
-### 1. Upload File yang Diubah
-Upload file-file berikut ke hosting Anda:
+Pastikan PHP di hosting memiliki konfigurasi berikut (cek di `php.ini` atau `.htaccess`):
 
-- `app/Config/Filters.php`
-- `app/Config/Security.php`
-- `public/uploads/sekolah/.htaccess` (file baru)
-
-### 2. Buat Direktori Upload (jika belum ada)
-Pastikan direktori `public/uploads/sekolah/` ada di hosting. Jika belum, buat melalui FTP atau File Manager.
-
-### 3. Set Permission Direktori
-Set permission untuk direktori upload:
-
-```bash
-# Via FTP/File Manager, set permission ke:
-public/uploads/ = 755 atau 775
-public/uploads/sekolah/ = 755 atau 775
+```ini
+upload_max_filesize = 10M
+post_max_size = 12M
+max_execution_time = 300
+max_input_time = 300
 ```
 
-### 4. Clear Cache (PENTING - JANGAN DILEWATI!)
-**WAJIB clear cache setelah deploy karena ada perubahan pada config Security!**
+Jika tidak bisa mengedit `php.ini`, tambahkan di `.htaccess`:
 
-```bash
-# Via terminal/SSH
-php spark cache:clear
-
-# Jika tidak bisa via terminal, hapus file cache manual via FTP:
-# Hapus semua file di folder: writable/cache/
-# Khususnya file: FactoriesCache_config
+```apache
+php_value upload_max_filesize 10M
+php_value post_max_size 12M
+php_value max_execution_time 300
 ```
 
-**Catatan:** Jika error "Cannot assign null to property" masih muncul, itu berarti cache belum di-clear. Lakukan clear cache kembali.
+### 7. Testing
 
-### 5. Test Upload Foto
-1. Login ke admin panel
-2. Buka menu "Data Sekolah"
-3. Klik "Tambah Sekolah Baru"
-4. Isi form termasuk upload foto
-5. Klik "Simpan Data"
+Setelah deployment, test fitur-fitur berikut:
+
+1. **Upload Foto Sekolah:**
+   - Login sebagai admin
+   - Buka menu "Data Sekolah"
+   - Klik "Tambah Sekolah" atau "Edit" pada sekolah yang ada
+   - Upload foto dengan format JPG/JPEG/PNG (maks 5MB)
+   - Klik "Simpan Data"
+   - **Expected:** Foto berhasil diupload dan ditampilkan
+
+2. **Upload Foto Profil:**
+   - Login sebagai admin/superadmin
+   - Buka menu "Profil Saya"
+   - Upload foto profil
+   - Klik "Simpan Perubahan"
+   - **Expected:** Foto profil berhasil diupdate
+
+3. **Akses File Upload:**
+   - Setelah upload, coba akses file melalui browser:
+   - `https://domain-anda.com/uploads/sekolah/nama-file.jpg`
+   - `https://domain-anda.com/uploads/user/nama-file.jpg`
+   - **Expected:** File dapat diakses (tidak ada error 403)
 
 ## Troubleshooting
 
-### Jika masih muncul error 403:
+### Error 403 masih muncul?
 
-1. **Cek error logs** di hosting untuk melihat pesan error yang detail
-2. **Pastikan mod_rewrite aktif** di Apache
-3. **Cek cookie browser** - pastikan cookie `csrf_cookie_name` tersimpan
-4. **Cek file permissions** - pastikan direktori `writable/` memiliki permission yang benar (755/775)
-5. **Cek session driver** - pastikan session menggunakan database (sesuai .env)
+1. **Cek permission folder:**
+   ```bash
+   ls -la public/uploads/
+   # Pastikan permission adalah 755 atau 775
+   ```
 
-### Jika foto tidak bisa diupload:
+2. **Cek ownership:**
+   ```bash
+   # Pastikan folder dimiliki oleh user yang sama dengan web server
+   chown -R www-data:www-data public/uploads/
+   ```
 
-1. **Cek disk quota** - pastikan ada ruang disk yang cukup
-2. **Cek upload_max_filesize** di php.ini hosting (minimal 5M)
-3. **Cek post_max_size** di php.ini hosting (minimal 5M)
+3. **Cek .htaccess:**
+   - Pastikan `AllowOverride All` aktif di konfigurasi Apache
+   - Cek error log Apache untuk detail error
 
-## Catatan Keamanan
+4. **Cek error log:**
+   ```bash
+   # Lokasi error log biasanya di:
+   /var/log/apache2/error.log
+   # atau
+   /var/log/httpd/error_log
+   ```
 
-- File `.htaccess` di `public/uploads/sekolah/` mencegah eksekusi file PHP di direktori upload
-- CSRF protection aktif untuk mencegah serangan Cross-Site Request Forgery
-- Token CSRF tidak diregenerasi untuk menghindari mismatch pada form dengan upload file
+### File tidak bisa diupload?
+
+1. Cek `upload_max_filesize` dan `post_max_size` di phpinfo()
+2. Pastikan folder uploads memiliki permission write
+3. Cek error log PHP untuk detail error
+
+### CSRF Token Mismatch?
+
+1. Pastikan cookie di browser aktif
+2. Cek apakah domain cookie sesuai dengan domain website
+3. Clear cache dan cookies browser
+
+## File yang Telah Diperbaiki
+
+1. ✅ `app/Config/Security.php` - CSRF cookie domain diubah ke null
+2. ✅ `app/Controllers/Admin/Sekolah.php` - Path upload menggunakan FCPATH
+3. ✅ `app/Controllers/Profile.php` - Path upload menggunakan FCPATH
 
 ## Kontak Support
 
-Jika masalah masih berlanjut, periksa:
-1. Error logs di `writable/logs/`
-2. Browser console untuk error JavaScript
-3. Network tab di Developer Tools untuk melihat response dari server
+Jika masih mengalami masalah, periksa:
+- Error log Apache/Nginx
+- Error log PHP
+- Browser console (F12) untuk error JavaScript
+- Network tab untuk melihat response dari server
+
+## Catatan Penting
+
+- Selalu backup file dan database sebelum deployment
+- Test di localhost terlebih dahulu sebelum upload ke hosting
+- Gunakan HTTPS di production untuk keamanan
+- Jangan gunakan permission 777 kecuali sangat diperlukan (risiko keamanan)

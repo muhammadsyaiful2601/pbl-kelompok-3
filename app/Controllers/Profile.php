@@ -79,15 +79,18 @@ class Profile extends BaseController
 
         $foto = $this->request->getFile('foto');
         if ($foto && $foto->getError() != 4) {
-            if (!is_dir('uploads/user')) {
-                mkdir('uploads/user', 0755, true);
+            $uploadPath = FCPATH . 'uploads/user/';
+
+            // Ensure directory exists
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
             }
 
             $newName = $foto->getRandomName();
-            $foto->move('uploads/user', $newName);
+            $foto->move($uploadPath, $newName);
 
-            if ($this->request->getPost('foto_lama') && file_exists('uploads/user/' . $this->request->getPost('foto_lama'))) {
-                @unlink('uploads/user/' . $this->request->getPost('foto_lama'));
+            if ($this->request->getPost('foto_lama') && file_exists($uploadPath . $this->request->getPost('foto_lama'))) {
+                @unlink($uploadPath . $this->request->getPost('foto_lama'));
             }
 
             $saveData['foto'] = $newName;

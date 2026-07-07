@@ -150,11 +150,18 @@ class Sekolah extends BaseController
         if ($foto->getError() != 4) {
             // Jika ada foto baru diupload
             $namaFoto = $foto->getRandomName();
-            $foto->move('uploads/sekolah/', $namaFoto);
+            $uploadPath = FCPATH . 'uploads/sekolah/';
+
+            // Ensure directory exists
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            $foto->move($uploadPath, $namaFoto);
 
             // Hapus foto lama jika sedang edit
-            if ($this->request->getPost('foto_lama') && file_exists('uploads/sekolah/' . $this->request->getPost('foto_lama'))) {
-                unlink('uploads/sekolah/' . $this->request->getPost('foto_lama'));
+            if ($this->request->getPost('foto_lama') && file_exists($uploadPath . $this->request->getPost('foto_lama'))) {
+                @unlink($uploadPath . $this->request->getPost('foto_lama'));
             }
         }
 
@@ -200,8 +207,9 @@ class Sekolah extends BaseController
 
         $sekolah = $this->sekolahModel->find($id);
         if ($sekolah) {
-            if ($sekolah['foto'] && file_exists('uploads/sekolah/' . $sekolah['foto'])) {
-                unlink('uploads/sekolah/' . $sekolah['foto']);
+            $uploadPath = FCPATH . 'uploads/sekolah/';
+            if ($sekolah['foto'] && file_exists($uploadPath . $sekolah['foto'])) {
+                @unlink($uploadPath . $sekolah['foto']);
             }
             $this->sekolahModel->delete($id);
             log_activity('hapus', 'sekolah', $id, 'Menghapus data sekolah: ' . $sekolah['nama_sekolah']);

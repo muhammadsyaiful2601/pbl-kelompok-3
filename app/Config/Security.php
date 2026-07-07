@@ -55,6 +55,25 @@ class Security extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
+     * CSRF Cookie Domain
+     * --------------------------------------------------------------------------
+     *
+     * Domain for CSRF protection cookie.
+     * Use leading dot for subdomains: .sisteminformasiduaa.my.id
+     */
+    public string $cookieDomain = '.sisteminformasiduaa.my.id';
+
+    /**
+     * --------------------------------------------------------------------------
+     * CSRF Cookie Path
+     * --------------------------------------------------------------------------
+     *
+     * Path for CSRF protection cookie.
+     */
+    public string $cookiePath = '/';
+
+    /**
+     * --------------------------------------------------------------------------
      * CSRF Expires
      * --------------------------------------------------------------------------
      *
@@ -71,7 +90,7 @@ class Security extends BaseConfig
      *
      * Regenerate CSRF Token on every submission.
      */
-    public bool $regenerate = true;
+    public bool $regenerate = false;
 
     /**
      * --------------------------------------------------------------------------

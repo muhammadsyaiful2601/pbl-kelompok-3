@@ -70,7 +70,7 @@ class Security extends BaseConfig
      *
      * Path for CSRF protection cookie.
      */
-    public string $cookiePath = '/';
+    public ?string $cookiePath = '/';
 
     /**
      * --------------------------------------------------------------------------

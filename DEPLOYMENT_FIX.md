@@ -95,13 +95,19 @@ public/uploads/ = 755 atau 775
 public/uploads/sekolah/ = 755 atau 775
 ```
 
-### 4. Clear Cache (jika perlu)
-Jika menggunakan caching, clear cache setelah deploy:
+### 4. Clear Cache (PENTING - JANGAN DILEWATI!)
+**WAJIB clear cache setelah deploy karena ada perubahan pada config Security!**
 
 ```bash
 # Via terminal/SSH
 php spark cache:clear
+
+# Jika tidak bisa via terminal, hapus file cache manual via FTP:
+# Hapus semua file di folder: writable/cache/
+# Khususnya file: FactoriesCache_config
 ```
+
+**Catatan:** Jika error "Cannot assign null to property" masih muncul, itu berarti cache belum di-clear. Lakukan clear cache kembali.
 
 ### 5. Test Upload Foto
 1. Login ke admin panel

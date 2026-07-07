@@ -61,7 +61,7 @@ class Security extends BaseConfig
      * Domain for CSRF protection cookie.
      * Use leading dot for subdomains: .sisteminformasiduaa.my.id
      */
-    public string $cookieDomain = '.sisteminformasiduaa.my.id';
+    public ?string $cookieDomain = '.sisteminformasiduaa.my.id';
 
     /**
      * --------------------------------------------------------------------------

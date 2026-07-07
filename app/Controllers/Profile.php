@@ -50,8 +50,11 @@ class Profile extends BaseController
 
         $rules = [
             'nama_lengkap' => 'permit_empty|min_length[3]',
-            'foto'         => 'max_size[foto,10240]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
         ];
+
+        if (empty($this->request->getPost('foto_base64'))) {
+            $rules['foto'] = 'max_size[foto,10240]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]';
+        }
 
         if ($passwordRequired) {
             $rules['password'] = 'required|min_length[6]';
@@ -78,7 +81,40 @@ class Profile extends BaseController
         }
 
         $foto = $this->request->getFile('foto');
-        if ($foto && $foto->getError() != 4) {
+        $fotoBase64 = $this->request->getPost('foto_base64');
+        $newName = null;
+
+        if (!empty($fotoBase64)) {
+            // Proses upload via Base64 (WAF Bypass)
+            if (preg_match('/^data:image\/(\w+);base64,/', $fotoBase64, $type)) {
+                $data = substr($fotoBase64, strpos($fotoBase64, ',') + 1);
+                $type = strtolower($type[1]);
+
+                if (in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $decodedData = base64_decode($data);
+                    if ($decodedData !== false) {
+                        $newName = bin2hex(random_bytes(16)) . '.' . ($type === 'jpeg' ? 'jpg' : $type);
+                        $uploadPath = FCPATH . 'uploads/user/';
+
+                        if (!is_dir($uploadPath)) {
+                            mkdir($uploadPath, 0755, true);
+                        }
+
+                        if ($this->request->getPost('foto_lama') && file_exists($uploadPath . $this->request->getPost('foto_lama'))) {
+                            @unlink($uploadPath . $this->request->getPost('foto_lama'));
+                        }
+
+                        file_put_contents($uploadPath . $newName, $decodedData);
+                        $saveData['foto'] = $newName;
+
+                        // Perbarui data foto di sesi jika yang diupdate adalah profil login
+                        if (session()->get('id_user') == $user['id_user']) {
+                            session()->set('foto', $newName);
+                        }
+                    }
+                }
+            }
+        } else if ($foto && $foto->getError() != 4) {
             // Cek apakah upload file valid dan bebas kesalahan engine
             if (!$foto->isValid()) {
                 $errorStr = $foto->getErrorString();
@@ -103,6 +139,11 @@ class Profile extends BaseController
             }
 
             $saveData['foto'] = $newName;
+
+            // Perbarui data foto di sesi jika yang diupdate adalah profil login
+            if (session()->get('id_user') == $user['id_user']) {
+                session()->set('foto', $newName);
+            }
         }
 
         $this->userModel->save($saveData);

@@ -282,6 +282,7 @@
                                             </div>
                                         <?php endif; ?>
                                         <input type="file" name="foto" id="foto-input" class="form-control mt-2 <?= ($validation->hasError('foto')) ? 'is-invalid' : '' ?>" onchange="previewImage()">
+                                        <input type="hidden" name="foto_base64" id="foto_base64">
                                         <div class="invalid-feedback"><?= $validation->getError('foto') ?></div>
                                         <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 10MB)</p>
                                         <div id="foto-warning" class="alert alert-warning py-2 mt-2 mb-0 small d-none" style="border-radius: 8px;"></div>
@@ -616,7 +617,37 @@
                     block: 'center'
                 });
             }
+            return; // stop execution
         }
+
+        // Tampilkan loading info
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Mengompres Foto...';
+
+        try {
+            const fotoInput = document.getElementById('foto-input');
+            const base64Input = document.getElementById('foto_base64');
+            if (fotoInput && fotoInput.files && fotoInput.files[0]) {
+                const compressed = await compressImage(fotoInput, 1240, 1240, 0.85);
+                if (compressed) {
+                    const base64Data = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(compressed);
+                    });
+                    base64Input.value = base64Data;
+                    // Kosongkan input file agar tidak dikirim sebagai multipart binary upload
+                    fotoInput.value = '';
+                }
+            }
+        } catch (err) {
+            console.error('Error compression:', err);
+        }
+
+        // Submit form yang sesungguhnya ke server
+        this.submit();
     });
 
     // Preview Gambar

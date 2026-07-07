@@ -43,7 +43,7 @@
                                     <td class="ps-3"><?= $no++ ?></td>
                                     <td><span class="text-dark"><?= $admin['username'] ?></span></td>
                                     <td><?= $admin['nama_lengkap'] ?? '-' ?></td>
-                                    <td><span class="badge rounded-pill" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Admin</span></td>
+                                    <td><span class="badge rounded-pill" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;"><?= ucfirst($admin['role']) ?></span></td>
                                     <td class="text-center">
                                         <a href="<?= base_url('superadmin/admin/hapus/' . $admin['id_user']) ?>"
                                             class="text-danger text-decoration-none"

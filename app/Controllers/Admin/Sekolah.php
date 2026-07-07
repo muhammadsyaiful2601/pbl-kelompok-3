@@ -130,19 +130,15 @@ class Sekolah extends BaseController
                     'required' => 'Alamat harus diisi.'
                 ]
             ],
-        ];
-
-        // Hanya validasi berkas fisik jika tidak menggunakan upload Base64
-        if (empty($this->request->getPost('foto_base64'))) {
-            $rules['foto'] = [
+            'foto' => [
                 'rules'  => 'max_size[foto,10240]|is_image[foto]|mime_in[foto,image/jpg,image/jpeg,image/png]',
                 'errors' => [
                     'max_size' => 'Ukuran foto terlalu besar (Maks. 10MB).',
                     'is_image' => 'File yang dipilih bukan gambar.',
                     'mime_in'  => 'Format foto harus JPG, JPEG, atau PNG.'
                 ]
-            ];
-        }
+            ]
+        ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput();
@@ -150,34 +146,8 @@ class Sekolah extends BaseController
 
         $foto = $this->request->getFile('foto');
         $namaFoto = $this->request->getPost('foto_lama');
-        $fotoBase64 = $this->request->getPost('foto_base64');
 
-        if (!empty($fotoBase64)) {
-            // Proses upload via Base64 (WAF Bypass)
-            if (preg_match('/^data:image\/(\w+);base64,/', $fotoBase64, $type)) {
-                $data = substr($fotoBase64, strpos($fotoBase64, ',') + 1);
-                $type = strtolower($type[1]); // jpg, jpeg, png
-
-                if (in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    $decodedData = base64_decode($data);
-                    if ($decodedData !== false) {
-                        $namaFoto = bin2hex(random_bytes(16)) . '.' . ($type === 'jpeg' ? 'jpg' : $type);
-                        $uploadPath = FCPATH . 'uploads/sekolah/';
-
-                        if (!is_dir($uploadPath)) {
-                            mkdir($uploadPath, 0755, true);
-                        }
-
-                        // Hapus foto lama jika sedang edit
-                        if ($this->request->getPost('foto_lama') && file_exists($uploadPath . $this->request->getPost('foto_lama'))) {
-                            @unlink($uploadPath . $this->request->getPost('foto_lama'));
-                        }
-
-                        file_put_contents($uploadPath . $namaFoto, $decodedData);
-                    }
-                }
-            }
-        } else if ($foto && $foto->getError() != 4) {
+        if ($foto && $foto->getError() != 4) {
             // Cek apakah upload file valid dan bebas kesalahan engine
             if (!$foto->isValid()) {
                 $errorStr = $foto->getErrorString();

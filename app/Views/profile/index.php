@@ -58,8 +58,7 @@
                     <div class="mb-3">
                         <label for="foto" class="form-label small fw-bold">Foto Profil</label>
                         <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
-                        <input type="hidden" name="foto_base64" id="foto_base64">
-                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 10MB)</p>
+                        <p class="text-muted x-small mt-2 mb-0">Format: JPG, JPEG, PNG (Maks. 5MB)</p>
                         <div id="foto-warning-profile" class="alert alert-warning py-2 mt-2 mb-0 small d-none" style="border-radius: 8px;"></div>
                     </div>
 
@@ -74,115 +73,20 @@
 </div>
 
 <script>
-    /**
-     * Memproses kompresi gambar client-side menggunakan HTML5 Canvas.
-     */
-    function compressImage(fileInput, maxWidth = 1000, maxHeight = 1000, quality = 0.8) {
-        return new Promise((resolve) => {
-            if (!fileInput.files || !fileInput.files[0]) {
-                resolve(null);
-                return;
-            }
-
-            const file = fileInput.files[0];
-            if (!file.type.startsWith('image/')) {
-                resolve(null);
-                return;
-            }
-
-            if (file.size < 500 * 1024) {
-                resolve(null);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function(event) {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = function() {
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width = Math.round((width * maxHeight) / height);
-                            height = maxHeight;
-                        }
-                    }
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    canvas.toBlob((blob) => {
-                        if (!blob) {
-                            resolve(null);
-                            return;
-                        }
-                        const compressedFile = new File([blob], file.name.substring(0, file.name.lastIndexOf('.')) + '.jpg', {
-                            type: 'image/jpeg',
-                            lastModified: Date.now()
-                        });
-                        resolve(compressedFile);
-                    }, 'image/jpeg', quality);
-                };
-                img.onerror = () => resolve(null);
-            };
-            reader.onerror = () => resolve(null);
-        });
-    }
-
     const fotoInput = document.querySelector('#foto');
     const fotoWarning = document.querySelector('#foto-warning-profile');
 
     fotoInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
             const file = this.files[0];
-            if (file.size > 10 * 1024 * 1024) {
-                fotoWarning.textContent = 'Ukuran file melebihi 10MB. Silakan pilih file yang lebih kecil.';
+            if (file.size > 5 * 1024 * 1024) {
+                fotoWarning.textContent = 'Ukuran file melebihi 5MB. Silakan pilih file yang lebih kecil.';
                 fotoWarning.classList.remove('d-none');
                 this.value = '';
             } else {
                 fotoWarning.classList.add('d-none');
             }
         }
-    });
-
-    document.querySelector('form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalHtml = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Mengompres Foto...';
-
-        try {
-            if (fotoInput && fotoInput.files && fotoInput.files[0]) {
-                const compressed = await compressImage(fotoInput, 1000, 1000, 0.85);
-                if (compressed) {
-                    const base64Data = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(compressed);
-                    });
-                    document.getElementById('foto_base64').value = base64Data;
-                    fotoInput.value = '';
-                }
-            }
-        } catch (err) {
-            console.error('Error compression:', err);
-        }
-
-        this.submit();
     });
 </script>
 <?= $this->endSection() ?>

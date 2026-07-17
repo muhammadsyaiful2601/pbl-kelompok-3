@@ -398,9 +398,47 @@ $sekolah_list = $sekolah_list ?? [];
                         filterKecamatanList(<?= $gj['id_geojson'] ?>, false);
                     });
                 }
+
+                // Sinkronkan visibility dengan localStorage
+                var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
+                if (isVisible === 'false') {
+                    if (geojsonLayers[<?= $gj['id_geojson'] ?>]) {
+                        map.removeLayer(geojsonLayers[<?= $gj['id_geojson'] ?>]);
+                    }
+                }
             });
         <?php endforeach; ?>
+
+        // Sinkronkan marker/cluster dengan visibility layer
+        setTimeout(function() {
+            // Panggil fungsi filter kecamatan untuk menyesuaikan marker
+            if (typeof updateMarkersVisibility === 'function') {
+                updateMarkersVisibility();
+            }
+        }, 300);
     <?php endif; ?>
+
+    // ===== FUNGSI UPDATE MARKER BERDASARKAN LAYER VISIBILITY =====
+    window.updateMarkersVisibility = function() {
+        var filterFn = function(marker) {
+            var latlng = marker.getLatLng();
+            var shouldHide = false;
+
+            Object.keys(geojsonLayers).forEach(function(gjId) {
+                var isChecked = document.getElementById('toggle_' + gjId);
+                var checked = isChecked ? isChecked.checked : true;
+                if (!checked) {
+                    if (window.isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                        shouldHide = true;
+                    }
+                }
+            });
+
+            return !shouldHide;
+        };
+
+        window.updateClusterMarkers(markerCluster, markers, filterFn);
+    };
 
     // Zoom listener
     map.on('zoomend', function() {

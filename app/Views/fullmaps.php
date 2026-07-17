@@ -643,9 +643,18 @@
                     var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
                     if (isVisible === 'false') {
                         $('#toggle_<?= $gj['id_geojson'] ?>').prop('checked', false);
+                        // Hapus layer dari map karena unchecked
+                        if (geojsonLayers[<?= $gj['id_geojson'] ?>]) {
+                            map.removeLayer(geojsonLayers[<?= $gj['id_geojson'] ?>]);
+                        }
                     }
                 });
             <?php endforeach; ?>
+
+            // Setelah semua GeoJSON selesai di-load, sinkronkan marker
+            setTimeout(function() {
+                updateMarkersVisibility();
+            }, 300);
         <?php endif; ?>
 
         // Zoom change listener

@@ -285,12 +285,12 @@ $sekolah_list = $sekolah_list ?? [];
         <?php foreach ($sekolah_list as $sk) : ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])) : ?>
                 var initialSize = getMarkerSize(map.getZoom());
-                var icon = createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
+                var icon = createSchoolIcon('<?= addslashes($sk['jenjang']) ?>', initialSize);
                 L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: icon
                     })
                     .addTo(map)
-                    .bindPopup("<b><?= $sk['nama_sekolah'] ?></b>");
+                    .bindPopup("<b><?= addslashes($sk['nama_sekolah']) ?></b>");
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -314,7 +314,7 @@ $sekolah_list = $sekolah_list ?? [];
                                 };
                             }
                         })
-                        .bindPopup("<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>");
+                        .bindPopup("<b>Wilayah:</b> <?= addslashes($gj['nama_geojson']) ?>");
 
                     geojsonLayers[<?= $gj['id_geojson'] ?>] = layer;
                     geojsonConfig[<?= $gj['id_geojson'] ?>] = {

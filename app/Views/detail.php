@@ -316,12 +316,12 @@ $sekolah = $sekolah ?? [
     var geojsonConfig = {}; // For dynamic zoom opacity
 
     var initialSize = window.getMarkerSize(map.getZoom());
-    var iconSekolah = window.createSchoolIcon('<?= $sekolah['jenjang'] ?>', initialSize);
+    var iconSekolah = window.createSchoolIcon('<?= addslashes($sekolah['jenjang']) ?>', initialSize);
 
     var markerSekolah = L.marker([lat, lng], {
             icon: iconSekolah
         }).addTo(map)
-        .bindPopup('<b><?= $sekolah['nama_sekolah'] ?></b><br><small>Akreditasi: <?= $sekolah['akreditasi'] ?: 'Belum Terakreditasi' ?></small>').openPopup();
+        .bindPopup('<b><?= addslashes($sekolah['nama_sekolah']) ?></b><br><small>Akreditasi: <?= addslashes($sekolah['akreditasi'] ?: 'Belum Terakreditasi') ?></small>').openPopup();
 
     markers[<?= $sekolah['id_sekolah'] ?>] = markerSekolah;
 
@@ -329,15 +329,14 @@ $sekolah = $sekolah ?? [
     <?php if (!empty($active_geojson)) : ?>
         <?php foreach ($active_geojson as $gj) : ?>
             window.loadGeoJsonLayer(
-                '<?= base_url($gj['file_geojson']) ?>',
-                {
+                '<?= base_url($gj['file_geojson']) ?>', {
                     color: "#000000",
                     weight: 1.5,
                     opacity: 0.8,
                     fillOpacity: <?= $gj['opacity_geojson'] ?>,
                     fillColor: "<?= $gj['warna_geojson'] ?>"
                 },
-                "<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>",
+                "<b>Wilayah:</b> <?= addslashes($gj['nama_geojson']) ?>",
                 geojsonLayers,
                 geojsonConfig,
                 <?= $gj['id_geojson'] ?>,

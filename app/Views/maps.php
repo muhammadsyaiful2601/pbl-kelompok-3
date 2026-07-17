@@ -200,7 +200,9 @@ $sekolah_list = $sekolah_list ?? [];
                             <ul class="dropdown-menu shadow-sm border-0 rounded-3 py-2" style="min-width: 200px;" id="basemapDropdownMenu">
                                 <li><a class="dropdown-item active small py-2" href="#" data-basemap="Standard Map"><i class="fa-solid fa-map me-2 text-primary"></i> Standar (OSM)</a></li>
                                 <li><a class="dropdown-item small py-2" href="#" data-basemap="Satellite View"><i class="fa-solid fa-satellite me-2 text-danger"></i> Satelit (Google)</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item small py-2" href="#" data-basemap="Peta Jalan (MapTiler)"><i class="fa-solid fa-road me-2 text-success"></i> Jalan (MapTiler)</a></li>
                                 <li><a class="dropdown-item small py-2" href="#" data-basemap="Peta Jalan Detail (MapTiler)"><i class="fa-solid fa-road me-2 text-success"></i> Jalan Detail (MapTiler)</a></li>
                                 <li><a class="dropdown-item small py-2" href="#" data-basemap="Citra Satelit (MapTiler)"><i class="fa-solid fa-globe me-2 text-info"></i> Citra Satelit (MapTiler)</a></li>
@@ -292,13 +294,13 @@ $sekolah_list = $sekolah_list ?? [];
         <?php foreach ($sekolah_list as $sk): ?>
             <?php if (!empty($sk['latitude']) && !empty($sk['longitude'])): ?>
                 var initialSize = window.getMarkerSize(map.getZoom());
-                var iconSekolah = window.createSchoolIcon('<?= $sk['jenjang'] ?>', initialSize);
+                var iconSekolah = window.createSchoolIcon('<?= addslashes($sk['jenjang']) ?>', initialSize);
 
                 var popupContent = `<?php ob_start(); ?>
                     <div class="card border-0" style="width: 260px; font-family: 'Plus Jakarta Sans', sans-serif;">
                         <div class="position-relative" style="height: 120px; overflow: hidden; background: #f8f9fa;">
                             <?php if (!empty($sk['foto'])) : ?>
-                                <img src="<?= base_url('uploads/sekolah/' . $sk['foto']) ?>" alt="<?= $sk['nama_sekolah'] ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="<?= base_url('uploads/sekolah/' . $sk['foto']) ?>" alt="<?= addslashes($sk['nama_sekolah']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                             <?php else : ?>
                                 <div class="img-placeholder bg-light d-flex flex-column align-items-center justify-content-center" style="width:100%;height:100%;">
                                     <i class="fa-solid fa-school text-secondary opacity-25 fs-1 mb-2"></i>
@@ -306,22 +308,22 @@ $sekolah_list = $sekolah_list ?? [];
                                 </div>
                             <?php endif; ?>
                             <span class="badge <?= $sk['jenjang'] == 'SD' ? 'bg-danger' : ($sk['jenjang'] == 'SMP' ? 'bg-primary' : 'bg-info text-dark') ?> position-absolute top-0 start-0 m-2 rounded-pill px-2 py-1" style="font-size: 0.65rem; z-index: 5;">
-                                <?= $sk['jenjang'] ?>
+                                <?= addslashes($sk['jenjang']) ?>
                             </span>
                         </div>
                         <div class="p-3">
-                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;"><?= $sk['nama_sekolah'] ?></h6>
+                            <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;"><?= addslashes($sk['nama_sekolah']) ?></h6>
                             <p class="text-muted small mb-2" style="font-size: 0.75rem; line-height: 1.4;">
-                                <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= $sk['alamat'] ?>
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i><?= addslashes($sk['alamat']) ?>
                             </p>
                             <div class="row g-0 border-top border-bottom py-2 my-2">
                                 <div class="col-6 text-center border-end">
                                     <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Akreditasi</small>
-                                    <span class="fw-semibold text-dark" style="font-size: 0.8rem;"><?= $sk['akreditasi'] ?: 'Belum Terakreditasi' ?></span>
+                                    <span class="fw-semibold text-dark" style="font-size: 0.8rem;"><?= addslashes($sk['akreditasi'] ?: 'Belum Terakreditasi') ?></span>
                                 </div>
                                 <div class="col-6 text-center">
                                     <small class="text-muted d-block" style="font-size: 0.6rem; letter-spacing: 0.3px; text-transform: uppercase;">Kategori</small>
-                                     <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= !empty($sk['kategori']) ? $sk['kategori'] : '-' ?></span>
+                                     <span class="fw-semibold text-dark" style="font-size: 0.8rem; text-transform: capitalize;"><?= addslashes(!empty($sk['kategori']) ? $sk['kategori'] : '-') ?></span>
                                 </div>
                             </div>
                             <div class="d-grid mt-2">
@@ -336,7 +338,7 @@ $sekolah_list = $sekolah_list ?? [];
 
                 var marker = L.marker([<?= $sk['latitude'] ?>, <?= $sk['longitude'] ?>], {
                         icon: iconSekolah,
-                        originalJenjang: '<?= $sk['jenjang'] ?>'
+                        originalJenjang: '<?= addslashes($sk['jenjang']) ?>'
                     })
                     .addTo(map)
                     .bindPopup(popupContent, {
@@ -353,15 +355,14 @@ $sekolah_list = $sekolah_list ?? [];
     <?php if (!empty($active_geojson)) : ?>
         <?php foreach ($active_geojson as $gj) : ?>
             window.loadGeoJsonLayer(
-                '<?= base_url($gj['file_geojson']) ?>',
-                {
+                '<?= base_url($gj['file_geojson']) ?>', {
                     color: "#000000",
                     weight: 2,
                     opacity: 0.8,
                     fillOpacity: <?= $gj['opacity_geojson'] ?>,
                     fillColor: "<?= $gj['warna_geojson'] ?>"
                 },
-                "<b>Wilayah:</b> <?= $gj['nama_geojson'] ?>",
+                "<b>Wilayah:</b> <?= addslashes($gj['nama_geojson']) ?>",
                 geojsonLayers,
                 geojsonConfig,
                 <?= $gj['id_geojson'] ?>,

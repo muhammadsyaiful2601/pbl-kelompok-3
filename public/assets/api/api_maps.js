@@ -123,6 +123,97 @@
     map._currentBasemapKey = key;
   };
 
+  // ===================== CLUSTER FUNCTIONS =====================
+
+  /**
+   * Buat MarkerClusterGroup dengan konfigurasi default
+   * @param {Object} [opts] - Opsi tambahan untuk MarkerClusterGroup
+   * @returns {L.MarkerClusterGroup}
+   */
+  window.createClusterGroup = function (opts) {
+    opts = opts || {};
+    var defaultOpts = {
+      chunkedLoading: true,
+      maxClusterRadius: 50,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 17,
+      removeOutsideVisibleBounds: true,
+      animate: true,
+      animateAddingMarkers: true,
+      iconCreateFunction: function (cluster) {
+        var childCount = cluster.getChildCount();
+        var size = 'small';
+        if (childCount < 10) {
+          size = 'small';
+        } else if (childCount < 50) {
+          size = 'medium';
+        } else {
+          size = 'large';
+        }
+        return L.divIcon({
+          html: '<div><span>' + childCount + '</span></div>',
+          className: 'marker-cluster marker-cluster-' + size,
+          iconSize: L.point(40, 40)
+        });
+      }
+    };
+    // Merge user options
+    Object.keys(opts).forEach(function (k) {
+      defaultOpts[k] = opts[k];
+    });
+    return L.markerClusterGroup(defaultOpts);
+  };
+
+  /**
+   * Update cluster: hapus semua marker dari cluster, lalu tambahkan kembali
+   * marker yang visible (tidak di-filter)
+   * @param {L.MarkerClusterGroup} clusterGroup - Cluster group
+   * @param {Object} markersObj - Object berisi semua marker {id: marker}
+   * @param {Function} filterFn - Fungsi filter(marker) => true jika visible
+   */
+  window.updateClusterMarkers = function (clusterGroup, markersObj, filterFn) {
+    clusterGroup.clearLayers();
+    Object.keys(markersObj).forEach(function (id) {
+      var marker = markersObj[id];
+      if (filterFn(marker)) {
+        clusterGroup.addLayer(marker);
+      }
+    });
+  };
+
+  /**
+   * Cari marker dalam cluster group berdasarkan ID (untuk focusOnSchool)
+   * @param {L.MarkerClusterGroup} clusterGroup - Cluster group
+   * @param {number|string} markerId - ID marker yang dicari
+   * @param {Object} markersObj - Object berisi semua marker {id: marker}
+   * @returns {L.Marker|null}
+   */
+  window.findMarkerInCluster = function (clusterGroup, markerId, markersObj) {
+    return markersObj[markerId] || null;
+  };
+
+  /**
+   * Zoom ke marker tertentu dan buka popup, dengan dukungan cluster
+   * @param {L.Map} map - Instance Leaflet map
+   * @param {L.MarkerClusterGroup} clusterGroup - Cluster group
+   * @param {L.Marker} marker - Marker tujuan
+   * @param {number} zoomLevel - Zoom level tujuan (default 17)
+   */
+  window.zoomToMarker = function (map, clusterGroup, marker, zoomLevel) {
+    zoomLevel = zoomLevel || 17;
+    // Zoom ke lokasi marker
+    map.setView(marker.getLatLng(), zoomLevel, {
+      animate: true,
+      duration: 1.5
+    });
+    // Buka popup setelah animasi selesai
+    setTimeout(function () {
+      marker.openPopup();
+    }, 600);
+  };
+
   // ===================== MARKER FUNCTIONS =====================
 
   /**
@@ -335,13 +426,6 @@
 
         // Trigger initial zoom-based opacity
         window.updateGeoJsonOpacity(geojsonLayers, geojsonConfig, map.getZoom());
-
-        // Trigger visibility update
-        if (markersObj) {
-          setTimeout(function () {
-            window.updateMarkersVisibility(markersObj, geojsonLayers, map);
-          }, 100);
-        }
 
         return layer; // Return layer untuk chaining (.then())
       });

@@ -10,6 +10,8 @@ $sekolah_list = $sekolah_list ?? [];
 
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="<?= base_url('assets/css/style-publik.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/search-hero.css') ?>">
 <style>
@@ -254,6 +256,7 @@ $sekolah_list = $sekolah_list ?? [];
         }
     };
 </script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="<?= base_url('assets/api/api_maps.js') ?>"></script>
 
 <script>
@@ -288,6 +291,20 @@ $sekolah_list = $sekolah_list ?? [];
     var markers = {};
     var geojsonLayers = {};
     var geojsonConfig = {}; // Stores original style for dynamic opacity
+
+    // ===== CLUSTER MARKER: SEMUA MARKER WAJIB MASUK CLUSTER =====
+    var markerCluster = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 30,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        disableClusteringAtZoom: 17,
+        removeOutsideVisibleBounds: true,
+        animate: true,
+        animateAddingMarkers: true
+    });
+    map.addLayer(markerCluster);
 
     // Merender marker secara dinamis berdasarkan data PHP
     <?php if (!empty($sekolah_list)): ?>
@@ -340,16 +357,22 @@ $sekolah_list = $sekolah_list ?? [];
                         icon: iconSekolah,
                         originalJenjang: '<?= addslashes($sk['jenjang']) ?>'
                     })
-                    .addTo(map)
                     .bindPopup(popupContent, {
                         maxWidth: 260,
                         className: 'modern-leaflet-popup'
                     });
 
+                // HANYA TAMBAHKAN KE CLUSTER, JANGAN PERNAH .addTo(map) LANGSUNG!
+                markerCluster.addLayer(marker);
                 markers[<?= $sk['id_sekolah'] ?>] = marker;
             <?php endif; ?>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    // ===== REFRESH CLUSTER: paksa semua marker masuk cluster =====
+    setTimeout(function() {
+        markerCluster.refreshClusters();
+    }, 500);
 
     // Render GeoJSON Layers (Wilayah)
     <?php if (!empty($active_geojson)) : ?>
@@ -367,7 +390,7 @@ $sekolah_list = $sekolah_list ?? [];
                 geojsonConfig,
                 <?= $gj['id_geojson'] ?>,
                 map,
-                markers
+                null // jangan kirim markersObj karena sudah pakai cluster
             ).then(function(layer) {
                 if (layer) {
                     layer.on('click', function(e) {

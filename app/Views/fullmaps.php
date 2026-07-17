@@ -19,6 +19,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
     <style>
         body,
@@ -403,6 +405,7 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
         /* Konfigurasi marker icon untuk API Maps */
@@ -418,6 +421,8 @@
 
     <script>
         var markers = {};
+        var geojsonLayers = {};
+        var geojsonConfig = {};
 
         // Setup Map
         var map = L.map('map', {
@@ -435,7 +440,6 @@
         // Populate basemap selector dengan semua layer (termasuk MapTiler)
         var $selector = $('#basemapSelector');
         Object.keys(baseMaps).forEach(function(name) {
-            // Only add if not already in the default options
             if ($selector.find('option[value="' + name + '"]').length === 0) {
                 $selector.append($('<option>', {
                     value: name,
@@ -444,14 +448,26 @@
             }
         });
 
-        // Initialize with saved basemap or default
         var savedBasemap = window.loadSavedBasemap(baseMaps, map);
         $('#basemapSelector').val(savedBasemap);
 
-        // Handle Selector Change
         $('#basemapSelector').on('change', function() {
             window.switchBasemap(map, baseMaps, $(this).val());
         });
+
+        // ===== CLUSTER MARKER: SEMUA MARKER WAJIB MASUK CLUSTER =====
+        var markerCluster = L.markerClusterGroup({
+            chunkedLoading: true,
+            maxClusterRadius: 30,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            disableClusteringAtZoom: 17,
+            removeOutsideVisibleBounds: true,
+            animate: true,
+            animateAddingMarkers: true
+        });
+        map.addLayer(markerCluster);
 
         // Store initial zoom for marker sizing
         var currentZoom = map.getZoom();
@@ -470,7 +486,6 @@
                             originalJenjang: '<?= addslashes($sk['jenjang']) ?>',
                             nama: '<?= addslashes($sk['nama_sekolah']) ?>'
                         })
-                        .addTo(map)
                         .bindPopup(`
                             <div class="card border-0" style="width: 260px; font-family: 'Plus Jakarta Sans', sans-serif;">
                                 <div class="position-relative" style="height: 120px; overflow: hidden; background: #f8f9fa;">
@@ -513,20 +528,23 @@
                             maxWidth: 260
                         });
 
+                    // PASTIKAN SEMUA MARKER MASUK CLUSTER, JANGAN PERNAH .addTo(map) LANGSUNG!
+                    markerCluster.addLayer(marker);
                     markers[<?= $sk['id_sekolah'] ?>] = marker;
                 <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>
 
+        // ===== REFRESH CLUSTER: paksa semua marker masuk cluster =====
+        setTimeout(function() {
+            markerCluster.refreshClusters();
+        }, 500);
+
         // Interaction
         function focusOnSchool(id, element) {
             if (markers[id]) {
                 var m = markers[id];
-                map.setView(m.getLatLng(), 17, {
-                    animate: true,
-                    duration: 1.5
-                });
-                m.openPopup();
+                window.zoomToMarker(map, markerCluster, m, 17);
 
                 $('.school-item').removeClass('active');
                 $(element).addClass('active');
@@ -576,11 +594,9 @@
             var isCollapsed = $panel.hasClass('collapsed');
             $(this).find('i').attr('class', isCollapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up');
 
-            // Save state
             localStorage.setItem('schoolPanelCollapsed', isCollapsed);
         });
 
-        // Restore state on load
         $(document).ready(function() {
             if (localStorage.getItem('schoolPanelCollapsed') === 'true') {
                 $('#toggleSchoolPanel').addClass('active');
@@ -588,10 +604,6 @@
                 $('#toggleSchoolPanel').find('i').attr('class', 'fa-solid fa-chevron-down');
             }
         });
-
-        // Global storage for GeoJSON layers
-        var geojsonLayers = {};
-        var geojsonConfig = {};
 
         // Render GeoJSON Layers (Wilayah)
         <?php if (!empty($active_geojson)) : ?>
@@ -609,9 +621,8 @@
                     geojsonConfig,
                     <?= $gj['id_geojson'] ?>,
                     map,
-                    markers
+                    null // jangan kirim markersObj karena sudah pakai cluster
                 ).then(function() {
-                    // Hover effects for GeoJSON layers (hanya di fullmaps)
                     var layer = geojsonLayers[<?= $gj['id_geojson'] ?>];
                     if (layer) {
                         layer.on('mouseover', function(e) {
@@ -629,7 +640,6 @@
                         });
                     }
 
-                    // Set checkbox state
                     var isVisible = localStorage.getItem('geojson_vis_<?= $gj['id_geojson'] ?>');
                     if (isVisible === 'false') {
                         $('#toggle_<?= $gj['id_geojson'] ?>').prop('checked', false);
@@ -657,55 +667,43 @@
                 }
                 localStorage.setItem('geojson_vis_' + id, isChecked);
 
-                // Update markers visibility whenever a layer is toggled
                 updateMarkersVisibility();
             }
         });
 
         /**
-         * Update visibility of markers based on GeoJSON layer visibility AND Jenjang/Search filters
+         * Update visibility dengan cluster - filter marker yang visible
          */
         function updateMarkersVisibility() {
             var searchVal = $('#schoolSearch').val().toLowerCase();
 
-            Object.keys(markers).forEach(function(schoolId) {
-                var marker = markers[schoolId];
+            var filterFn = function(marker) {
                 var latlng = marker.getLatLng();
-                var shouldHide = false;
 
-                // 1. Check Jenjang and Search Filter
                 var jenjang = marker.options.jenjang;
                 var name = marker.options.nama ? marker.options.nama.toLowerCase() : '';
 
                 if (currentFilter !== 'Semua' && jenjang !== currentFilter) {
-                    shouldHide = true;
+                    return false;
                 }
                 if (searchVal && name.indexOf(searchVal) === -1) {
-                    shouldHide = true;
+                    return false;
                 }
 
-                // 2. Check GeoJSON layer visibility (if not already hidden)
-                if (!shouldHide) {
-                    Object.keys(geojsonLayers).forEach(function(gjId) {
-                        var isChecked = $('#toggle_' + gjId).is(':checked');
-                        if (!isChecked) {
-                            if (window.isLatLngInLayer(latlng, geojsonLayers[gjId])) {
-                                shouldHide = true;
-                            }
+                var shouldHide = false;
+                Object.keys(geojsonLayers).forEach(function(gjId) {
+                    var isChecked = $('#toggle_' + gjId).is(':checked');
+                    if (!isChecked) {
+                        if (window.isLatLngInLayer(latlng, geojsonLayers[gjId])) {
+                            shouldHide = true;
                         }
-                    });
-                }
+                    }
+                });
 
-                if (shouldHide) {
-                    if (map.hasLayer(marker)) {
-                        map.removeLayer(marker);
-                    }
-                } else {
-                    if (!map.hasLayer(marker)) {
-                        marker.addTo(map);
-                    }
-                }
-            });
+                return !shouldHide;
+            };
+
+            window.updateClusterMarkers(markerCluster, markers, filterFn);
         }
 
         // Toggle Layer Panel Visibility
@@ -722,7 +720,6 @@
             localStorage.setItem('layerPanelCollapsed', isCollapsed);
         });
 
-        // Restore Layer Panel State
         $(document).ready(function() {
             if (localStorage.getItem('layerPanelCollapsed') === 'true') {
                 $('.toggle-layer-content').addClass('active');

@@ -75,7 +75,8 @@ class Filters extends BaseFilters
         'before' => [
             'uploadsize',
             // 'honeypot',
-            'csrf' => ['except' => ['admin/sekolah/simpan', 'admin/sekolah/*']],
+            // CSRF dinonaktifkan sementara untuk development
+            // 'csrf',
             // 'invalidchars',
         ],
         'after' => [

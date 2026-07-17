@@ -10,16 +10,26 @@ function isSchoolInGeoJson(school, geojsonLayer) {
 
 /* Fungsi untuk menyaring marker di peta berdasarkan filter yang aktif */
 function updateMapMarkers() {
-    if (typeof markers === 'undefined' || typeof map === 'undefined') return;
+    if (typeof markers === 'undefined' || typeof markerCluster === 'undefined' || typeof map === 'undefined') return;
 
-    Object.keys(markers).forEach(id => {
-        const marker = markers[id];
-        const school = window.sekolahData.find(s => s.id_sekolah == id);
+    var filterFn = function(marker) {
+        // Cari ID sekolah dari marker
+        var markerId = null;
+        Object.keys(markers).forEach(function(id) {
+            if (markers[id] === marker) {
+                markerId = id;
+            }
+        });
         
-        if (!school) return;
+        if (!markerId) return true;
+        
+        const school = window.sekolahData.find(s => s.id_sekolah == markerId);
+        if (!school) return true;
 
         const jenjang = (school.jenjang || school.type || 'SD').toLowerCase();
         const matchesJenjang = currentJenjangFilter === 'semua' || jenjang === currentJenjangFilter.toLowerCase();
+
+        if (!matchesJenjang) return false;
 
         let matchesKecamatan = true;
         if (currentKecamatanFilter !== 'semua') {
@@ -29,12 +39,10 @@ function updateMapMarkers() {
             }
         }
 
-        if (matchesJenjang && matchesKecamatan) {
-            if (!map.hasLayer(marker)) marker.addTo(map);
-        } else {
-            if (map.hasLayer(marker)) map.removeLayer(marker);
-        }
-    });
+        return matchesKecamatan;
+    };
+
+    window.updateClusterMarkers(markerCluster, markers, filterFn);
 }
 
 /* Fungsi untuk merender daftar sekolah ke elemen HTML (Format Tabel Hover 3D) */

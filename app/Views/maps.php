@@ -105,10 +105,9 @@ $sekolah_list = $sekolah_list ?? [];
                         <button type="button" class="btn btn-outline-primary btn-sm fw-semibold filter-btn" onclick="filterSearchList('TK', this)">TK</button>
                     </div>
 
-                    <div class="filter-kecamatan-wrapper text-start">
-                        <label for="filterKecamatanSelect" class="form-label small fw-bold text-secondary mb-1">Filter Wilayah (Kecamatan)</label>
-                        <select id="filterKecamatanSelect" class="form-select rounded-pill small mb-2" style="box-shadow: none; border-color: #dee2e6;" onchange="filterKecamatanList(this.value, true)">
-                            <option value="semua">-- Semua Wilayah/Kecamatan --</option>
+                    <div class="filter-kecamatan-wrapper">
+                        <select id="filterKecamatanSelect" class="form-select rounded-pill small" style="box-shadow: none; border-color: #dee2e6;" onchange="filterKecamatanList(this.value, true)">
+                            <option value="semua">Semua Wilayah</option>
                             <?php if (!empty($active_geojson)) : ?>
                                 <?php foreach ($active_geojson as $gj) : ?>
                                     <option value="<?= $gj['id_geojson'] ?>"><?= $gj['nama_geojson'] ?></option>

@@ -46,4 +46,5 @@ $routes->group('superadmin', function ($routes) {
     $routes->post('geojson/update/(:num)', 'Superadmin\Geojson::update/$1');
     $routes->get('geojson/toggle/(:num)', 'Superadmin\Geojson::toggle/$1');
     $routes->get('geojson/hapus/(:num)', 'Superadmin\Geojson::hapus/$1');
+    $routes->post('geojson/hapus-multiple', 'Superadmin\Geojson::hapus_multiple');
 });

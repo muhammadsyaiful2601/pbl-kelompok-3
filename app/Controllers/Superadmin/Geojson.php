@@ -45,7 +45,7 @@ class Geojson extends BaseController
                 if (!$existing) {
                     $cleanName = preg_replace('/^id\d+_/', '', $filename);
                     $cleanName = str_replace(['_', '.geojson'], [' ', ''], $cleanName);
-                    
+
                     $this->geojsonModel->save([
                         'nama_geojson' => $cleanName,
                         'file_geojson' => 'assets/geojson/id1305_tanah_datar/' . $filename,
@@ -73,8 +73,6 @@ class Geojson extends BaseController
         $count = 0;
         foreach ($geojsons as $gj) {
             $oldName = $gj['nama_geojson'];
-            // Since they are already in DB with spaces instead of underscores, we handle that
-            // If the name starts with "id" followed by digits
             if (preg_match('/^id\d+\s/', $oldName)) {
                 $newName = preg_replace('/^id\d+\s/', '', $oldName);
                 $this->geojsonModel->update($gj['id_geojson'], ['nama_geojson' => $newName]);
@@ -166,5 +164,29 @@ class Geojson extends BaseController
             return redirect()->to(base_url('superadmin/geojson'))->with('success', 'Data GeoJSON berhasil dihapus dari sistem.');
         }
         return redirect()->to(base_url('superadmin/geojson'))->with('error', 'Data tidak ditemukan.');
+    }
+
+    public function hapus_multiple()
+    {
+        if (!session()->get('logged_in') || session()->get('role') !== 'superadmin') {
+            return redirect()->to(base_url('login'));
+        }
+
+        $ids = $this->request->getPost('ids');
+        if (!empty($ids) && is_array($ids)) {
+            $deleted = 0;
+            foreach ($ids as $id) {
+                $geojson = $this->geojsonModel->find($id);
+                if ($geojson) {
+                    $this->geojsonModel->delete($id);
+                    log_activity('hapus', 'geojson', $id, "Menghapus data GeoJSON: " . $geojson['nama_geojson']);
+                    $deleted++;
+                }
+            }
+            if ($deleted > 0) {
+                return redirect()->to(base_url('superadmin/geojson'))->with('success', "$deleted data GeoJSON berhasil dihapus dari sistem.");
+            }
+        }
+        return redirect()->to(base_url('superadmin/geojson'))->with('error', 'Tidak ada data yang dipilih.');
     }
 }

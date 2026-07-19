@@ -3,7 +3,21 @@
 <?= $this->section('content') ?>
 <div class="row mb-4">
     <div class="col-12">
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <form action="<?= base_url('superadmin/admin') ?>" method="get" class="d-flex" role="search">
+                <div class="input-group input-group-sm w-auto" style="min-width: 280px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0 small" name="search" value="<?= esc($search ?? '') ?>" placeholder="Cari admin...">
+                    <button class="btn btn-primary rounded-pill px-3" type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <?php if (!empty($search)) : ?>
+                        <a href="<?= base_url('superadmin/admin') ?>" class="btn btn-outline-secondary rounded-pill px-3" title="Reset Pencarian">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
             <a href="<?= base_url('superadmin/admin/tambah') ?>" class="btn btn-primary rounded-pill px-4">
                 <i class="fa-solid fa-plus me-2"></i>Tambah Admin
             </a>

@@ -20,10 +20,21 @@ class Admin extends BaseController
             return redirect()->to(base_url('login'));
         }
 
+        $search = $this->request->getGet('search');
+        $query = $this->userModel->whereIn('role', ['admin', 'superadmin']);
+
+        if (!empty($search)) {
+            $query->groupStart()
+                ->like('username', $search)
+                ->orLike('nama_lengkap', $search)
+                ->groupEnd();
+        }
+
         $data = [
             'title'      => 'Kelola Admin | WebGIS Sekolah',
             'page_title' => 'Manajemen Akun Admin',
-            'admins'     => $this->userModel->whereIn('role', ['admin', 'superadmin'])->findAll(),
+            'admins'     => $query->findAll(),
+            'search'     => $search,
         ];
 
         return view('superadmin/admin/index', $data);

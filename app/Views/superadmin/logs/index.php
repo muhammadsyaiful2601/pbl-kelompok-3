@@ -2,24 +2,17 @@
 
 <?= $this->section('content') ?>
 
-<!-- Baris container luar dihilangkan agar tombol menyatu di dalam Card Header -->
 <div class="row">
     <div class="col-12">
         <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-            <!-- Card Header disesuaikan agar judul berada di kiri dan tombol aksi terkumpul di kanan -->
             <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0">
                     <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Daftar Aktivitas
                 </h6>
-
-                <!-- Container Tombol & Teks diletakkan di sisi kanan Card Header -->
-                <!-- Menggunakan flex-row dan align-items-center agar tombol Hapus Semua dan Total Log sejajar horizontal di kanan -->
                 <div class="d-flex flex-row align-items-center gap-2">
-                    <!-- Teks Total Log -->
                     <span class="badge bg-light text-dark border px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
-                        Total Log: <?= count($logs) ?>
+                        Total Log: <?= $total_logs ?>
                     </span>
-                    <!-- Tombol Hapus Semua -->
                     <a href="<?= base_url('superadmin/logs/hapus-semua') ?>"
                         class="btn btn-sm btn-outline-danger rounded-pill"
                         onclick="return confirm('Hapus SEMUA log aktivitas? Tindakan ini tidak bisa dibatalkan.')">
@@ -44,7 +37,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1;
+                            <?php $no = ($current_page - 1) * $per_page + 1;
                             foreach ($logs as $log) : ?>
                                 <tr class="py-3">
                                     <td class="ps-3"><?= $no++ ?></td>
@@ -145,6 +138,25 @@
                         </tbody>
                     </table>
                 </div>
+                <?php if ($total_logs > $per_page) : ?>
+                    <?php
+                    $totalPages = max(1, (int) ceil($total_logs / $per_page));
+                    $page = max(1, (int) ($current_page ?: 1));
+                    $hasPrev = $page > 1;
+                    $hasNext = $page < $totalPages;
+                    ?>
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <span class="text-muted small">Halaman <?= $page ?> dari <?= $totalPages ?></span>
+                        <div class="d-flex gap-2">
+                            <?php if ($hasPrev) : ?>
+                                <a href="<?= base_url('superadmin/logs?page=' . ($page - 1)) ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Sebelumnya</a>
+                            <?php endif; ?>
+                            <?php if ($hasNext) : ?>
+                                <a href="<?= base_url('superadmin/logs?page=' . ($page + 1)) ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Selanjutnya</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

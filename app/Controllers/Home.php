@@ -19,16 +19,10 @@ class Home extends BaseController
     {
         $sekolahList = $this->sekolahModel->findAll();
 
-        $totalSekolah = count($sekolahList);
-        $totalSD = 0;
-        $totalSMP = 0;
-        $totalTK = 0;
-
-        foreach ($sekolahList as $s) {
-            if ($s['jenjang'] == 'SD') $totalSD++;
-            if ($s['jenjang'] == 'SMP') $totalSMP++;
-            if ($s['jenjang'] == 'TK') $totalTK++;
-        }
+        $totalSekolah = $this->sekolahModel->countAllResults();
+        $totalSD = $this->sekolahModel->where('jenjang', 'SD')->countAllResults();
+        $totalSMP = $this->sekolahModel->where('jenjang', 'SMP')->countAllResults();
+        $totalTK = $this->sekolahModel->where('jenjang', 'TK')->countAllResults();
 
         $data = [
             'title'         => 'Peta Sebaran Sekolah | WebGIS Publik',
@@ -46,20 +40,10 @@ class Home extends BaseController
     {
         $sekolahList = $this->sekolahModel->findAll();
 
-        $totalSekolah = count($sekolahList);
-        $totalSD = 0;
-        $totalSMP = 0;
-        $totalTK = 0;
-
-        foreach ($sekolahList as $s) {
-            if ($s['jenjang'] == 'SD') {
-                $totalSD++;
-            } elseif ($s['jenjang'] == 'SMP') {
-                $totalSMP++;
-            } elseif ($s['jenjang'] == 'TK') {
-                $totalTK++;
-            }
-        }
+        $totalSekolah = $this->sekolahModel->countAllResults();
+        $totalSD = $this->sekolahModel->where('jenjang', 'SD')->countAllResults();
+        $totalSMP = $this->sekolahModel->where('jenjang', 'SMP')->countAllResults();
+        $totalTK = $this->sekolahModel->where('jenjang', 'TK')->countAllResults();
 
         $data = [
             'title'          => 'Peta Sebaran Sekolah | WebGIS Publik',
